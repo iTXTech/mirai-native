@@ -12,10 +12,10 @@ extern "C" {
 /*
  * Class:     org_itxtech_mirainative_Bridge
  * Method:    loadDynamicLibraries
- * Signature: ()V
+ * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadDynamicLibraries
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jstring);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge

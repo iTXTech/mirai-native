@@ -18,10 +18,18 @@
     <ClInclude Include="org_itxtech_mirainative_Bridge.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="native.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="native.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="native.def">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

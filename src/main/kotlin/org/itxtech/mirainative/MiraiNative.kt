@@ -36,31 +36,30 @@ import kotlin.concurrent.thread
  *
  */
 class MiraiNative : PluginBase() {
-    private var bridge: Bridge? = null
+    private var bridge: Bridge = Bridge()
 
     override fun onLoad() {
-        bridge = Bridge(File(".").absolutePath)
         Runtime.getRuntime().addShutdownHook(thread(start = false) {
-            bridge?.eventExit()
+            bridge.eventExit()
         })
 
         logger.info("Mirai Native 正在加载 CQP.dll。")
         System.loadLibrary("CQP")
-        bridge?.loadDynamicLibraries() //扫描目录下所有DLL并加载
-        bridge?.eventStartup()
+        bridge.loadDynamicLibraries(File(".").absolutePath) //扫描目录下所有DLL并加载
+        bridge.eventStartup()
     }
 
     @ExperimentalCoroutinesApi
     @MiraiExperimentalAPI
     override fun onEnable() {
         logger.info("Mirai Native 正启用所有DLL插件。")
-        bridge?.eventEnable() //加载所有DLL插件并触发事件
+        bridge.eventEnable() //加载所有DLL插件并触发事件
 
         GlobalScope.subscribeAlways<BotOnlineEvent> {
             logger.info("Bot 已上线，监听事件。")
             this.bot.subscribeMessages {
                 sentByFriend {
-                    bridge?.eventPrivateMessage(
+                    bridge.eventPrivateMessage(
                         Bridge.PRI_MSG_SUBTYPE_FRIEND, message.sequenceId,
                         sender.id, message.toString(), 0)
                 }
@@ -70,6 +69,6 @@ class MiraiNative : PluginBase() {
 
     override fun onDisable() {
         logger.info("Mirai Native 正停用所有DLL插件。")
-        bridge?.eventDisable()
+        bridge.eventDisable()
     }
 }

@@ -26,13 +26,7 @@ package org.itxtech.mirainative;
 class Bridge{
     public static final int PRI_MSG_SUBTYPE_FRIEND = 11;
 
-    private String dir;
-
-    public Bridge(String dir){
-        this.dir = dir;
-    }
-
-    public native void loadDynamicLibraries();
+    public native void loadDynamicLibraries(String dir);
     public native void eventStartup();
     public native void eventExit();
     public native void eventEnable();

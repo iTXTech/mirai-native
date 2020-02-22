@@ -1,0 +1,4 @@
+LIBRARY
+EXPORTS
+CQ_addLog @ 1
+CQ_canSendImage @ 2
