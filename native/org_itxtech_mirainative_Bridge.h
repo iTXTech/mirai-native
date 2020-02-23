@@ -11,11 +11,11 @@ extern "C" {
 #define org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_FRIEND 11L
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    loadDynamicLibraries
- * Signature: (Ljava/lang/String;)V
+ * Method:    loadNativePlugin
+ * Signature: (Ljava/lang/String;I)V
  */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadDynamicLibraries
-  (JNIEnv *, jobject, jstring);
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin
+  (JNIEnv *, jobject, jstring, jint);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge

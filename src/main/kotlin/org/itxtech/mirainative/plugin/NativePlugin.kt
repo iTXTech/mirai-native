@@ -1,4 +1,4 @@
-package org.itxtech.mirainative;
+package org.itxtech.mirainative.plugin
 
 /*
  *
@@ -23,13 +23,6 @@ package org.itxtech.mirainative;
  * @website https://github.com/iTXTech/mirai-native
  *
  */
-class Bridge{
-    public static final int PRI_MSG_SUBTYPE_FRIEND = 11;
-
-    public native void loadNativePlugin(String file, int id);
-    public native void eventStartup();
-    public native void eventExit();
-    public native void eventEnable();
-    public native void eventDisable();
-    public native void eventPrivateMessage(int subType, int msgId, long fromAccount, String msg, int font);
+data class NativePlugin(val file: String, val id: Int){
+    lateinit var name: String
 }

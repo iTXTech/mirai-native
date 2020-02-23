@@ -13,8 +13,13 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
-    implementation "net.mamoe:mirai-core"
-    implementation "net.mamoe:mirai-console"
+    //implementation "net.mamoe:mirai-core"
+    //implementation "net.mamoe:mirai-console"
+    implementation files("libs/mirai-console-terminal-0.21.0-all.jar")
+}
+
+jar{
+
 }
 
 compileKotlin {

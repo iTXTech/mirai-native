@@ -1,5 +1,5 @@
 name: MiraiNative
-main: org.itxtech.mirai.native.MiraiNative
+main: org.itxtech.mirainative.MiraiNative
 version: 1.0.0
 author: iTX Technologies
 info: CoolQ Plugin Bridge for Mirai

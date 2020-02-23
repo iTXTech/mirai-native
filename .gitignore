@@ -2,3 +2,4 @@
 .gradle
 native/.vs
 native/Debug
+libs

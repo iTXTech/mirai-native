@@ -6,9 +6,9 @@ import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeMessages
-import net.mamoe.mirai.message.data.messageUid
 import net.mamoe.mirai.message.data.sequenceId
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import org.itxtech.mirainative.plugin.NativePlugin
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -36,17 +36,35 @@ import kotlin.concurrent.thread
  *
  */
 class MiraiNative : PluginBase() {
+    private var pluginId: Int = 0
     private var bridge: Bridge = Bridge()
+    private var plugins: HashMap<Int, NativePlugin> = HashMap()
 
     override fun onLoad() {
         Runtime.getRuntime().addShutdownHook(thread(start = false) {
             bridge.eventExit()
         })
 
-        logger.info("Mirai Native 正在加载 CQP.dll。")
-        System.loadLibrary("CQP")
-        bridge.loadDynamicLibraries(File(".").absolutePath) //扫描目录下所有DLL并加载
-        bridge.eventStartup()
+        val dll = dataFolder.absolutePath + File.separatorChar + "CQP.dll"
+        logger.info("Mirai Native 正在加载 $dll")
+        System.load(dll)
+
+        if (!dataFolder.isDirectory){
+            logger.error("数据文件夹不是一个文件夹！" + dataFolder.absolutePath)
+        } else {
+            dataFolder.listFiles()?.forEach {file ->
+                if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")){
+                    val plugin = NativePlugin(file.absolutePath, pluginId++)
+                    plugins[pluginId] = plugin
+                    loadPlugin(plugin)
+                }
+            }
+            bridge.eventStartup()
+        }
+    }
+
+    private fun loadPlugin(plugin: NativePlugin){
+        bridge.loadNativePlugin(plugin.file.replace("\\", "\\\\"), plugin.id)
     }
 
     @ExperimentalCoroutinesApi
