@@ -23,25 +23,38 @@ package org.itxtech.mirainative;
  * @website https://github.com/iTXTech/mirai-native
  *
  */
-class Bridge{
+class Bridge {
     public static final int PRI_MSG_SUBTYPE_FRIEND = 11;
 
     // Plugin
     public native void loadNativePlugin(String file, int id);
+
     public native void disablePlugin(int id);
+
     public native void enablePlugin(int id);
 
     // Events
     public native void eventStartup();
+
     public native void eventExit();
+
     public native void eventEnable();
+
     public native void eventDisable();
+
     public native void eventPrivateMessage(int subType, int msgId, long fromAccount, String msg, int font);
 
+    public native void eventGroupMessage(int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font);
+
     // Bridge
-    public static int sendMessageToFriend(long account, String msg){
+    public static int sendMessageToFriend(int pluginId, long account, String msg) {
         System.out.println("Send to " + account + " Msg: " + msg);
         //MiraiNative.getINSTANCE().getBot().getFriend()
+        return 0;
+    }
+
+    public static int sendMessageToGroup(int pluginId, long group, String msg) {
+        System.out.println("Send to " + group + " Msg: " + msg);
         return 0;
     }
 }

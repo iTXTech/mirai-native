@@ -19,6 +19,22 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
+ * Method:    disablePlugin
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_disablePlugin
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    enablePlugin
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_enablePlugin
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
  * Method:    eventStartup
  * Signature: ()V
  */
@@ -59,19 +75,11 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventPrivateMessage
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    disablePlugin
- * Signature: (I)V
+ * Method:    eventGroupMessage
+ * Signature: (IIJJLjava/lang/String;Ljava/lang/String;I)V
  */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_disablePlugin
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     org_itxtech_mirainative_Bridge
- * Method:    enablePlugin
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_enablePlugin
-  (JNIEnv *, jobject, jint);
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage
+  (JNIEnv *, jobject, jint, jint, jlong, jlong, jstring, jstring, jint);
 
 #ifdef __cplusplus
 }

@@ -72,7 +72,8 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 // Load
 
 JavaVM* javaVM = nullptr;
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
+{
 	JNIEnv* env;
 	if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_8) != JNI_OK)
 	{
@@ -90,7 +91,7 @@ JNIEnv* AttachJava()
 		int getEnvStat = javaVM->GetEnv((void**)&java, JNI_VERSION_1_8);
 		if (getEnvStat == JNI_EDETACHED)
 		{
-			JavaVMAttachArgs args = { JNI_VERSION_1_8, 0, 0 };
+			JavaVMAttachArgs args = {JNI_VERSION_1_8, 0, 0};
 			javaVM->AttachCurrentThread((void**)&java, &args);
 		}
 		else if (getEnvStat == JNI_EVERSION)
@@ -178,26 +179,6 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventDisable(JNIEnv* 
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventPrivateMessage(
-	JNIEnv* env, jobject obj, jint sub_type, jint msg_id, jlong from_account, jstring msg, jint font)
-{
-	char* m = JstringToGb(env, msg);
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = EvPriMsg(GetProcAddress(plugin.dll, "_eventPrivateMsg"));
-			if (ev)
-			{
-				if (ev(sub_type, msg_id, from_account, m, font) == 1) //插件拦截事件
-				{
-					break;
-				}
-			}
-		}
-	}
-}
-
 JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_disablePlugin(JNIEnv* env, jobject obj, jint id)
 {
 	for (auto& plugin : plugins)
@@ -220,6 +201,48 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_enablePlugin(JNIEnv* 
 	}
 }
 
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventPrivateMessage(
+	JNIEnv* env, jobject obj, jint sub_type, jint msg_id, jlong from_account, jstring msg, jint font)
+{
+	char* m = JstringToGb(env, msg);
+	for (auto const& plugin : plugins)
+	{
+		if (plugin.enabled)
+		{
+			const auto ev = EvPriMsg(GetProcAddress(plugin.dll, "_eventPrivateMsg"));
+			if (ev)
+			{
+				if (ev(sub_type, msg_id, from_account, m, font) == 1) //插件拦截事件
+				{
+					break;
+				}
+			}
+		}
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage
+(JNIEnv* env, jobject obj, jint sub_type, jint msg_id, jlong from_group, jlong from_account, jstring from_anonymous,
+ jstring msg, jint font)
+{
+	char* a = JstringToGb(env, from_anonymous);
+	char* m = JstringToGb(env, msg);
+	for (auto const& plugin : plugins)
+	{
+		if (plugin.enabled)
+		{
+			const auto ev = EvGroupMsg(GetProcAddress(plugin.dll, "_eventGroupMsg"));
+			if (ev)
+			{
+				if (ev(sub_type, msg_id, from_group, from_account, a, m, font) == 1) //插件拦截事件
+				{
+					break;
+				}
+			}
+		}
+	}
+}
+
 // CQ APIs
 
 int32_t __stdcall CQ_addLog(int32_t plugin_id, int32_t priority, const char* type, const char* content)
@@ -237,13 +260,23 @@ int32_t __stdcall CQ_canSendRecord(int32_t)
 	return 1;
 }
 
-int32_t __stdcall CQ_sendPrivateMsg(int32_t plugin_id, int64_t account, const char* msg)
+int32_t __stdcall sendMsg(int32_t plugin_id, int64_t acc, const char* msg, const char* m)
 {
 	auto env = AttachJava();
 	auto jstr = GbToJstring(env, msg);
 	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
-	auto method = env->GetStaticMethodID(clazz, "sendMessageToFriend", "(JLjava/lang/String;)I");
-	jint result = env->CallStaticIntMethod(clazz, method, account, jstr);
+	auto method = env->GetStaticMethodID(clazz, m, "(IJLjava/lang/String;)I");
+	jint result = env->CallStaticIntMethod(clazz, method, plugin_id, acc, jstr);
 	env->DeleteLocalRef(jstr);
 	return result;
+}
+
+int32_t __stdcall CQ_sendPrivateMsg(int32_t plugin_id, int64_t account, const char* msg)
+{
+	return sendMsg(plugin_id, account, msg, "sendMessageToFriend");
+}
+
+int32_t __stdcall CQ_sendGroupMsg(int32_t plugin_id, int64_t group, const char* msg)
+{
+	return sendMsg(plugin_id, group, msg, "sendMessageToGroup");
 }

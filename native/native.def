@@ -4,3 +4,4 @@ CQ_addLog @ 1
 CQ_canSendImage @ 2
 CQ_canSendRecord @ 3
 CQ_sendPrivateMsg @ 4
+CQ_sendGroupMsg @ 5

@@ -1,12 +1,12 @@
 package org.itxtech.mirainative
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.event.subscribeAlways
-import net.mamoe.mirai.event.subscribeMessages
+import net.mamoe.mirai.message.FriendMessage
+import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.sequenceId
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
 import org.itxtech.mirainative.plugin.NativePlugin
@@ -37,16 +37,17 @@ import kotlin.concurrent.thread
  *
  */
 class MiraiNative : PluginBase() {
-    companion object{
+    companion object {
         @JvmStatic
         var INSTANCE: MiraiNative? = null
     }
+
     private var pluginId: Int = 0
     private var bridge: Bridge = Bridge()
     private var plugins: HashMap<Int, NativePlugin> = HashMap()
     private var bot: Bot? = null
 
-    fun getBot() : Bot?{
+    fun getBot(): Bot? {
         return bot
     }
 
@@ -54,35 +55,37 @@ class MiraiNative : PluginBase() {
         INSTANCE = this
         Runtime.getRuntime().addShutdownHook(thread(start = false) {
             bridge.eventExit()
+            logger.info("Mirai Native 已调用 Exit 事件")
         })
 
         val dll = dataFolder.absolutePath + File.separatorChar + "CQP.dll"
         logger.info("Mirai Native 正在加载 $dll")
         System.load(dll)
 
-        if (!dataFolder.isDirectory){
+        if (!dataFolder.isDirectory) {
             logger.error("数据文件夹不是一个文件夹！" + dataFolder.absolutePath)
         } else {
-            dataFolder.listFiles()?.forEach {file ->
-                if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")){
+            dataFolder.listFiles()?.forEach { file ->
+                if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
                     val plugin = NativePlugin(file.absolutePath, pluginId++)
                     plugins[pluginId] = plugin
                     loadPlugin(plugin)
                 }
             }
             bridge.eventStartup()
+            logger.info("Mirai Native 已调用 Startup 事件")
         }
     }
 
-    private fun loadPlugin(plugin: NativePlugin){
+    private fun loadPlugin(plugin: NativePlugin) {
         bridge.loadNativePlugin(plugin.file.replace("\\", "\\\\"), plugin.id)
     }
 
-    fun enablePlugin(plugin: NativePlugin){
+    fun enablePlugin(plugin: NativePlugin) {
         bridge.enablePlugin(plugin.id)
     }
 
-    fun disablePlugin(plugin: NativePlugin){
+    fun disablePlugin(plugin: NativePlugin) {
         bridge.disablePlugin(plugin.id)
     }
 
@@ -92,16 +95,21 @@ class MiraiNative : PluginBase() {
         logger.info("Mirai Native 正启用所有DLL插件。")
         bridge.eventEnable() //加载所有DLL插件并触发事件
 
-        GlobalScope.subscribeAlways<BotOnlineEvent> {
+        subscribeAlways<BotOnlineEvent> {
             logger.info("Bot 已上线，监听事件。")
-            MiraiNative.INSTANCE?.bot = bot
-            bot.subscribeMessages {
-                sentByFriend {
-                    bridge.eventPrivateMessage(
-                        Bridge.PRI_MSG_SUBTYPE_FRIEND, message.sequenceId,
-                        sender.id, message.toString(), 0)
-                }
-            }
+            INSTANCE?.bot = bot
+        }
+        subscribeAlways<FriendMessage> {
+            bridge.eventPrivateMessage(
+                Bridge.PRI_MSG_SUBTYPE_FRIEND,
+                message.sequenceId,
+                sender.id,
+                message.toString(),
+                0
+            )
+        }
+        subscribeAlways<GroupMessage> {
+            bridge.eventGroupMessage(1, message.sequenceId, group.id, sender.id, "", message.toString(), 0)
         }
     }
 
