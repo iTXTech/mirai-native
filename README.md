@@ -2,10 +2,26 @@
 
 Mirai Native 致力于通过实现 酷Q 的兼容API使 酷Q 的应用（插件）能在 [Mirai](https://github.com/mamoe/mirai) 环境下运行。
 
-## 技术路线
+## 运行环境
 
-* Kotlin
-* JNI
+* **JRE 8 32位** - ~~酷Q的插件都是32位哒~~
+
+## 开发环境
+
+* JDK 8
+* Visual Studio 2019
+
+## 如何使用
+
+1. 搭建 `mirai-console` 运行环境
+1. 将 `mirai-native.jar` 放入 `plugins` 文件夹
+1. 将 `CQP.dll` 和 要加载的酷Q插件 **DLL** (不是 **CPK**) 一起放入 `plugins\MiraiNative` 下
+1. 启动 `mirai-console`
+
+## 如何获取酷Q插件的DLL
+
+1. 启动酷Q
+1. 查找路径 `data\tmp\capp\` 的二级目录下的 `CPK` 文件，将后缀修改为 `DLL` 即可
 
 ## 开源协议
 
