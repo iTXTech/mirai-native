@@ -57,6 +57,22 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventDisable
 JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventPrivateMessage
   (JNIEnv *, jobject, jint, jint, jlong, jstring, jint);
 
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    disablePlugin
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_disablePlugin
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    enablePlugin
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_enablePlugin
+  (JNIEnv *, jobject, jint);
+
 #ifdef __cplusplus
 }
 #endif

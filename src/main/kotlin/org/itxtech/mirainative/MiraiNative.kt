@@ -2,6 +2,7 @@ package org.itxtech.mirainative
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.event.subscribeAlways
@@ -36,11 +37,21 @@ import kotlin.concurrent.thread
  *
  */
 class MiraiNative : PluginBase() {
+    companion object{
+        @JvmStatic
+        var INSTANCE: MiraiNative? = null
+    }
     private var pluginId: Int = 0
     private var bridge: Bridge = Bridge()
     private var plugins: HashMap<Int, NativePlugin> = HashMap()
+    private var bot: Bot? = null
+
+    fun getBot() : Bot?{
+        return bot
+    }
 
     override fun onLoad() {
+        INSTANCE = this
         Runtime.getRuntime().addShutdownHook(thread(start = false) {
             bridge.eventExit()
         })
@@ -67,6 +78,14 @@ class MiraiNative : PluginBase() {
         bridge.loadNativePlugin(plugin.file.replace("\\", "\\\\"), plugin.id)
     }
 
+    fun enablePlugin(plugin: NativePlugin){
+        bridge.enablePlugin(plugin.id)
+    }
+
+    fun disablePlugin(plugin: NativePlugin){
+        bridge.disablePlugin(plugin.id)
+    }
+
     @ExperimentalCoroutinesApi
     @MiraiExperimentalAPI
     override fun onEnable() {
@@ -75,7 +94,8 @@ class MiraiNative : PluginBase() {
 
         GlobalScope.subscribeAlways<BotOnlineEvent> {
             logger.info("Bot 已上线，监听事件。")
-            this.bot.subscribeMessages {
+            MiraiNative.INSTANCE?.bot = bot
+            bot.subscribeMessages {
                 sentByFriend {
                     bridge.eventPrivateMessage(
                         Bridge.PRI_MSG_SUBTYPE_FRIEND, message.sequenceId,
