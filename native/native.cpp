@@ -29,8 +29,8 @@ vector<native_plugin> plugins;
 // Helper
 char* JstringToGb(JNIEnv* env, jstring jstr)
 {
-	int length = (env)->GetStringLength(jstr);
-	auto jcstr = (env)->GetStringChars(jstr, nullptr);
+	int length = env->GetStringLength(jstr);
+	auto jcstr = env->GetStringChars(jstr, nullptr);
 	auto clen = WideCharToMultiByte(CP_ACP, 0, LPCWSTR(jcstr), length, nullptr, 0, nullptr, nullptr);
 	auto rtn = static_cast<char*>(malloc(clen));
 	int size = 0;
@@ -39,7 +39,7 @@ char* JstringToGb(JNIEnv* env, jstring jstr)
 	{
 		return nullptr;
 	}
-	(env)->ReleaseStringChars(jstr, jcstr);
+	env->ReleaseStringChars(jstr, jcstr);
 	rtn[size] = 0;
 	return rtn;
 }
@@ -51,7 +51,7 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 	unsigned short* buffer = 0;
 	if (slen == 0)
 	{
-		rtn = (env)->NewStringUTF(str);
+		rtn = env->NewStringUTF(str);
 	}
 	else
 	{
@@ -59,7 +59,7 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 		buffer = static_cast<unsigned short*>(malloc(length * 2 + 1));
 		if (MultiByteToWideChar(CP_ACP, 0, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
 		{
-			rtn = (env)->NewString(static_cast<jchar*>(buffer), length);
+			rtn = env->NewString(static_cast<jchar*>(buffer), length);
 		}
 	}
 	if (buffer)
@@ -116,6 +116,16 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 	if (init)
 	{
 		init(plugin.id);
+	}
+
+	const auto info = FuncAppInfo(GetProcAddress(dll, "AppInfo"));
+	if (info)
+	{
+		auto jstr = GbToJstring(env, info());
+		auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+		auto method = env->GetStaticMethodID(clazz, "updatePluginInfo", "(ILjava/lang/String;)V");
+		env->CallStaticVoidMethod(clazz, method, plugin.id, jstr);
+		env->DeleteLocalRef(jstr);
 	}
 }
 
@@ -247,6 +257,14 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage
 
 int32_t __stdcall CQ_addLog(int32_t plugin_id, int32_t priority, const char* type, const char* content)
 {
+	auto env = AttachJava();
+	auto t = GbToJstring(env, type);
+	auto c = GbToJstring(env, content);
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "addLog", "(IILjava/lang/String;Ljava/lang/String;)V");
+	jint result = env->CallStaticIntMethod(clazz, method, plugin_id, priority, t, c);
+	env->DeleteLocalRef(t);
+	env->DeleteLocalRef(c);
 	return 0;
 }
 
@@ -279,4 +297,19 @@ int32_t __stdcall CQ_sendPrivateMsg(int32_t plugin_id, int64_t account, const ch
 int32_t __stdcall CQ_sendGroupMsg(int32_t plugin_id, int64_t group, const char* msg)
 {
 	return sendMsg(plugin_id, group, msg, "sendMessageToGroup");
+}
+
+int32_t __stdcall CQ_setFatal(int32_t plugin_id, const char* info)
+{
+	CQ_addLog(plugin_id, 22, "", info);
+	return 0;
+}
+
+const char* __stdcall CQ_getAppDirectory(int32_t plugin_id)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "getPluginDataDir", "(I)Ljava/lang/String;");
+	jstring result = jstring(env->CallStaticObjectMethod(clazz, method, plugin_id));
+	return JstringToGb(env, result);
 }

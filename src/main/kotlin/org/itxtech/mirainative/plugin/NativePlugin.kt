@@ -1,5 +1,7 @@
 package org.itxtech.mirainative.plugin
 
+import java.io.File
+
 /*
  *
  * Mirai Native
@@ -23,6 +25,18 @@ package org.itxtech.mirainative.plugin
  * @website https://github.com/iTXTech/mirai-native
  *
  */
-data class NativePlugin(val file: String, val id: Int){
-    lateinit var name: String
+data class NativePlugin(val file: File, val id: Int) {
+    var api: Int = -1
+    var identifier: String = file.name
+    val appDir: File by lazy {
+        File(file.parent + File.separatorChar + identifier).also { it.mkdir() }
+    }
+
+    fun setInfo(i: String) {
+        val parts = i.split(",")
+        if (parts.size == 2) {
+            api = parts[0].toInt()
+            identifier = parts[1]
+        }
+    }
 }

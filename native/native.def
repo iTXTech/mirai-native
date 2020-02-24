@@ -5,3 +5,5 @@ CQ_canSendImage @ 2
 CQ_canSendRecord @ 3
 CQ_sendPrivateMsg @ 4
 CQ_sendGroupMsg @ 5
+CQ_setFatal @ 6
+CQ_getAppDirectory @ 7

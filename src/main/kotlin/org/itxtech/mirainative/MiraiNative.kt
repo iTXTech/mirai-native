@@ -1,6 +1,5 @@
 package org.itxtech.mirainative
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.event.events.BotOnlineEvent
@@ -8,10 +7,8 @@ import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.message.FriendMessage
 import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.sequenceId
-import net.mamoe.mirai.utils.MiraiExperimentalAPI
 import org.itxtech.mirainative.plugin.NativePlugin
 import java.io.File
-import kotlin.concurrent.thread
 
 /*
  *
@@ -44,20 +41,11 @@ class MiraiNative : PluginBase() {
 
     private var pluginId: Int = 0
     private var bridge: Bridge = Bridge()
-    private var plugins: HashMap<Int, NativePlugin> = HashMap()
-    private var bot: Bot? = null
-
-    fun getBot(): Bot? {
-        return bot
-    }
+    var plugins: HashMap<Int, NativePlugin> = HashMap()
+    var bot: Bot? = null
 
     override fun onLoad() {
         INSTANCE = this
-        Runtime.getRuntime().addShutdownHook(thread(start = false) {
-            bridge.eventExit()
-            logger.info("Mirai Native 已调用 Exit 事件")
-        })
-
         val dll = dataFolder.absolutePath + File.separatorChar + "CQP.dll"
         logger.info("Mirai Native 正在加载 $dll")
         System.load(dll)
@@ -67,7 +55,7 @@ class MiraiNative : PluginBase() {
         } else {
             dataFolder.listFiles()?.forEach { file ->
                 if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
-                    val plugin = NativePlugin(file.absolutePath, pluginId++)
+                    val plugin = NativePlugin(file, pluginId++)
                     plugins[pluginId] = plugin
                     loadPlugin(plugin)
                 }
@@ -78,7 +66,7 @@ class MiraiNative : PluginBase() {
     }
 
     private fun loadPlugin(plugin: NativePlugin) {
-        bridge.loadNativePlugin(plugin.file.replace("\\", "\\\\"), plugin.id)
+        bridge.loadNativePlugin(plugin.file.absolutePath.replace("\\", "\\\\"), plugin.id)
     }
 
     fun enablePlugin(plugin: NativePlugin) {
@@ -89,8 +77,6 @@ class MiraiNative : PluginBase() {
         bridge.disablePlugin(plugin.id)
     }
 
-    @ExperimentalCoroutinesApi
-    @MiraiExperimentalAPI
     override fun onEnable() {
         logger.info("Mirai Native 正启用所有DLL插件。")
         bridge.eventEnable() //加载所有DLL插件并触发事件
@@ -116,5 +102,8 @@ class MiraiNative : PluginBase() {
     override fun onDisable() {
         logger.info("Mirai Native 正停用所有DLL插件。")
         bridge.eventDisable()
+
+        logger.info("Mirai Native 正调用 Exit 事件")
+        bridge.eventExit()
     }
 }
