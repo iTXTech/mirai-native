@@ -7,3 +7,5 @@ CQ_sendPrivateMsg @ 4
 CQ_sendGroupMsg @ 5
 CQ_setFatal @ 6
 CQ_getAppDirectory @ 7
+CQ_getLoginQQ @ 8
+CQ_getLoginNick @ 9

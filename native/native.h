@@ -18,3 +18,5 @@ CQAPI(int32_t) CQ_sendPrivateMsg(int32_t, int64_t, const char*);
 CQAPI(int32_t) CQ_sendGroupMsg(int32_t, int64_t, const char*);
 CQAPI(int32_t) CQ_setFatal(int32_t, const char*);
 CQAPI(const char*) CQ_getAppDirectory(int32_t);
+CQAPI(int64_t) CQ_getLoginQQ(int32_t);
+CQAPI(const char*) CQ_getLoginNick(int32_t);

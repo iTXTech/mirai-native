@@ -311,5 +311,24 @@ const char* __stdcall CQ_getAppDirectory(int32_t plugin_id)
 	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
 	auto method = env->GetStaticMethodID(clazz, "getPluginDataDir", "(I)Ljava/lang/String;");
 	jstring result = jstring(env->CallStaticObjectMethod(clazz, method, plugin_id));
+	auto r = JstringToGb(env, result);
+	env->DeleteLocalRef(result);
+	return r;
+}
+
+int64_t __stdcall CQ_getLoginQQ(int32_t plugin_id)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "getLoginQQ", "(I)J");
+	return env->CallStaticLongMethod(clazz, method, plugin_id);
+}
+
+const char* __stdcall CQ_getLoginNick(int32_t plugin_id)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "getLoginNick", "(I)Ljava/lang/String;");
+	jstring result = jstring(env->CallStaticObjectMethod(clazz, method, plugin_id));
 	return JstringToGb(env, result);
 }

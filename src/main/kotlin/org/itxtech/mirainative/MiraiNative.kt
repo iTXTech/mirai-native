@@ -9,7 +9,6 @@ import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.sequenceId
 import org.itxtech.mirainative.plugin.NativePlugin
 import java.io.File
-import kotlin.concurrent.thread
 
 /*
  *
@@ -36,10 +35,6 @@ import kotlin.concurrent.thread
  */
 class MiraiNative : PluginBase() {
     companion object {
-        @JvmStatic
-        val INSTANCE: MiraiNative
-            get() = _instance
-
         @Suppress("ObjectPropertyName")
         internal lateinit var _instance: MiraiNative
     }
@@ -50,15 +45,10 @@ class MiraiNative : PluginBase() {
     private var _plugins: HashMap<Int, NativePlugin> = HashMap()
     val plugins: HashMap<Int, NativePlugin> get() = _plugins
 
-    private lateinit var _bot: Bot
-    val bot: Bot get() = _bot
+    val bot: Bot by lazy { Bot.instances.first().get()!! }
 
     override fun onLoad() {
         _instance = this
-        Runtime.getRuntime().addShutdownHook(thread(start = false) {
-            bridge.eventExit()
-            logger.info("Mirai Native 已调用 Exit 事件")
-        })
 
         val dll = dataFolder.absolutePath + File.separatorChar + "CQP.dll"
         logger.info("Mirai Native 正在加载 $dll")
@@ -69,8 +59,8 @@ class MiraiNative : PluginBase() {
         } else {
             dataFolder.listFiles()?.forEach { file ->
                 if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
-                    val plugin = NativePlugin(file, pluginId++)
-                    _plugins[pluginId] = plugin
+                    val plugin = NativePlugin(file, pluginId)
+                    _plugins[pluginId++] = plugin
                     loadPlugin(plugin)
                 }
             }
@@ -95,11 +85,10 @@ class MiraiNative : PluginBase() {
         logger.info("Mirai Native 正启用所有DLL插件。")
         bridge.eventEnable() //加载所有DLL插件并触发事件
 
-        this.subscribeAlways<BotOnlineEvent> {
+        subscribeAlways<BotOnlineEvent> {
             logger.info("Bot 已上线，监听事件。")
-            _bot = bot
         }
-        this.subscribeAlways<FriendMessage> {
+        subscribeAlways<FriendMessage> {
             bridge.eventPrivateMessage(
                 Bridge.PRI_MSG_SUBTYPE_FRIEND,
                 message.sequenceId,
@@ -108,7 +97,7 @@ class MiraiNative : PluginBase() {
                 0
             )
         }
-        this.subscribeAlways<GroupMessage> {
+        subscribeAlways<GroupMessage> {
             bridge.eventGroupMessage(1, message.sequenceId, group.id, sender.id, "", message.toString(), 0)
         }
     }

@@ -1,5 +1,9 @@
 package org.itxtech.mirainative;
 
+import net.mamoe.mirai.Bot;
+import net.mamoe.mirai.contact.Group;
+import net.mamoe.mirai.contact.QQ;
+import net.mamoe.mirai.message.MessageReceipt;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.itxtech.mirainative.plugin.NativePlugin;
 
@@ -52,22 +56,40 @@ class Bridge {
     public native void eventGroupMessage(int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font);
 
     private static NativePlugin getPlugin(int pluginId) {
-        return MiraiNative.getINSTANCE().getPlugins().get(pluginId);
+        return MiraiNative._instance.getPlugins().get(pluginId);
+    }
+
+    private static MiraiLogger getLogger() {
+        return MiraiNative._instance.getLogger();
+    }
+
+    private static Bot getBot() {
+        return MiraiNative._instance.getBot();
     }
 
     // Bridge
     @SuppressWarnings("unused")
     public static int sendMessageToFriend(int pluginId, long account, String msg) {
-        System.out.println("Send to " + account + " Msg: " + msg);
-        BridgeHelper.sendMessageToFriend(account, msg);
-        return 0;
+        try {
+            MessageReceipt<QQ> receipt = BridgeHelper.sendMessageToFriend(account, msg);
+            //TODO: message id
+            return 0;
+        } catch (Exception e) {
+            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
+            return -1;
+        }
     }
 
     @SuppressWarnings("unused")
     public static int sendMessageToGroup(int pluginId, long group, String msg) {
-        System.out.println("Send to " + group + " Msg: " + msg);
-        BridgeHelper.sendMessageToGroup(group, msg);
-        return 0;
+        try {
+            MessageReceipt<Group> receipt = BridgeHelper.sendMessageToGroup(group, msg);
+            //TODO: message id
+            return 0;
+        } catch (Exception e) {
+            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
+            return -1;
+        }
     }
 
     @SuppressWarnings("unused")
@@ -85,8 +107,17 @@ class Bridge {
 
     @SuppressWarnings("unused")
     public static String getPluginDataDir(int pluginId) {
-        addLog(pluginId, 0, "", getPlugin(pluginId).getAppDir().getAbsolutePath() + File.separatorChar);
         return getPlugin(pluginId).getAppDir().getAbsolutePath() + File.separatorChar;
+    }
+
+    @SuppressWarnings("unused")
+    public static long getLoginQQ(int pluginId) {
+        return getBot().getSelfQQ().getId();
+    }
+
+    @SuppressWarnings("unused")
+    public static String getLoginNick(int pluginId) {
+        return getBot().getSelfQQ().getNick();
     }
 
     static class NativeLoggerHelper {
@@ -100,30 +131,29 @@ class Bridge {
         public static final int LOG_FATAL = 22;
 
         static void log(NativePlugin plugin, int priority, String type, String content) {
-            String c = "[NativePlugin " + plugin.getIdentifier();
+            String c = "[NP " + plugin.getIdentifier();
             if (!"".equals(type)) {
                 c += " " + type;
             }
             c += "] " + content;
-            MiraiLogger logger = MiraiNative.getINSTANCE().getLogger();
             switch (priority) {
                 case LOG_DEBUG:
-                    logger.debug(c);
+                    getLogger().debug(c);
                     break;
                 case LOG_INFO:
                 case LOG_INFO_RECV:
                 case LOG_INFO_SUCC:
                 case LOG_INFO_SEND:
-                    logger.info(c);
+                    getLogger().info(c);
                     break;
                 case LOG_WARNING:
-                    logger.warning(c);
+                    getLogger().warning(c);
                     break;
                 case LOG_ERROR:
-                    logger.error(c);
+                    getLogger().error(c);
                     break;
                 case LOG_FATAL:
-                    logger.error("[FATAL]" + c);
+                    getLogger().error("[FATAL]" + c);
                     break;
             }
         }
