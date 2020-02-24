@@ -58,7 +58,7 @@ class Bridge {
     // Bridge
     public static int sendMessageToFriend(int pluginId, long account, String msg) {
         System.out.println("Send to " + account + " Msg: " + msg);
-        //MiraiNative.getINSTANCE().getBot().getFriend()
+        BridgeHelper.sendMessageToFriend(account, msg);
         return 0;
     }
 
