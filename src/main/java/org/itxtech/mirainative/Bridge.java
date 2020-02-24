@@ -35,6 +35,15 @@ import java.io.File;
 class Bridge {
     public static final int PRI_MSG_SUBTYPE_FRIEND = 11;
 
+    public static final int PERM_SUBTYPE_CANCEL_ADMIN = 1;
+    public static final int PERM_SUBTYPE_SET_ADMIN = 2;
+
+    public static final int MEMBER_LEAVE_QUIT = 1;
+    public static final int MEMBER_LEAVE_KICK = 2;
+
+    public static final int GROUP_UNMUTE = 1;
+    public static final int GROUP_MUTE = 2;
+
     // Plugin
     public native void loadNativePlugin(String file, int id);
 
@@ -55,6 +64,14 @@ class Bridge {
 
     public native void eventGroupMessage(int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font);
 
+    public native void eventGroupAdmin(int subType, int time, long fromGroup, long beingOperateAccount);
+
+    public native void eventGroupMemberLeave(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount);
+
+    public native void eventGroupBan(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration);
+
+    // Helper
+
     private static NativePlugin getPlugin(int pluginId) {
         return MiraiNative._instance.getPlugins().get(pluginId);
     }
@@ -68,6 +85,7 @@ class Bridge {
     }
 
     // Bridge
+
     @SuppressWarnings("unused")
     public static int sendMessageToFriend(int pluginId, long account, String msg) {
         try {
@@ -101,6 +119,7 @@ class Bridge {
         System.out.println("Plugin Id " + pluginId + " Info: " + info);
     }
 
+    @SuppressWarnings("unused")
     public static void addLog(int pluginId, int priority, String type, String content) {
         NativeLoggerHelper.log(getPlugin(pluginId), priority, type, content);
     }
@@ -112,12 +131,12 @@ class Bridge {
 
     @SuppressWarnings("unused")
     public static long getLoginQQ(int pluginId) {
-        return getBot().getSelfQQ().getId();
+        return getBot().getUin();
     }
 
     @SuppressWarnings("unused")
     public static String getLoginNick(int pluginId) {
-        return getBot().getSelfQQ().getNick();
+        return getBot().getNick();
     }
 
     static class NativeLoggerHelper {

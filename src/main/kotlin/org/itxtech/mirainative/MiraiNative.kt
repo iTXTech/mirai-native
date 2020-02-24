@@ -2,11 +2,13 @@ package org.itxtech.mirainative
 
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugins.PluginBase
-import net.mamoe.mirai.event.events.BotOnlineEvent
+import net.mamoe.mirai.contact.MemberPermission
+import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.message.FriendMessage
 import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.sequenceId
+import net.mamoe.mirai.utils.currentTimeSeconds
 import org.itxtech.mirainative.plugin.NativePlugin
 import java.io.File
 
@@ -82,12 +84,14 @@ class MiraiNative : PluginBase() {
     }
 
     override fun onEnable() {
-        logger.info("Mirai Native 正启用所有DLL插件。")
+        logger.info("Mirai Native 正启用所有 DLL 插件。")
         bridge.eventEnable() //加载所有DLL插件并触发事件
 
         subscribeAlways<BotOnlineEvent> {
             logger.info("Bot 已上线，监听事件。")
         }
+
+        // 消息事件
         subscribeAlways<FriendMessage> {
             bridge.eventPrivateMessage(
                 Bridge.PRI_MSG_SUBTYPE_FRIEND,
@@ -100,6 +104,66 @@ class MiraiNative : PluginBase() {
         subscribeAlways<GroupMessage> {
             bridge.eventGroupMessage(1, message.sequenceId, group.id, sender.id, "", message.toString(), 0)
         }
+
+        // 权限事件
+        subscribeAlways<MemberPermissionChangeEvent> {
+            if (new == MemberPermission.MEMBER) {
+                bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, member.id)
+            } else {
+                bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, member.id)
+            }
+        }
+
+        // 退群事件
+        subscribeAlways<MemberLeaveEvent.Kick> {
+            val op = operator?.id ?: bot.uin
+            bridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_KICK, getTimestamp(), group.id, op, member.id)
+        }
+        subscribeAlways<MemberLeaveEvent.Quit> {
+            bridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_QUIT, getTimestamp(), group.id, 0, member.id)
+        }
+
+        // 禁言事件
+        subscribeAlways<MemberMuteEvent> {
+            val op = operator?.id ?: bot.uin
+            bridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, member.id, durationSeconds.toLong())
+        }
+        subscribeAlways<MemberUnmuteEvent> {
+            val op = operator?.id ?: bot.uin
+            bridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, member.id, 0)
+        }
+        subscribeAlways<BotMuteEvent> {
+            bridge.eventGroupBan(
+                Bridge.GROUP_MUTE,
+                getTimestamp(),
+                group.id,
+                operator.id,
+                bot.uin,
+                durationSeconds.toLong()
+            )
+        }
+        subscribeAlways<BotUnmuteEvent> {
+            bridge.eventGroupBan(
+                Bridge.GROUP_UNMUTE,
+                getTimestamp(),
+                group.id,
+                operator.id,
+                bot.uin,
+                0
+            )
+        }
+        subscribeAlways<GroupMuteAllEvent> {
+            val op = operator?.id ?: bot.uin
+            if (new) {
+                bridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, 0, 0)
+            } else {
+                bridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, 0, 0)
+            }
+        }
+    }
+
+    private fun getTimestamp(): Int {
+        return currentTimeSeconds.toInt()
     }
 
     override fun onDisable() {

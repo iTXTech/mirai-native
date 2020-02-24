@@ -10,6 +10,9 @@ typedef int32_t (__stdcall* EvEnable)();
 typedef int32_t (__stdcall* EvDisable)();
 typedef int32_t (__stdcall* EvPriMsg)(int32_t, int32_t, int64_t, const char*, int32_t);
 typedef int32_t (__stdcall* EvGroupMsg)(int32_t, int32_t, int64_t, int64_t, const char*, const char*, int32_t);
+typedef int32_t (__stdcall* EvGroupAdmin)(int32_t, int32_t, int64_t, int64_t);
+typedef int32_t (__stdcall* EvGroupMemberLeave)(int32_t, int32_t, int64_t, int64_t, int64_t);
+typedef int32_t (__stdcall* EvGroupBan)(int32_t, int32_t, int64_t, int64_t, int64_t, int64_t);
 
 CQAPI(int32_t) CQ_addLog(int32_t, int32_t, const char*, const char*);
 CQAPI(int32_t) CQ_canSendImage(int32_t);

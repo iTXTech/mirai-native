@@ -2,4 +2,5 @@
 .gradle
 native/.vs
 native/Debug
+native/Release
 libs

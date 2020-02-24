@@ -231,9 +231,9 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventPrivateMessage(
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage
-(JNIEnv* env, jobject obj, jint sub_type, jint msg_id, jlong from_group, jlong from_account, jstring from_anonymous,
- jstring msg, jint font)
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage(
+	JNIEnv* env, jobject obj, jint sub_type, jint msg_id, jlong from_group, jlong from_account, jstring from_anonymous,
+	jstring msg, jint font)
 {
 	char* a = JstringToGb(env, from_anonymous);
 	char* m = JstringToGb(env, msg);
@@ -245,6 +245,63 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage
 			if (ev)
 			{
 				if (ev(sub_type, msg_id, from_group, from_account, a, m, font) == 1) //插件拦截事件
+				{
+					break;
+				}
+			}
+		}
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupAdmin(
+	JNIEnv* env, jobject obj, jint sub_type, jint timestamp, jlong group, jlong member)
+{
+	for (auto const& plugin : plugins)
+	{
+		if (plugin.enabled)
+		{
+			const auto ev = EvGroupAdmin(GetProcAddress(plugin.dll, "_eventSystem_GroupAdmin"));
+			if (ev)
+			{
+				if (ev(sub_type, timestamp, group, member) == 1) //插件拦截事件
+				{
+					break;
+				}
+			}
+		}
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMemberLeave(
+	JNIEnv* env, jobject obj, jint sub_type, jint timestamp, jlong group, jlong admin, jlong member)
+{
+	for (auto const& plugin : plugins)
+	{
+		if (plugin.enabled)
+		{
+			const auto ev = EvGroupMemberLeave(GetProcAddress(plugin.dll, "_eventSystem_GroupMemberDecrease"));
+			if (ev)
+			{
+				if (ev(sub_type, timestamp, group, admin, member) == 1) //插件拦截事件
+				{
+					break;
+				}
+			}
+		}
+	}
+}
+
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupBan(
+	JNIEnv* env, jobject obj, jint sub_type, jint timestamp, jlong group, jlong admin, jlong member, jlong duration)
+{
+	for (auto const& plugin : plugins)
+	{
+		if (plugin.enabled)
+		{
+			const auto ev = EvGroupBan(GetProcAddress(plugin.dll, "_eventSystem_GroupBan"));
+			if (ev)
+			{
+				if (ev(sub_type, timestamp, group, admin, member, duration) == 1) //插件拦截事件
 				{
 					break;
 				}

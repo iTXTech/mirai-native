@@ -9,6 +9,18 @@ extern "C" {
 #endif
 #undef org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_FRIEND
 #define org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_FRIEND 11L
+#undef org_itxtech_mirainative_Bridge_PERM_SUBTYPE_CANCEL_ADMIN
+#define org_itxtech_mirainative_Bridge_PERM_SUBTYPE_CANCEL_ADMIN 1L
+#undef org_itxtech_mirainative_Bridge_PERM_SUBTYPE_SET_ADMIN
+#define org_itxtech_mirainative_Bridge_PERM_SUBTYPE_SET_ADMIN 2L
+#undef org_itxtech_mirainative_Bridge_MEMBER_LEAVE_QUIT
+#define org_itxtech_mirainative_Bridge_MEMBER_LEAVE_QUIT 1L
+#undef org_itxtech_mirainative_Bridge_MEMBER_LEAVE_KICK
+#define org_itxtech_mirainative_Bridge_MEMBER_LEAVE_KICK 2L
+#undef org_itxtech_mirainative_Bridge_GROUP_UNMUTE
+#define org_itxtech_mirainative_Bridge_GROUP_UNMUTE 1L
+#undef org_itxtech_mirainative_Bridge_GROUP_MUTE
+#define org_itxtech_mirainative_Bridge_GROUP_MUTE 2L
 /*
  * Class:     org_itxtech_mirainative_Bridge
  * Method:    loadNativePlugin
@@ -80,6 +92,30 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventPrivateMessage
  */
 JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage
   (JNIEnv *, jobject, jint, jint, jlong, jlong, jstring, jstring, jint);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    eventGroupAdmin
+ * Signature: (IIJJ)V
+ */
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupAdmin
+  (JNIEnv *, jobject, jint, jint, jlong, jlong);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    eventGroupMemberLeave
+ * Signature: (IIJJJ)V
+ */
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMemberLeave
+  (JNIEnv *, jobject, jint, jint, jlong, jlong, jlong);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    eventGroupBan
+ * Signature: (IIJJJJ)V
+ */
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupBan
+  (JNIEnv *, jobject, jint, jint, jlong, jlong, jlong, jlong);
 
 #ifdef __cplusplus
 }
