@@ -56,17 +56,21 @@ class Bridge {
     }
 
     // Bridge
+    @SuppressWarnings("unused")
     public static int sendMessageToFriend(int pluginId, long account, String msg) {
         System.out.println("Send to " + account + " Msg: " + msg);
         BridgeHelper.sendMessageToFriend(account, msg);
         return 0;
     }
 
+    @SuppressWarnings("unused")
     public static int sendMessageToGroup(int pluginId, long group, String msg) {
         System.out.println("Send to " + group + " Msg: " + msg);
+        BridgeHelper.sendMessageToGroup(group, msg);
         return 0;
     }
 
+    @SuppressWarnings("unused")
     public static void updatePluginInfo(int pluginId, String info) {
         NativePlugin plugin = getPlugin(pluginId);
         if (plugin != null) {
@@ -79,6 +83,7 @@ class Bridge {
         NativeLoggerHelper.log(getPlugin(pluginId), priority, type, content);
     }
 
+    @SuppressWarnings("unused")
     public static String getPluginDataDir(int pluginId) {
         addLog(pluginId, 0, "", getPlugin(pluginId).getAppDir().getAbsolutePath() + File.separatorChar);
         return getPlugin(pluginId).getAppDir().getAbsolutePath() + File.separatorChar;
