@@ -2,8 +2,12 @@
 
 #define CQAPI(ReturnType) extern "C" __declspec(dllexport) ReturnType __stdcall
 
+typedef int32_t (__stdcall* IntMethod)();
+typedef const char* (__stdcall* StringMethod)();
+
 typedef int32_t (__stdcall* FuncInitialize)(int32_t);
 typedef const char* (__stdcall* FuncAppInfo)();
+
 typedef int32_t (__stdcall* EvStartup)();
 typedef int32_t (__stdcall* EvExit)();
 typedef int32_t (__stdcall* EvEnable)();

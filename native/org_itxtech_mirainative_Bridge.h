@@ -117,6 +117,22 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMemberLeave
 JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupBan
   (JNIEnv *, jobject, jint, jint, jlong, jlong, jlong, jlong);
 
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    callIntMethod
+ * Signature: (ILjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod
+  (JNIEnv *, jobject, jint, jstring);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    callStringMethod
+ * Signature: (ILjava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod
+  (JNIEnv *, jobject, jint, jstring);
+
 #ifdef __cplusplus
 }
 #endif

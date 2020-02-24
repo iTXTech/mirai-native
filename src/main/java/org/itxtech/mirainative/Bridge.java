@@ -70,6 +70,10 @@ class Bridge {
 
     public native void eventGroupBan(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration);
 
+    public native int callIntMethod(int pluginId, String methodName);
+
+    public native String callStringMethod(int pluginId, String methodName);
+
     // Helper
 
     private static NativePlugin getPlugin(int pluginId) {

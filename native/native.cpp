@@ -71,7 +71,8 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 
 // Load
 
-JavaVM* javaVM = nullptr;
+JavaVM* jvm = nullptr;
+
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	JNIEnv* env;
@@ -79,20 +80,20 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 	{
 		return -1;
 	}
-	javaVM = vm;
+	jvm = vm;
 	return JNI_VERSION_1_8;
 }
 
 JNIEnv* AttachJava()
 {
 	JNIEnv* java = nullptr;
-	if (javaVM)
+	if (jvm)
 	{
-		int getEnvStat = javaVM->GetEnv((void**)&java, JNI_VERSION_1_8);
+		int getEnvStat = jvm->GetEnv((void**)&java, JNI_VERSION_1_8);
 		if (getEnvStat == JNI_EDETACHED)
 		{
 			JavaVMAttachArgs args = {JNI_VERSION_1_8, 0, 0};
-			javaVM->AttachCurrentThread((void**)&java, &args);
+			jvm->AttachCurrentThread((void**)&java, &args);
 		}
 		else if (getEnvStat == JNI_EVERSION)
 		{
@@ -308,6 +309,45 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupBan(
 			}
 		}
 	}
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(
+	JNIEnv* env, jobject obj, jint id, jstring method)
+{
+	for (const auto& plugin : plugins)
+	{
+		if (plugin.id == id)
+		{
+			const auto me = JstringToGb(env, method);
+			const auto m = IntMethod(GetProcAddress(plugin.dll, me));
+			if (m)
+			{
+				return m();
+			}
+			break;
+		}
+	}
+	return -1;
+}
+
+JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
+	JNIEnv* env, jobject obj, jint id, jstring method)
+{
+	const char* rtn = "";
+	for (const auto& plugin : plugins)
+	{
+		if (plugin.id == id)
+		{
+			const auto me = JstringToGb(env, method);
+			const auto m = StringMethod(GetProcAddress(plugin.dll, me));
+			if (m)
+			{
+				rtn = m();
+			}
+			break;
+		}
+	}
+	return GbToJstring(env, rtn);
 }
 
 // CQ APIs
