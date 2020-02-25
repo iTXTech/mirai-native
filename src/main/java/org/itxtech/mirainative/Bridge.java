@@ -194,9 +194,9 @@ class Bridge {
     // Bridge
 
     @SuppressWarnings("unused")
-    public static int sendMessageToFriend(int pluginId, long account, String msg) {
+    public static int sendFriendMessage(int pluginId, long account, String msg) {
         try {
-            MessageReceipt<QQ> receipt = BridgeHelper.sendMessageToFriend(account, msg);
+            MessageReceipt<QQ> receipt = BridgeHelper.sendFriendMessage(account, msg);
             //TODO: message id
             return 0;
         } catch (Exception e) {
@@ -206,9 +206,9 @@ class Bridge {
     }
 
     @SuppressWarnings("unused")
-    public static int sendMessageToGroup(int pluginId, long group, String msg) {
+    public static int sendGroupMessage(int pluginId, long group, String msg) {
         try {
-            MessageReceipt<Group> receipt = BridgeHelper.sendMessageToGroup(group, msg);
+            MessageReceipt<Group> receipt = BridgeHelper.sendGroupMessage(group, msg);
             //TODO: message id
             return 0;
         } catch (Exception e) {
@@ -244,6 +244,51 @@ class Bridge {
     @SuppressWarnings("unused")
     public static String getLoginNick(int pluginId) {
         return getBot().getNick();
+    }
+
+    @SuppressWarnings("unused")
+    public static int setGroupAnonymous(int pluginId, long group, boolean enable) {
+        //TODO: BridgeHelper
+        return 0;
+    }
+
+    @SuppressWarnings("unused")
+    public static int setGroupBan(int pluginId, long group, long member, long duration) {
+        //TODO: BridgeHelper
+        // duration 为零 解禁
+        return 0;
+    }
+
+    @SuppressWarnings("unused")
+    public static int setGroupCard(int pluginId, long group, long member, String card) {
+        //TODO: BridgeHelper
+        return 0;
+    }
+
+    @SuppressWarnings("unused")
+    public static int setGroupKick(int pluginId, long group, long member, boolean reject) {
+        //TODO: BridgeHelper
+        return 0;
+    }
+
+    @SuppressWarnings("unused")
+    public static int setGroupLeave(int pluginId, long group, boolean dismiss) {
+        //TODO: BridgeHelper
+        //dismiss 是否解散该群
+        return 0;
+    }
+
+    @SuppressWarnings("unused")
+    public static int setGroupSpecialTitle(int pluginId, long group, String title, long duration) {
+        //TODO: BridgeHelper
+        //如果要删除，title = "", 专属头衔有效期，单位为秒。如果永久有效，duration = -1
+        return 0;
+    }
+
+    @SuppressWarnings("unused")
+    public static int setGroupWholeBan(int pluginId, long group, boolean enable) {
+        //TODO: BridgeHelper
+        return 0;
     }
 
     static class NativeLoggerHelper {

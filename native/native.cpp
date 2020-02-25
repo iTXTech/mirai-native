@@ -1,4 +1,4 @@
-#include <jni.h>
+ï»¿#include <jni.h>
 #include <vector>
 #include <Windows.h>
 #include "org_itxtech_mirainative_Bridge.h"
@@ -114,11 +114,11 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 {
 	native_plugin plugin = {id, const_cast<char*>(env->GetStringUTFChars(file, nullptr))};
 	const auto dll = LoadLibraryA(plugin.file);
-	if (dll != nullptr) {
+	if (dll != nullptr)
+	{
 		plugin.dll = dll;
 		plugins.push_back(plugin);
 
-		//µ÷ÓÃ Initialize
 		const auto init = FuncInitialize(GetProcAddress(dll, "Initialize"));
 		if (init)
 		{
@@ -260,12 +260,12 @@ int32_t __stdcall sendMsg(int32_t plugin_id, int64_t acc, const char* msg, const
 
 int32_t __stdcall CQ_sendPrivateMsg(int32_t plugin_id, int64_t account, const char* msg)
 {
-	return sendMsg(plugin_id, account, msg, "sendMessageToFriend");
+	return sendMsg(plugin_id, account, msg, "sendFriendMessage");
 }
 
 int32_t __stdcall CQ_sendGroupMsg(int32_t plugin_id, int64_t group, const char* msg)
 {
-	return sendMsg(plugin_id, group, msg, "sendMessageToGroup");
+	return sendMsg(plugin_id, group, msg, "sendGroupMessage");
 }
 
 int32_t __stdcall CQ_setFatal(int32_t plugin_id, const char* info)
@@ -298,6 +298,69 @@ const char* __stdcall CQ_getLoginNick(int32_t plugin_id)
 	auto env = AttachJava();
 	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
 	auto method = env->GetStaticMethodID(clazz, "getLoginNick", "(I)Ljava/lang/String;");
-	jstring result = jstring(env->CallStaticObjectMethod(clazz, method, plugin_id));
+	auto result = jstring(env->CallStaticObjectMethod(clazz, method, plugin_id));
 	return JstringToGb(env, result);
+}
+
+int32_t __stdcall CQ_setGroupAnonymous(int32_t plugin_id, int64_t group, BOOL enable)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "setGroupAnonymous", "(IJZ)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, group, enable != FALSE);
+}
+
+int32_t __stdcall CQ_setGroupBan(int32_t plugin_id, int64_t group, int64_t member, int64_t duration)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "setGroupBan", "(IJJJ)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, group, member, duration);
+}
+
+int32_t __stdcall CQ_setGroupCard(int32_t plugin_id, int64_t group, int64_t member, const char* card)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "setGroupCard", "(IJJLjava/lang/String;)I");
+	auto jstr = GbToJstring(env, card);
+	auto result = env->CallStaticIntMethod(clazz, method, plugin_id, group, member, jstr);
+	env->DeleteLocalRef(jstr);
+	return result;
+}
+
+int32_t __stdcall CQ_setGroupKick(int32_t plugin_id, int64_t group, int64_t member, BOOL reject)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "setGroupKick", "(IJJZ)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, group, member, reject != FALSE);
+}
+
+int32_t __stdcall CQ_setGroupLeave(int32_t plugin_id, int64_t group, BOOL dismiss)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "setGroupLeave", "(IJZ)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, group, dismiss != FALSE);
+}
+
+int32_t __stdcall CQ_setGroupSpecialTitle(int32_t plugin_id, int64_t group, int64_t member,
+                                          const char* title, int64_t duration)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "setGroupSpecialTitle", "(IJZ)I");
+	auto jstr = GbToJstring(env, title);
+	auto result = env->CallStaticIntMethod(clazz, method, plugin_id, group, member, jstr, duration);
+	env->DeleteLocalRef(jstr);
+	return result;
+}
+
+int32_t __stdcall CQ_setGroupWholeBan(int32_t plugin_id, int64_t group, BOOL enable)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "setGroupWholeBan", "(IJZ)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, group, enable != FALSE);
 }

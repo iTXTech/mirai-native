@@ -31,21 +31,21 @@
 - [ ] `CQ_getStrangeInfo`
 - [ ] `CQ_sendDiscussMsg`
 - [x] `CQ_sendGroupMsg`
-- [ ] `CQ_LikeV2`
+- [ ] `CQ_sendLikeV2`
 - [x] `CQ_sendPrivateMsg`
 - [ ] `CQ_setDiscussLeave`
 - [x] `CQ_setFatal`
 - [ ] `CQ_setFriendAddRequest`
 - [ ] `CQ_setGroupAddRequestV2`
 - [ ] `CQ_setGroupAdmin`
-- [ ] `CQ_setGroupAnonymous`
+- [x] `CQ_setGroupAnonymous`
 - [ ] `CQ_setGroupAnonymousBan`
-- [ ] `CQ_setGroupBan`
-- [ ] `CQ_setGroupCard`
-- [ ] `CQ_setGroupKick`
-- [ ] `CQ_setGroupLeave`
-- [ ] `CQ_setGroupSpecialTitle`
-- [ ] `CQ_setGroupWholeBan`
+- [x] `CQ_setGroupBan`
+- [x] `CQ_setGroupCard`
+- [x] `CQ_setGroupKick`
+- [x] `CQ_setGroupLeave`
+- [x] `CQ_setGroupSpecialTitle`
+- [x] `CQ_setGroupWholeBan`
 
 ## 事件
 

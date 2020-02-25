@@ -31,12 +31,12 @@ import net.mamoe.mirai.message.MessageReceipt
  */
 object BridgeHelper {
     @JvmStatic
-    fun sendMessageToFriend(id: Long, message: String): MessageReceipt<QQ> = runBlocking {
+    fun sendFriendMessage(id: Long, message: String): MessageReceipt<QQ> = runBlocking {
         MiraiNative._instance.bot.getFriend(id).sendMessage(message)
     }
 
     @JvmStatic
-    fun sendMessageToGroup(id: Long, message: String): MessageReceipt<Group> = runBlocking {
+    fun sendGroupMessage(id: Long, message: String): MessageReceipt<Group> = runBlocking {
         MiraiNative._instance.bot.getGroup(id).sendMessage(message)
     }
 }

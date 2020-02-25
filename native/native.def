@@ -9,3 +9,10 @@ CQ_setFatal @ 6
 CQ_getAppDirectory @ 7
 CQ_getLoginQQ @ 8
 CQ_getLoginNick @ 9
+CQ_setGroupAnonymous @ 10
+CQ_setGroupBan @ 11
+CQ_setGroupCard @ 12
+CQ_setGroupKick @ 13
+CQ_setGroupLeave @ 14
+CQ_setGroupSpecialTitle @ 15
+CQ_setGroupWholeBan @ 16
