@@ -5,9 +5,12 @@ import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.contact.QQ;
 import net.mamoe.mirai.message.MessageReceipt;
 import net.mamoe.mirai.utils.MiraiLogger;
+import org.itxtech.mirainative.plugin.Event;
 import org.itxtech.mirainative.plugin.NativePlugin;
+import org.itxtech.mirainative.plugin.PluginInfo;
 
 import java.io.File;
+import java.util.HashMap;
 
 /*
  *
@@ -45,39 +48,137 @@ class Bridge {
     public static final int GROUP_MUTE = 2;
 
     // Plugin
-    public native void loadNativePlugin(String file, int id);
+    public void loadPlugin(NativePlugin plugin) {
+        if (plugin.getPluginInfo() != null) {
+            PluginInfo info = plugin.getPluginInfo();
+            getLogger().info("Loading " + info.getName() + " from " + plugin.getFile().getName());
+        } else {
+            getLogger().info("Loading " + plugin.getFile().getName() + " without JSON manifest.");
+        }
+        loadNativePlugin(plugin.getFile().getAbsolutePath().replace("\\", "\\\\"), plugin.getId());
+    }
 
-    public native void disablePlugin(int id);
 
-    public native void enablePlugin(int id);
+    public void disablePlugin(NativePlugin plugin) {
+        plugin.setEnabled(false);
+        if (plugin.shouldCallEvent(Event.EVENT_DISABLE)) {
+            callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable"));
+        }
+    }
+
+    public void enablePlugin(NativePlugin plugin) {
+        plugin.setEnabled(true);
+        if (plugin.shouldCallEvent(Event.EVENT_ENABLE)) {
+            callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable"));
+        }
+    }
 
     // Events
-    public native void eventStartup();
 
-    public native void eventExit();
+    public void eventStartup() {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_STARTUP)) {
+                callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup"));
+            }
+        }
+    }
 
-    public native void eventEnable();
+    public void eventExit() {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_EXIT)) {
+                callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit"));
+            }
+        }
+    }
 
-    public native void eventDisable();
+    public void eventEnable() {
+        for (NativePlugin plugin : getPlugins().values()) {
+            enablePlugin(plugin);
+        }
+    }
 
-    public native void eventPrivateMessage(int subType, int msgId, long fromAccount, String msg, int font);
+    public void eventDisable() {
+        for (NativePlugin plugin : getPlugins().values()) {
+            disablePlugin(plugin);
+        }
+    }
 
-    public native void eventGroupMessage(int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font);
+    public void eventPrivateMessage(int subType, int msgId, long fromAccount, String msg, int font) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_PRI_MSG) && pEvPrivateMessage(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_PRI_MSG, "_eventPrivateMsg"),
+                    subType, msgId, fromAccount, plugin.processMessage(Event.EVENT_PRI_MSG, msg), font) == 1) {
+                break;
+            }
+        }
+    }
 
-    public native void eventGroupAdmin(int subType, int time, long fromGroup, long beingOperateAccount);
+    public void eventGroupMessage(int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MSG) && pEvGroupMessage(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_GROUP_MSG, "_eventGroupMsg"),
+                    subType, msgId, fromGroup, fromAccount, fromAnonymous, plugin.processMessage(Event.EVENT_GROUP_MSG, msg), font) == 1) {
+                break;
+            }
+        }
+    }
 
-    public native void eventGroupMemberLeave(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount);
+    public void eventGroupAdmin(int subType, int time, long fromGroup, long beingOperateAccount) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_GROUP_ADMIN) && pEvGroupAdmin(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_GROUP_ADMIN, "_eventSystem_GroupAdmin"),
+                    subType, time, fromGroup, beingOperateAccount) == 1) {
+                break;
+            }
+        }
+    }
 
-    public native void eventGroupBan(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration);
+    public void eventGroupMemberLeave(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_DEC) && pEvGroupMemberLeave(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_GROUP_MEMBER_DEC, "_eventSystem_GroupMemberDecrease"),
+                    subType, time, fromGroup, fromAccount, beingOperateAccount) == 1) {
+                break;
+            }
+        }
+    }
 
-    public native int callIntMethod(int pluginId, String methodName);
+    public void eventGroupBan(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_GROUP_BAN) && pEvGroupBan(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_GROUP_BAN, "_eventSystem_GroupBan"),
+                    subType, time, fromGroup, fromAccount, beingOperateAccount, duration) == 1) {
+                break;
+            }
+        }
+    }
 
-    public native String callStringMethod(int pluginId, String methodName);
+    // Native
+
+    public native void loadNativePlugin(String file, int id);
+
+    public native int pEvPrivateMessage(int pluginId, String name, int subType, int msgId, long fromAccount, String msg, int font);
+
+    public native int pEvGroupMessage(int pluginId, String name, int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font);
+
+    public native int pEvGroupAdmin(int pluginId, String name, int subType, int time, long fromGroup, long beingOperateAccount);
+
+    public native int pEvGroupMemberLeave(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount);
+
+    public native int pEvGroupBan(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration);
+
+    public native int callIntMethod(int pluginId, String name);
+
+    public native String callStringMethod(int pluginId, String name);
 
     // Helper
 
+    private static HashMap<Integer, NativePlugin> getPlugins() {
+        return MiraiNative._instance.getPlugins();
+    }
+
     private static NativePlugin getPlugin(int pluginId) {
-        return MiraiNative._instance.getPlugins().get(pluginId);
+        return getPlugins().get(pluginId);
     }
 
     private static MiraiLogger getLogger() {

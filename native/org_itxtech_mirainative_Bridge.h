@@ -31,91 +31,43 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    disablePlugin
- * Signature: (I)V
+ * Method:    pEvPrivateMessage
+ * Signature: (ILjava/lang/String;IIJLjava/lang/String;I)I
  */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_disablePlugin
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage
+  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jstring, jint);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    enablePlugin
- * Signature: (I)V
+ * Method:    pEvGroupMessage
+ * Signature: (ILjava/lang/String;IIJJLjava/lang/String;Ljava/lang/String;I)I
  */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_enablePlugin
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage
+  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong, jstring, jstring, jint);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventStartup
- * Signature: ()V
+ * Method:    pEvGroupAdmin
+ * Signature: (ILjava/lang/String;IIJJ)I
  */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventStartup
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin
+  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventExit
- * Signature: ()V
+ * Method:    pEvGroupMemberLeave
+ * Signature: (ILjava/lang/String;IIJJJ)I
  */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventExit
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMemberLeave
+  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong, jlong);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventEnable
- * Signature: ()V
+ * Method:    pEvGroupBan
+ * Signature: (ILjava/lang/String;IIJJJJ)I
  */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventEnable
-  (JNIEnv *, jobject);
-
-/*
- * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventDisable
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventDisable
-  (JNIEnv *, jobject);
-
-/*
- * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventPrivateMessage
- * Signature: (IIJLjava/lang/String;I)V
- */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventPrivateMessage
-  (JNIEnv *, jobject, jint, jint, jlong, jstring, jint);
-
-/*
- * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventGroupMessage
- * Signature: (IIJJLjava/lang/String;Ljava/lang/String;I)V
- */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage
-  (JNIEnv *, jobject, jint, jint, jlong, jlong, jstring, jstring, jint);
-
-/*
- * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventGroupAdmin
- * Signature: (IIJJ)V
- */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupAdmin
-  (JNIEnv *, jobject, jint, jint, jlong, jlong);
-
-/*
- * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventGroupMemberLeave
- * Signature: (IIJJJ)V
- */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMemberLeave
-  (JNIEnv *, jobject, jint, jint, jlong, jlong, jlong);
-
-/*
- * Class:     org_itxtech_mirainative_Bridge
- * Method:    eventGroupBan
- * Signature: (IIJJJJ)V
- */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupBan
-  (JNIEnv *, jobject, jint, jint, jlong, jlong, jlong, jlong);
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan
+  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong, jlong, jlong);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge

@@ -1,5 +1,7 @@
 package org.itxtech.mirainative
 
+import kotlinx.serialization.UnstableDefault
+import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.contact.MemberPermission
@@ -10,6 +12,7 @@ import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.sequenceId
 import net.mamoe.mirai.utils.currentTimeSeconds
 import org.itxtech.mirainative.plugin.NativePlugin
+import org.itxtech.mirainative.plugin.PluginInfo
 import java.io.File
 
 /*
@@ -49,6 +52,7 @@ class MiraiNative : PluginBase() {
 
     val bot: Bot by lazy { Bot.instances.first().get()!! }
 
+    @UnstableDefault
     override fun onLoad() {
         _instance = this
 
@@ -63,24 +67,16 @@ class MiraiNative : PluginBase() {
                 if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
                     val plugin = NativePlugin(file, pluginId)
                     _plugins[pluginId++] = plugin
-                    loadPlugin(plugin)
+                    val json = File(file.parent + File.separatorChar + file.name.replace(".dll", ".json"))
+                    if (json.exists()) {
+                        plugin.pluginInfo = Json.nonstrict.parse(PluginInfo.serializer(), json.readText())
+                    }
+                    bridge.loadPlugin(plugin)
                 }
             }
             bridge.eventStartup()
             logger.info("Mirai Native 已调用 Startup 事件")
         }
-    }
-
-    private fun loadPlugin(plugin: NativePlugin) {
-        bridge.loadNativePlugin(plugin.file.absolutePath.replace("\\", "\\\\"), plugin.id)
-    }
-
-    fun enablePlugin(plugin: NativePlugin) {
-        bridge.enablePlugin(plugin.id)
-    }
-
-    fun disablePlugin(plugin: NativePlugin) {
-        bridge.disablePlugin(plugin.id)
     }
 
     override fun onEnable() {

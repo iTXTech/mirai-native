@@ -8,10 +8,6 @@ typedef const char* (__stdcall* StringMethod)();
 typedef int32_t (__stdcall* FuncInitialize)(int32_t);
 typedef const char* (__stdcall* FuncAppInfo)();
 
-typedef int32_t (__stdcall* EvStartup)();
-typedef int32_t (__stdcall* EvExit)();
-typedef int32_t (__stdcall* EvEnable)();
-typedef int32_t (__stdcall* EvDisable)();
 typedef int32_t (__stdcall* EvPriMsg)(int32_t, int32_t, int64_t, const char*, int32_t);
 typedef int32_t (__stdcall* EvGroupMsg)(int32_t, int32_t, int64_t, int64_t, const char*, const char*, int32_t);
 typedef int32_t (__stdcall* EvGroupAdmin)(int32_t, int32_t, int64_t, int64_t);

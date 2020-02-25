@@ -69,6 +69,11 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 	return rtn;
 }
 
+FARPROC GetMethod(JNIEnv* env, jint id, jstring method)
+{
+	return GetProcAddress(plugins[id].dll, env->GetStringUTFChars(method, nullptr));
+}
+
 // Load
 
 JavaVM* jvm = nullptr;
@@ -102,7 +107,7 @@ JNIEnv* AttachJava()
 	return java;
 }
 
-// Bridge Events
+// Plugin
 
 JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 	JNIEnv* env, jobject obj, jstring file, jint id)
@@ -130,202 +135,13 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventStartup(JNIEnv* env, jobject obj)
-{
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = static_cast<EvStartup>(GetProcAddress(plugin.dll, "_eventStartup"));
-			if (ev)
-			{
-				ev();
-			}
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventExit(JNIEnv* env, jobject obj)
-{
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = static_cast<EvExit>(GetProcAddress(plugin.dll, "_eventExit"));
-			if (ev)
-			{
-				ev();
-			}
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventEnable(JNIEnv* env, jobject obj)
-{
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = static_cast<EvEnable>(GetProcAddress(plugin.dll, "_eventEnable"));
-			if (ev)
-			{
-				ev();
-			}
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventDisable(JNIEnv* env, jobject obj)
-{
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = static_cast<EvDisable>(GetProcAddress(plugin.dll, "_eventDisable"));
-			if (ev)
-			{
-				ev();
-			}
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_disablePlugin(JNIEnv* env, jobject obj, jint id)
-{
-	for (auto& plugin : plugins)
-	{
-		if (plugin.id == id)
-		{
-			plugin.enabled = false;
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_enablePlugin(JNIEnv* env, jobject obj, jint id)
-{
-	for (auto& plugin : plugins)
-	{
-		if (plugin.id == id)
-		{
-			plugin.enabled = true;
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventPrivateMessage(
-	JNIEnv* env, jobject obj, jint sub_type, jint msg_id, jlong from_account, jstring msg, jint font)
-{
-	char* m = JstringToGb(env, msg);
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = EvPriMsg(GetProcAddress(plugin.dll, "_eventPrivateMsg"));
-			if (ev)
-			{
-				if (ev(sub_type, msg_id, from_account, m, font) == 1) //插件拦截事件
-				{
-					break;
-				}
-			}
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMessage(
-	JNIEnv* env, jobject obj, jint sub_type, jint msg_id, jlong from_group, jlong from_account, jstring from_anonymous,
-	jstring msg, jint font)
-{
-	char* a = JstringToGb(env, from_anonymous);
-	char* m = JstringToGb(env, msg);
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = EvGroupMsg(GetProcAddress(plugin.dll, "_eventGroupMsg"));
-			if (ev)
-			{
-				if (ev(sub_type, msg_id, from_group, from_account, a, m, font) == 1) //插件拦截事件
-				{
-					break;
-				}
-			}
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupAdmin(
-	JNIEnv* env, jobject obj, jint sub_type, jint timestamp, jlong group, jlong member)
-{
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = EvGroupAdmin(GetProcAddress(plugin.dll, "_eventSystem_GroupAdmin"));
-			if (ev)
-			{
-				if (ev(sub_type, timestamp, group, member) == 1) //插件拦截事件
-				{
-					break;
-				}
-			}
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupMemberLeave(
-	JNIEnv* env, jobject obj, jint sub_type, jint timestamp, jlong group, jlong admin, jlong member)
-{
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = EvGroupMemberLeave(GetProcAddress(plugin.dll, "_eventSystem_GroupMemberDecrease"));
-			if (ev)
-			{
-				if (ev(sub_type, timestamp, group, admin, member) == 1) //插件拦截事件
-				{
-					break;
-				}
-			}
-		}
-	}
-}
-
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_eventGroupBan(
-	JNIEnv* env, jobject obj, jint sub_type, jint timestamp, jlong group, jlong admin, jlong member, jlong duration)
-{
-	for (auto const& plugin : plugins)
-	{
-		if (plugin.enabled)
-		{
-			const auto ev = EvGroupBan(GetProcAddress(plugin.dll, "_eventSystem_GroupBan"));
-			if (ev)
-			{
-				if (ev(sub_type, timestamp, group, admin, member, duration) == 1) //插件拦截事件
-				{
-					break;
-				}
-			}
-		}
-	}
-}
-
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(
 	JNIEnv* env, jobject obj, jint id, jstring method)
 {
-	for (const auto& plugin : plugins)
+	const auto m = IntMethod(GetMethod(env, id, method));
+	if (m)
 	{
-		if (plugin.id == id)
-		{
-			const auto me = JstringToGb(env, method);
-			const auto m = IntMethod(GetProcAddress(plugin.dll, me));
-			if (m)
-			{
-				return m();
-			}
-			break;
-		}
+		return m();
 	}
 	return -1;
 }
@@ -334,20 +150,71 @@ JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
 	JNIEnv* env, jobject obj, jint id, jstring method)
 {
 	const char* rtn = "";
-	for (const auto& plugin : plugins)
+	const auto m = StringMethod(GetMethod(env, id, method));
+	if (m)
 	{
-		if (plugin.id == id)
-		{
-			const auto me = JstringToGb(env, method);
-			const auto m = StringMethod(GetProcAddress(plugin.dll, me));
-			if (m)
-			{
-				rtn = m();
-			}
-			break;
-		}
+		rtn = m();
 	}
 	return GbToJstring(env, rtn);
+}
+
+// Event
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
+	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint msg_id, jlong acct, jstring msg, jint font)
+{
+	const auto m = EvPriMsg(GetMethod(env, id, method));
+	if (m)
+	{
+		return m(type, msg_id, acct, JstringToGb(env, msg), font);
+	}
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
+	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint msg_id, jlong grp,
+	jlong acct, jstring anon, jstring msg, jint font)
+{
+	const auto m = EvGroupMsg(GetMethod(env, id, method));
+	if (m)
+	{
+		return m(type, msg_id, grp, acct, JstringToGb(env, anon), JstringToGb(env, msg), font);
+	}
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin(
+	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint time, jlong grp, jlong acct)
+{
+	const auto m = EvGroupAdmin(GetMethod(env, id, method));
+	if (m)
+	{
+		return m(type, time, grp, acct);
+	}
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMemberLeave(
+	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint time, jlong grp, jlong acct, jlong mbr)
+{
+	const auto m = EvGroupMemberLeave(GetMethod(env, id, method));
+	if (m)
+	{
+		return m(type, time, grp, acct, mbr);
+	}
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan(
+	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint time, jlong grp,
+	jlong acct, jlong mbr, jlong dur)
+{
+	const auto m = EvGroupBan(GetMethod(env, id, method));
+	if (m)
+	{
+		return m(type, time, grp, acct, mbr, dur);
+	}
+	return 0;
 }
 
 // CQ APIs

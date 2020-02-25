@@ -26,11 +26,21 @@ import java.io.File
  *
  */
 data class NativePlugin(val file: File, val id: Int) {
+    var enabled: Boolean = true
     var api: Int = -1
     var identifier: String = file.name
     val appDir: File by lazy {
         File(file.parent + File.separatorChar + identifier).also { it.mkdir() }
     }
+    var pluginInfo: PluginInfo? = null
+        set(v) {
+            events = HashMap()
+            v!!.event.forEach {
+                events!![it.type] = it.function
+            }
+            field = v
+        }
+    private var events: HashMap<Int, String>? = null
 
     fun setInfo(i: String) {
         val parts = i.split(",")
@@ -38,5 +48,24 @@ data class NativePlugin(val file: File, val id: Int) {
             api = parts[0].toInt()
             identifier = parts[1]
         }
+    }
+
+    fun getEventOrDefault(key: Int, default: String): String {
+        if (events == null) {
+            return default
+        }
+        return events!!.getOrDefault(key, default)
+    }
+
+    fun shouldCallEvent(key: Int): Boolean {
+        if (events == null) {
+            return true
+        }
+        return events!!.containsKey(key)
+    }
+
+    fun processMessage(key: Int, msg: String): String {
+        //TODO: regex
+        return msg
     }
 }
