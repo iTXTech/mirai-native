@@ -3,6 +3,7 @@ package org.itxtech.mirainative
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.command.registerCommand
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.*
@@ -83,10 +84,17 @@ class MiraiNative : PluginBase() {
         logger.info("Mirai Native 正启用所有 DLL 插件。")
         bridge.eventEnable() //加载所有DLL插件并触发事件
 
-        subscribeAlways<BotOnlineEvent> {
-            logger.info("Bot 已上线，监听事件。")
+        registerCommand {
+            name = "npm"
+            description = "Mirai Native 插件管理器"
+            onCommand {
+                true
+            }
         }
+        registerEvents()
+    }
 
+    private fun registerEvents(){
         // 消息事件
         subscribeAlways<FriendMessage> {
             bridge.eventPrivateMessage(

@@ -68,12 +68,12 @@ BEGIN
         BLOCK "040004b0"
         BEGIN
             VALUE "CompanyName", "iTX Technologies"
-            VALUE "FileDescription", "Mirai Native VC++ Bridge for CoolQ Plugins"
+            VALUE "FileDescription", "Mirai Native Bridge"
             VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "CQP.dll"
             VALUE "LegalCopyright", "Copyright (C) 2020 iTX Technologies"
-            VALUE "OriginalFilename", "native.dll"
-            VALUE "ProductName", "Mirai Native VC++ Bridge"
+            VALUE "OriginalFilename", "CQP.dll"
+            VALUE "ProductName", "Mirai Native Bridge"
             VALUE "ProductVersion", "1.0.0.0"
         END
     END
