@@ -4,3 +4,4 @@ native/.vs
 native/Debug
 native/Release
 libs
+*.aps

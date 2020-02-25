@@ -94,7 +94,7 @@ class MiraiNative : PluginBase() {
         registerEvents()
     }
 
-    private fun registerEvents(){
+    private fun registerEvents() {
         // 消息事件
         subscribeAlways<FriendMessage> {
             bridge.eventPrivateMessage(
