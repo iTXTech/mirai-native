@@ -109,30 +109,35 @@ JNIEnv* AttachJava()
 
 // Plugin
 
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 	JNIEnv* env, jobject obj, jstring file, jint id)
 {
 	native_plugin plugin = {id, const_cast<char*>(env->GetStringUTFChars(file, nullptr))};
 	const auto dll = LoadLibraryA(plugin.file);
-	plugin.dll = dll;
-	plugins.push_back(plugin);
+	if (dll != nullptr) {
+		plugin.dll = dll;
+		plugins.push_back(plugin);
 
-	//调用 Initialize
-	const auto init = FuncInitialize(GetProcAddress(dll, "Initialize"));
-	if (init)
-	{
-		init(plugin.id);
-	}
+		//调用 Initialize
+		const auto init = FuncInitialize(GetProcAddress(dll, "Initialize"));
+		if (init)
+		{
+			init(plugin.id);
+		}
 
-	const auto info = FuncAppInfo(GetProcAddress(dll, "AppInfo"));
-	if (info)
-	{
-		auto jstr = GbToJstring(env, info());
-		auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
-		auto method = env->GetStaticMethodID(clazz, "updatePluginInfo", "(ILjava/lang/String;)V");
-		env->CallStaticVoidMethod(clazz, method, plugin.id, jstr);
-		env->DeleteLocalRef(jstr);
+		const auto info = StringMethod(GetProcAddress(dll, "AppInfo"));
+		if (info)
+		{
+			const auto jstr = GbToJstring(env, info());
+			const auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+			const auto method = env->GetStaticMethodID(clazz, "updatePluginInfo", "(ILjava/lang/String;)V");
+			env->CallStaticVoidMethod(clazz, method, plugin.id, jstr);
+			env->DeleteLocalRef(jstr);
+		}
+
+		return 0;
 	}
+	return GetLastError();
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(

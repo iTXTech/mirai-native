@@ -24,9 +24,9 @@ extern "C" {
 /*
  * Class:     org_itxtech_mirainative_Bridge
  * Method:    loadNativePlugin
- * Signature: (Ljava/lang/String;I)V
+ * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin
   (JNIEnv *, jobject, jstring, jint);
 
 /*

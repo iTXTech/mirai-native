@@ -2,6 +2,10 @@
 
 Mirai Native 致力于通过实现 酷Q 的兼容API使 酷Q 的应用（插件）能在 [Mirai](https://github.com/mamoe/mirai) 环境下运行。
 
+## 贡献
+
+本项目欢迎一切形式的贡献，详见 [TODO列表](TODO.md)
+
 ## 运行环境
 
 * **JRE 8 32位** - ~~酷Q的插件都是32位哒~~

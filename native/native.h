@@ -6,7 +6,6 @@ typedef int32_t (__stdcall* IntMethod)();
 typedef const char* (__stdcall* StringMethod)();
 
 typedef int32_t (__stdcall* FuncInitialize)(int32_t);
-typedef const char* (__stdcall* FuncAppInfo)();
 
 typedef int32_t (__stdcall* EvPriMsg)(int32_t, int32_t, int64_t, const char*, int32_t);
 typedef int32_t (__stdcall* EvGroupMsg)(int32_t, int32_t, int64_t, int64_t, const char*, const char*, int32_t);

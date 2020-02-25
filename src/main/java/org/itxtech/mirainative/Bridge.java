@@ -49,15 +49,17 @@ class Bridge {
 
     // Plugin
     public void loadPlugin(NativePlugin plugin) {
+        int code = loadNativePlugin(plugin.getFile().getAbsolutePath().replace("\\", "\\\\"), plugin.getId());
+        if (code != 0) { // load failed
+            plugin.setEnabled(false);
+        }
         if (plugin.getPluginInfo() != null) {
             PluginInfo info = plugin.getPluginInfo();
-            getLogger().info("Loading " + info.getName() + " from " + plugin.getFile().getName());
+            getLogger().info("Native Plugin (w json) " + info.getName() + " loaded with code " + code);
         } else {
-            getLogger().info("Loading " + plugin.getFile().getName() + " without JSON manifest.");
+            getLogger().info("Native Plugin (w/o json) " + plugin.getFile().getName() + " loaded with code " + code);
         }
-        loadNativePlugin(plugin.getFile().getAbsolutePath().replace("\\", "\\\\"), plugin.getId());
     }
-
 
     public void disablePlugin(NativePlugin plugin) {
         plugin.setEnabled(false);
@@ -155,7 +157,7 @@ class Bridge {
 
     // Native
 
-    public native void loadNativePlugin(String file, int id);
+    public native int loadNativePlugin(String file, int id);
 
     public native int pEvPrivateMessage(int pluginId, String name, int subType, int msgId, long fromAccount, String msg, int font);
 
