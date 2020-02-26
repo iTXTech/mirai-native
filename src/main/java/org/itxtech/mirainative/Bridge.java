@@ -62,16 +62,20 @@ class Bridge {
     }
 
     public void disablePlugin(NativePlugin plugin) {
-        plugin.setEnabled(false);
-        if (plugin.shouldCallEvent(Event.EVENT_DISABLE)) {
-            callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable"));
+        if (plugin.getEnabled()) {
+            plugin.setEnabled(false);
+            if (plugin.shouldCallEvent(Event.EVENT_DISABLE, true)) {
+                callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable"));
+            }
         }
     }
 
     public void enablePlugin(NativePlugin plugin) {
-        plugin.setEnabled(true);
-        if (plugin.shouldCallEvent(Event.EVENT_ENABLE)) {
-            callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable"));
+        if (!plugin.getEnabled()) {
+            plugin.setEnabled(true);
+            if (plugin.shouldCallEvent(Event.EVENT_ENABLE, true)) {
+                callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable"));
+            }
         }
     }
 
@@ -79,7 +83,7 @@ class Bridge {
 
     public void eventStartup() {
         for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_STARTUP)) {
+            if (plugin.shouldCallEvent(Event.EVENT_STARTUP, true)) {
                 callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup"));
             }
         }
@@ -87,7 +91,7 @@ class Bridge {
 
     public void eventExit() {
         for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_EXIT)) {
+            if (plugin.shouldCallEvent(Event.EVENT_EXIT, true)) {
                 callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit"));
             }
         }

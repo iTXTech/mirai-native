@@ -48,8 +48,7 @@ class MiraiNative : PluginBase() {
     private var pluginId: Int = 0
     private var bridge: Bridge = Bridge()
 
-    private var _plugins: HashMap<Int, NativePlugin> = HashMap()
-    val plugins: HashMap<Int, NativePlugin> get() = _plugins
+    var plugins: HashMap<Int, NativePlugin> = HashMap()
 
     val bot: Bot by lazy { Bot.instances.first().get()!! }
 
@@ -67,7 +66,7 @@ class MiraiNative : PluginBase() {
             dataFolder.listFiles()?.forEach { file ->
                 if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
                     val plugin = NativePlugin(file, pluginId)
-                    _plugins[pluginId++] = plugin
+                    plugins[pluginId++] = plugin
                     val json = File(file.parent + File.separatorChar + file.name.replace(".dll", ".json"))
                     if (json.exists()) {
                         plugin.pluginInfo = Json.nonstrict.parse(PluginInfo.serializer(), json.readText())
@@ -84,14 +83,106 @@ class MiraiNative : PluginBase() {
         logger.info("Mirai Native 正启用所有 DLL 插件。")
         bridge.eventEnable() //加载所有DLL插件并触发事件
 
+        registerCommands()
+        registerEvents()
+    }
+
+    private fun registerCommands() {
         registerCommand {
             name = "npm"
             description = "Mirai Native 插件管理器"
+            usage = "npm [list|enable|disable|menu|info] (插件 Id) (方法名)"
             onCommand {
+                if ((it.isEmpty() || (it[0] != "list" && it.size < 2))) {
+                    return@onCommand false
+                }
+                when (it[0]) {
+                    "list" -> {
+                        appendMessage("共加载了 " + plugins.size + " 个 Mirai Native 插件")
+                        plugins.values.forEach { p ->
+                            if (p.pluginInfo != null) {
+                                appendMessage(
+                                    "Id：" + p.id + " 标识符：" + p.identifier + " 名称：" + p.pluginInfo!!.name +
+                                            " 版本：" + p.pluginInfo!!.version
+                                )
+                            } else {
+                                appendMessage("Id：" + p.id + " 标识符：" + p.identifier + " （JSON文件缺失）")
+                            }
+                        }
+                    }
+                    "enable" -> {
+                        if (plugins.containsKey(it[1].toInt())) {
+                            val p = plugins[it[1].toInt()]!!
+                            if (!p.enabled) {
+                                bridge.enablePlugin(p)
+                            }
+                            appendMessage("插件 " + p.identifier + " 已启用。")
+                        } else {
+                            appendMessage("Id " + it[1] + " 不存在。")
+                        }
+                    }
+                    "disable" -> {
+                        if (plugins.containsKey(it[1].toInt())) {
+                            val p = plugins[it[1].toInt()]!!
+                            if (p.enabled) {
+                                bridge.disablePlugin(p)
+                            }
+                            appendMessage("插件 " + p.identifier + " 已禁用。")
+                        } else {
+                            appendMessage("Id " + it[1] + " 不存在。")
+                        }
+                    }
+                    "menu" -> {
+                        if (it.size < 3) {
+                            return@onCommand false
+                        }
+                        if (plugins.containsKey(it[1].toInt())) {
+                            bridge.callIntMethod(it[1].toInt(), it[2])
+                            appendMessage("已调用 Id " + it[1] + " 的 " + it[2] + " 方法。")
+                        } else {
+                            appendMessage("Id " + it[2] + " 不存在。")
+                        }
+                    }
+                    "info" -> {
+                        if (plugins.containsKey(it[1].toInt())) {
+                            val p = plugins[it[1].toInt()]!!
+                            val i = p.pluginInfo
+                            if (i == null) {
+                                appendMessage("Id：" + p.id + " （JSON文件缺失）")
+                                appendMessage("标识符：" + p.identifier)
+                                appendMessage("CQ API：" + p.api)
+                            } else {
+                                appendMessage("Id：" + p.id)
+                                appendMessage("标识符：" + p.identifier)
+                                appendMessage("CQ API：" + p.api + " CQ API（JSON）：" + i.apiver)
+                                appendMessage("名称：" + i.name)
+                                appendMessage("版本：" + i.version + " 版本号：" + i.version_id)
+                                appendMessage("描述：" + i.description)
+                                appendMessage("作者：" + i.author)
+                                appendMessage("注册了 " + i.event.size + " 个事件")
+                                i.event.forEach { ev ->
+                                    appendMessage("类型：" + ev.type + " 描述：" + ev.name + " 方法名：" + ev.function)
+                                }
+                                appendMessage("注册了 " + i.status.size + " 个悬浮窗项目")
+                                i.status.forEach { s ->
+                                    appendMessage("名称：" + s.name + " 标题：" + s.title + " 方法名：" + s.function)
+                                }
+                                appendMessage("注册了 " + i.menu.size + " 个菜单入口")
+                                i.menu.forEach { m ->
+                                    appendMessage("名称：" + m.name + " 方法名：" + m.function)
+                                }
+                            }
+                        } else {
+                            appendMessage("Id " + it[1] + " 不存在。")
+                        }
+                    }
+                    else -> {
+                        return@onCommand false
+                    }
+                }
                 true
             }
         }
-        registerEvents()
     }
 
     private fun registerEvents() {

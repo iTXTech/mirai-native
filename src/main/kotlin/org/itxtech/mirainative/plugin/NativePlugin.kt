@@ -26,7 +26,7 @@ import java.io.File
  *
  */
 data class NativePlugin(val file: File, val id: Int) {
-    var enabled: Boolean = true
+    var enabled: Boolean = false
     var api: Int = -1
     var identifier: String = file.name
     val appDir: File by lazy {
@@ -57,7 +57,11 @@ data class NativePlugin(val file: File, val id: Int) {
         return events!!.getOrDefault(key, default)
     }
 
-    fun shouldCallEvent(key: Int): Boolean {
+    @JvmOverloads
+    fun shouldCallEvent(key: Int, ignorePluginState: Boolean = false): Boolean {
+        if (!enabled && !ignorePluginState){
+            return false
+        }
         if (events == null) {
             return true
         }
