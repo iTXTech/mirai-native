@@ -31,6 +31,14 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
+ * Method:    freeNativePlugin
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
  * Method:    pEvPrivateMessage
  * Signature: (ILjava/lang/String;IIJLjava/lang/String;I)I
  */

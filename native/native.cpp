@@ -114,6 +114,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 {
 	native_plugin plugin = {id, const_cast<char*>(env->GetStringUTFChars(file, nullptr))};
 	const auto dll = LoadLibraryA(plugin.file);
+
 	if (dll != nullptr)
 	{
 		plugin.dll = dll;
@@ -135,6 +136,17 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 			env->DeleteLocalRef(jstr);
 		}
 
+		return 0;
+	}
+	return GetLastError();
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin(
+	JNIEnv* env, jobject obj, jint id)
+{
+	auto r = FreeLibrary(plugins[id].dll);
+	if (r != FALSE)
+	{
 		return 0;
 	}
 	return GetLastError();

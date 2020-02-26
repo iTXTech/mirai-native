@@ -81,7 +81,6 @@ class MiraiNative : PluginBase() {
 
     override fun onEnable() {
         logger.info("Mirai Native 正启用所有 DLL 插件。")
-        bridge.eventEnable() //加载所有DLL插件并触发事件
 
         registerCommands()
         registerEvents()
@@ -186,6 +185,10 @@ class MiraiNative : PluginBase() {
     }
 
     private fun registerEvents() {
+        subscribeAlways<BotOnlineEvent> {
+            bridge.eventEnable()
+        }
+
         // 消息事件
         subscribeAlways<FriendMessage> {
             bridge.eventPrivateMessage(

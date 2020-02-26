@@ -48,17 +48,15 @@ class Bridge {
     public static final int GROUP_MUTE = 2;
 
     // Plugin
-    public void loadPlugin(NativePlugin plugin) {
+    public int loadPlugin(NativePlugin plugin) {
         int code = loadNativePlugin(plugin.getFile().getAbsolutePath().replace("\\", "\\\\"), plugin.getId());
-        if (code != 0) { // load failed
-            plugin.setEnabled(false);
-        }
         if (plugin.getPluginInfo() != null) {
             PluginInfo info = plugin.getPluginInfo();
             getLogger().info("Native Plugin (w json) " + info.getName() + " loaded with code " + code);
         } else {
             getLogger().info("Native Plugin (w/o json) " + plugin.getFile().getName() + " loaded with code " + code);
         }
+        return code;
     }
 
     public void disablePlugin(NativePlugin plugin) {
@@ -162,6 +160,8 @@ class Bridge {
     // Native
 
     public native int loadNativePlugin(String file, int id);
+
+    public native int freeNativePlugin(int id);
 
     public native int pEvPrivateMessage(int pluginId, String name, int subType, int msgId, long fromAccount, String msg, int font);
 
