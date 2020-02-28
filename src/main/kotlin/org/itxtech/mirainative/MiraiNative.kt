@@ -43,6 +43,8 @@ class MiraiNative : PluginBase() {
     companion object {
         @Suppress("ObjectPropertyName")
         internal lateinit var _instance: MiraiNative
+
+        val INSTANCE: MiraiNative get() = _instance
     }
 
     private var pluginId: Int = 0
