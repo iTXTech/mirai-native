@@ -362,7 +362,7 @@ int32_t __stdcall CQ_setGroupSpecialTitle(int32_t plugin_id, int64_t group, int6
 {
 	auto env = AttachJava();
 	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
-	auto method = env->GetStaticMethodID(clazz, "setGroupSpecialTitle", "(IJZ)I");
+	auto method = env->GetStaticMethodID(clazz, "setGroupSpecialTitle", "(IJJLjava/lang/String;J)I");
 	auto jstr = GbToJstring(env, title);
 	auto result = env->CallStaticIntMethod(clazz, method, plugin_id, group, member, jstr, duration);
 	env->DeleteLocalRef(jstr);

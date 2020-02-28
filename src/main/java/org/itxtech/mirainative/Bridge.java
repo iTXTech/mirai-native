@@ -299,10 +299,9 @@ class Bridge {
     }
 
     @SuppressWarnings("unused")
-    public static int setGroupSpecialTitle(int pluginId, long group, String title, long duration) {
+    public static int setGroupSpecialTitle(int pluginId, long group, long member, String title, long duration) {
         try {
-            // TODO: 2020/2/28 补群员
-            // getBot().getGroup(pluginId).get(member).setSpecialTitle(title);
+            getBot().getGroup(pluginId).get(member).setSpecialTitle(title);
             return 0;
         } catch (Exception e) {
             getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
