@@ -250,47 +250,75 @@ class Bridge {
 
     @SuppressWarnings("unused")
     public static int setGroupAnonymous(int pluginId, long group, boolean enable) {
-        //TODO: BridgeHelper
+        // TODO: 2020/2/28 core 还不支持
         return 0;
     }
 
     @SuppressWarnings("unused")
     public static int setGroupBan(int pluginId, long group, long member, long duration) {
-        //TODO: BridgeHelper
-        // duration 为零 解禁
-        return 0;
+        try {
+            BridgeHelper.setGroupBan(group, member, (int) duration);
+            return 0;
+        } catch (Exception e) {
+            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
+            return -1;
+        }
     }
 
     @SuppressWarnings("unused")
     public static int setGroupCard(int pluginId, long group, long member, String card) {
-        //TODO: BridgeHelper
-        return 0;
+        try {
+            getBot().getGroup(pluginId).get(member).setNameCard(card);
+            return 0;
+        } catch (Exception e) {
+            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
+            return -1;
+        }
     }
 
     @SuppressWarnings("unused")
     public static int setGroupKick(int pluginId, long group, long member, boolean reject) {
-        //TODO: BridgeHelper
-        return 0;
+        try {
+            BridgeHelper.setGroupKick(group, member);
+            return 0;
+        } catch (Exception e) {
+            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
+            return -1;
+        }
     }
 
     @SuppressWarnings("unused")
     public static int setGroupLeave(int pluginId, long group, boolean dismiss) {
-        //TODO: BridgeHelper
-        //dismiss 是否解散该群
-        return 0;
+        try {
+            BridgeHelper.setGroupLeave(group);
+            return 0;
+        } catch (Exception e) {
+            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
+            return -1;
+        }
     }
 
     @SuppressWarnings("unused")
     public static int setGroupSpecialTitle(int pluginId, long group, String title, long duration) {
-        //TODO: BridgeHelper
-        //如果要删除，title = "", 专属头衔有效期，单位为秒。如果永久有效，duration = -1
-        return 0;
+        try {
+            // TODO: 2020/2/28 补群员
+            // getBot().getGroup(pluginId).get(member).setSpecialTitle(title);
+            return 0;
+        } catch (Exception e) {
+            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
+            return -1;
+        }
     }
 
     @SuppressWarnings("unused")
     public static int setGroupWholeBan(int pluginId, long group, boolean enable) {
-        //TODO: BridgeHelper
-        return 0;
+        try {
+            getBot().getGroup(group).setMuteAll(enable);
+            return 0;
+        } catch (Exception e) {
+            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
+            return -1;
+        }
     }
 
     static class NativeLoggerHelper {

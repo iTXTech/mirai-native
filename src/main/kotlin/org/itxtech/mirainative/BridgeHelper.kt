@@ -5,6 +5,7 @@ import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.QQ
 import net.mamoe.mirai.contact.sendMessage
 import net.mamoe.mirai.message.MessageReceipt
+import net.mamoe.mirai.utils.MiraiExperimentalAPI
 
 /*
  *
@@ -32,11 +33,31 @@ import net.mamoe.mirai.message.MessageReceipt
 object BridgeHelper {
     @JvmStatic
     fun sendFriendMessage(id: Long, message: String): MessageReceipt<QQ> = runBlocking {
-        MiraiNative._instance.bot.getFriend(id).sendMessage(message)
+        MiraiNative.INSTANCE.bot.getFriend(id).sendMessage(message)
     }
 
     @JvmStatic
     fun sendGroupMessage(id: Long, message: String): MessageReceipt<Group> = runBlocking {
         MiraiNative._instance.bot.getGroup(id).sendMessage(message)
+    }
+
+    @JvmStatic
+    fun setGroupBan(groupId: Long, memberId: Long, duration: Int) = runBlocking {
+        if (duration == 0) {
+            MiraiNative._instance.bot.getGroup(groupId)[memberId].unmute()
+        } else {
+            MiraiNative._instance.bot.getGroup(groupId)[memberId].mute(duration)
+        }
+    }
+
+    @JvmStatic
+    fun setGroupKick(groupId: Long, memberId: Long) = runBlocking {
+        MiraiNative._instance.bot.getGroup(groupId)[memberId].kick()
+    }
+
+    @MiraiExperimentalAPI
+    @JvmStatic
+    fun setGroupLeave(groupId: Long) = runBlocking {
+        MiraiNative._instance.bot.getGroup(groupId).quit()
     }
 }
