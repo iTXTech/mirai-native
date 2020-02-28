@@ -28,3 +28,4 @@ CQAPI(int32_t) CQ_setGroupKick(int32_t, int64_t, int64_t, BOOL);
 CQAPI(int32_t) CQ_setGroupLeave(int32_t, int64_t, BOOL);
 CQAPI(int32_t) CQ_setGroupSpecialTitle(int32_t, int64_t, int64_t, const char*, int64_t);
 CQAPI(int32_t) CQ_setGroupWholeBan(int32_t, int64_t, BOOL);
+CQAPI(int32_t) CQ_deleteMsg(int32_t, int64_t);

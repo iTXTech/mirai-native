@@ -376,3 +376,11 @@ int32_t __stdcall CQ_setGroupWholeBan(int32_t plugin_id, int64_t group, BOOL ena
 	auto method = env->GetStaticMethodID(clazz, "setGroupWholeBan", "(IJZ)I");
 	return env->CallStaticIntMethod(clazz, method, plugin_id, group, enable != FALSE);
 }
+
+int32_t __stdcall CQ_deleteMsg(int32_t plugin_id, int64_t msg_id)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "recallMsg", "(IJ)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, msg_id);
+}

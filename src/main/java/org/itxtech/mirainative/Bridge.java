@@ -1,9 +1,6 @@
 package org.itxtech.mirainative;
 
 import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.contact.QQ;
-import net.mamoe.mirai.message.MessageReceipt;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.itxtech.mirainative.plugin.Event;
 import org.itxtech.mirainative.plugin.NativePlugin;
@@ -200,8 +197,7 @@ class Bridge {
     @SuppressWarnings("unused")
     public static int sendFriendMessage(int pluginId, long account, String msg) {
         try {
-            MessageReceipt<QQ> receipt = BridgeHelper.sendFriendMessage(account, msg);
-            return (int) receipt.getSource().getId();
+            return BridgeHelper.sendFriendMessage(account, msg);
         } catch (Exception e) {
             getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
             return -1;
@@ -211,8 +207,7 @@ class Bridge {
     @SuppressWarnings("unused")
     public static int sendGroupMessage(int pluginId, long group, String msg) {
         try {
-            MessageReceipt<Group> receipt = BridgeHelper.sendGroupMessage(group, msg);
-            return (int) receipt.getSource().getId();
+            return BridgeHelper.sendGroupMessage(group, msg);
         } catch (Exception e) {
             getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
             return -1;
@@ -318,6 +313,11 @@ class Bridge {
             getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
             return -1;
         }
+    }
+
+    @SuppressWarnings("unused")
+    public static int recallMsg(int pluginId, long msgId) {
+        return MessageCache.INSTANCE.recall(Long.valueOf(msgId).intValue()) ? 0 : -1;
     }
 
     static class NativeLoggerHelper {

@@ -1,10 +1,8 @@
 package org.itxtech.mirainative
 
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.contact.Group
-import net.mamoe.mirai.contact.QQ
 import net.mamoe.mirai.contact.sendMessage
-import net.mamoe.mirai.message.MessageReceipt
+import net.mamoe.mirai.message.data.messageRandom
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
 
 /*
@@ -32,13 +30,21 @@ import net.mamoe.mirai.utils.MiraiExperimentalAPI
  */
 object BridgeHelper {
     @JvmStatic
-    fun sendFriendMessage(id: Long, message: String): MessageReceipt<QQ> = runBlocking {
-        MiraiNative.INSTANCE.bot.getFriend(id).sendMessage(message)
+    fun sendFriendMessage(id: Long, message: String): Int = runBlocking {
+        val msg = MiraiNative.INSTANCE.bot.getFriend(id).sendMessage(message).apply {
+            source.ensureSequenceIdAvailable()
+            MessageCache.cacheMessage(source)
+        }
+        msg.source.messageRandom
     }
 
     @JvmStatic
-    fun sendGroupMessage(id: Long, message: String): MessageReceipt<Group> = runBlocking {
-        MiraiNative.INSTANCE.bot.getGroup(id).sendMessage(message)
+    fun sendGroupMessage(id: Long, message: String): Int = runBlocking {
+        val msg = MiraiNative.INSTANCE.bot.getGroup(id).sendMessage(message).apply {
+            source.ensureSequenceIdAvailable()
+            MessageCache.cacheMessage(source)
+        }
+        msg.source.messageRandom
     }
 
     @JvmStatic

@@ -10,6 +10,7 @@ import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.message.FriendMessage
 import net.mamoe.mirai.message.GroupMessage
+import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.message.data.sequenceId
 import net.mamoe.mirai.utils.currentTimeSeconds
 import org.itxtech.mirainative.plugin.NativePlugin
@@ -194,6 +195,7 @@ class MiraiNative : PluginBase() {
 
         // 消息事件
         subscribeAlways<FriendMessage> {
+            MessageCache.cacheMessage(message[MessageSource])
             bridge.eventPrivateMessage(
                 Bridge.PRI_MSG_SUBTYPE_FRIEND,
                 message.sequenceId,
@@ -203,6 +205,7 @@ class MiraiNative : PluginBase() {
             )
         }
         subscribeAlways<GroupMessage> {
+            MessageCache.cacheMessage(message[MessageSource])
             bridge.eventGroupMessage(1, message.sequenceId, group.id, sender.id, "", message.toString(), 0)
         }
 

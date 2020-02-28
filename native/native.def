@@ -16,3 +16,4 @@ CQ_setGroupKick @ 13
 CQ_setGroupLeave @ 14
 CQ_setGroupSpecialTitle @ 15
 CQ_setGroupWholeBan @ 16
+CQ_deleteMsg @ 17
