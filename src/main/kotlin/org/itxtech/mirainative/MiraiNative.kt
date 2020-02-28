@@ -44,6 +44,7 @@ class MiraiNative : PluginBase() {
         @Suppress("ObjectPropertyName")
         internal lateinit var _instance: MiraiNative
 
+        @JvmStatic
         val INSTANCE: MiraiNative get() = _instance
     }
 
