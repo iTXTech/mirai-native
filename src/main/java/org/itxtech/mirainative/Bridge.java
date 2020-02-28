@@ -201,8 +201,7 @@ class Bridge {
     public static int sendFriendMessage(int pluginId, long account, String msg) {
         try {
             MessageReceipt<QQ> receipt = BridgeHelper.sendFriendMessage(account, msg);
-            //TODO: message id
-            return 0;
+            return (int) receipt.getSource().getId();
         } catch (Exception e) {
             getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
             return -1;
@@ -213,8 +212,7 @@ class Bridge {
     public static int sendGroupMessage(int pluginId, long group, String msg) {
         try {
             MessageReceipt<Group> receipt = BridgeHelper.sendGroupMessage(group, msg);
-            //TODO: message id
-            return 0;
+            return (int) receipt.getSource().getId();
         } catch (Exception e) {
             getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
             return -1;
