@@ -7,6 +7,8 @@ import org.itxtech.mirainative.plugin.NativePlugin;
 import org.itxtech.mirainative.plugin.PluginInfo;
 
 import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 
 /*
@@ -194,7 +196,7 @@ class Bridge {
 
     // Bridge
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int sendFriendMessage(int pluginId, long account, String msg) {
         try {
             return BridgeHelper.sendFriendMessage(account, msg);
@@ -204,7 +206,7 @@ class Bridge {
         }
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int sendGroupMessage(int pluginId, long group, String msg) {
         try {
             return BridgeHelper.sendGroupMessage(group, msg);
@@ -214,7 +216,7 @@ class Bridge {
         }
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static void updatePluginInfo(int pluginId, String info) {
         NativePlugin plugin = getPlugin(pluginId);
         if (plugin != null) {
@@ -223,33 +225,33 @@ class Bridge {
         System.out.println("Plugin Id " + pluginId + " Info: " + info);
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static void addLog(int pluginId, int priority, String type, String content) {
         NativeLoggerHelper.log(getPlugin(pluginId), priority, type, content);
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static String getPluginDataDir(int pluginId) {
         return getPlugin(pluginId).getAppDir().getAbsolutePath() + File.separatorChar;
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static long getLoginQQ(int pluginId) {
         return getBot().getUin();
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static String getLoginNick(int pluginId) {
         return getBot().getNick();
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int setGroupAnonymous(int pluginId, long group, boolean enable) {
         // TODO: 2020/2/28 core 还不支持
         return 0;
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int setGroupBan(int pluginId, long group, long member, long duration) {
         try {
             BridgeHelper.setGroupBan(group, member, (int) duration);
@@ -260,7 +262,7 @@ class Bridge {
         }
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int setGroupCard(int pluginId, long group, long member, String card) {
         try {
             getBot().getGroup(pluginId).get(member).setNameCard(card);
@@ -271,7 +273,7 @@ class Bridge {
         }
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int setGroupKick(int pluginId, long group, long member, boolean reject) {
         try {
             BridgeHelper.setGroupKick(group, member);
@@ -282,7 +284,7 @@ class Bridge {
         }
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int setGroupLeave(int pluginId, long group, boolean dismiss) {
         try {
             BridgeHelper.setGroupLeave(group);
@@ -293,7 +295,7 @@ class Bridge {
         }
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int setGroupSpecialTitle(int pluginId, long group, long member, String title, long duration) {
         try {
             getBot().getGroup(pluginId).get(member).setSpecialTitle(title);
@@ -304,7 +306,7 @@ class Bridge {
         }
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int setGroupWholeBan(int pluginId, long group, boolean enable) {
         try {
             getBot().getGroup(group).setMuteAll(enable);
@@ -315,9 +317,16 @@ class Bridge {
         }
     }
 
-    @SuppressWarnings("unused")
+    @NativeBridgeMethod
     public static int recallMsg(int pluginId, long msgId) {
         return MessageCache.INSTANCE.recall(Long.valueOf(msgId).intValue()) ? 0 : -1;
+    }
+
+    /**
+     * Indicates the method is called from native code
+     */
+    @Retention(value = RetentionPolicy.SOURCE)
+    @interface NativeBridgeMethod {
     }
 
     static class NativeLoggerHelper {
