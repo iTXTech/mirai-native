@@ -319,7 +319,7 @@ class Bridge {
 
     @NativeBridgeMethod
     public static int recallMsg(int pluginId, long msgId) {
-        return MessageCache.INSTANCE.recall(Long.valueOf(msgId).intValue()) ? 0 : -1;
+        return MessageCache.INSTANCE.recallBlocking(Long.valueOf(msgId).intValue()) ? 0 : -1;
     }
 
     /**
