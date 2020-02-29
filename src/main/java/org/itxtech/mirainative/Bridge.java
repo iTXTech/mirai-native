@@ -198,22 +198,12 @@ class Bridge {
 
     @NativeBridgeMethod
     public static int sendFriendMessage(int pluginId, long account, String msg) {
-        try {
-            return BridgeHelper.sendFriendMessage(account, msg);
-        } catch (Exception e) {
-            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
-            return -1;
-        }
+        return BridgeHelper.sendFriendMessage(account, msg);
     }
 
     @NativeBridgeMethod
     public static int sendGroupMessage(int pluginId, long group, String msg) {
-        try {
-            return BridgeHelper.sendGroupMessage(group, msg);
-        } catch (Exception e) {
-            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
-            return -1;
-        }
+        return BridgeHelper.sendGroupMessage(group, msg);
     }
 
     @NativeBridgeMethod
@@ -222,7 +212,6 @@ class Bridge {
         if (plugin != null) {
             plugin.setInfo(info);
         }
-        System.out.println("Plugin Id " + pluginId + " Info: " + info);
     }
 
     @NativeBridgeMethod
@@ -253,68 +242,38 @@ class Bridge {
 
     @NativeBridgeMethod
     public static int setGroupBan(int pluginId, long group, long member, long duration) {
-        try {
-            BridgeHelper.setGroupBan(group, member, (int) duration);
-            return 0;
-        } catch (Exception e) {
-            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
-            return -1;
-        }
+        BridgeHelper.setGroupBan(group, member, (int) duration);
+        return 0;
     }
 
     @NativeBridgeMethod
     public static int setGroupCard(int pluginId, long group, long member, String card) {
-        try {
-            getBot().getGroup(pluginId).get(member).setNameCard(card);
-            return 0;
-        } catch (Exception e) {
-            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
-            return -1;
-        }
+        getBot().getGroup(pluginId).get(member).setNameCard(card);
+        return 0;
     }
 
     @NativeBridgeMethod
     public static int setGroupKick(int pluginId, long group, long member, boolean reject) {
-        try {
-            BridgeHelper.setGroupKick(group, member);
-            return 0;
-        } catch (Exception e) {
-            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
-            return -1;
-        }
+        BridgeHelper.setGroupKick(group, member);
+        return 0;
     }
 
     @NativeBridgeMethod
     public static int setGroupLeave(int pluginId, long group, boolean dismiss) {
-        try {
-            BridgeHelper.setGroupLeave(group);
-            return 0;
-        } catch (Exception e) {
-            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
-            return -1;
-        }
+        BridgeHelper.setGroupLeave(group);
+        return 0;
     }
 
     @NativeBridgeMethod
     public static int setGroupSpecialTitle(int pluginId, long group, long member, String title, long duration) {
-        try {
-            getBot().getGroup(pluginId).get(member).setSpecialTitle(title);
-            return 0;
-        } catch (Exception e) {
-            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
-            return -1;
-        }
+        getBot().getGroup(pluginId).get(member).setSpecialTitle(title);
+        return 0;
     }
 
     @NativeBridgeMethod
     public static int setGroupWholeBan(int pluginId, long group, boolean enable) {
-        try {
-            getBot().getGroup(group).setMuteAll(enable);
-            return 0;
-        } catch (Exception e) {
-            getLogger().error("[NP " + getPlugin(pluginId).getIdentifier() + "] ", e);
-            return -1;
-        }
+        getBot().getGroup(group).setMuteAll(enable);
+        return 0;
     }
 
     @NativeBridgeMethod

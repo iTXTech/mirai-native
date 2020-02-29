@@ -1,5 +1,6 @@
 package org.itxtech.mirainative
 
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.sendMessage
 import net.mamoe.mirai.message.data.messageRandom
@@ -30,40 +31,52 @@ import net.mamoe.mirai.utils.MiraiExperimentalAPI
  */
 object BridgeHelper {
     @JvmStatic
-    fun sendFriendMessage(id: Long, message: String): Int = runBlocking {
-        val msg = MiraiNative.INSTANCE.bot.getFriend(id).sendMessage(message).apply {
-            source.ensureSequenceIdAvailable()
-            MessageCache.cacheMessage(source)
+    fun sendFriendMessage(id: Long, message: String): Int {
+        val internalId = MessageCache.nextId()
+        MiraiNative.INSTANCE.launch {
+            MiraiNative.INSTANCE.bot.getFriend(id).sendMessage(message).apply {
+                source.ensureSequenceIdAvailable()
+                MessageCache.cacheMessage(source, internalId)
+            }
         }
-        msg.source.messageRandom
+        return internalId
     }
 
     @JvmStatic
-    fun sendGroupMessage(id: Long, message: String): Int = runBlocking {
-        val msg = MiraiNative.INSTANCE.bot.getGroup(id).sendMessage(message).apply {
-            source.ensureSequenceIdAvailable()
-            MessageCache.cacheMessage(source)
+    fun sendGroupMessage(id: Long, message: String): Int {
+        val internalId = MessageCache.nextId()
+        MiraiNative.INSTANCE.launch {
+            MiraiNative.INSTANCE.bot.getGroup(id).sendMessage(message).apply {
+                source.ensureSequenceIdAvailable()
+                MessageCache.cacheMessage(source, internalId)
+            }
         }
-        msg.source.messageRandom
+        return internalId
     }
 
     @JvmStatic
-    fun setGroupBan(groupId: Long, memberId: Long, duration: Int) = runBlocking {
-        if (duration == 0) {
-            MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].unmute()
-        } else {
-            MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].mute(duration)
+    fun setGroupBan(groupId: Long, memberId: Long, duration: Int) {
+        MiraiNative.INSTANCE.launch {
+            if (duration == 0) {
+                MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].unmute()
+            } else {
+                MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].mute(duration)
+            }
         }
     }
 
     @JvmStatic
-    fun setGroupKick(groupId: Long, memberId: Long) = runBlocking {
-        MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].kick()
+    fun setGroupKick(groupId: Long, memberId: Long) {
+        MiraiNative.INSTANCE.launch {
+            MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].kick()
+        }
     }
 
     @MiraiExperimentalAPI
     @JvmStatic
-    fun setGroupLeave(groupId: Long) = runBlocking {
-        MiraiNative.INSTANCE.bot.getGroup(groupId).quit()
+    fun setGroupLeave(groupId: Long) {
+        MiraiNative.INSTANCE.launch {
+            MiraiNative.INSTANCE.bot.getGroup(groupId).quit()
+        }
     }
 }

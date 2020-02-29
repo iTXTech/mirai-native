@@ -11,7 +11,6 @@ import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.message.FriendMessage
 import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.MessageSource
-import net.mamoe.mirai.message.data.sequenceId
 import net.mamoe.mirai.utils.currentTimeSeconds
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
@@ -46,7 +45,8 @@ class MiraiNative : PluginBase() {
         internal lateinit var _instance: MiraiNative
 
         @JvmStatic
-        val INSTANCE: MiraiNative get() = _instance
+        val INSTANCE: MiraiNative
+            get() = _instance
     }
 
     private var pluginId: Int = 0
@@ -195,18 +195,24 @@ class MiraiNative : PluginBase() {
 
         // 消息事件
         subscribeAlways<FriendMessage> {
-            MessageCache.cacheMessage(message[MessageSource])
             bridge.eventPrivateMessage(
                 Bridge.PRI_MSG_SUBTYPE_FRIEND,
-                message.sequenceId,
+                MessageCache.cacheMessage(message[MessageSource]),
                 sender.id,
                 message.toString(),
                 0
             )
         }
         subscribeAlways<GroupMessage> {
-            MessageCache.cacheMessage(message[MessageSource])
-            bridge.eventGroupMessage(1, message.sequenceId, group.id, sender.id, "", message.toString(), 0)
+            bridge.eventGroupMessage(
+                1,
+                MessageCache.cacheMessage(message[MessageSource]),
+                group.id,
+                sender.id,
+                "",
+                message.toString(),
+                0
+            )
         }
 
         // 权限事件
