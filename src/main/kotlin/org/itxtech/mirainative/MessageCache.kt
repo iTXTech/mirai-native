@@ -1,6 +1,6 @@
 package org.itxtech.mirainative
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.message.data.messageRandom
 import net.mamoe.mirai.message.data.sequenceId
@@ -39,13 +39,14 @@ object MessageCache {
         }
     }
 
-    fun recallBlocking(id: Int): Boolean {
+    fun recall(id: Int): Boolean {
         val message = cache[id] ?: return false
-        runBlocking {
+        cache.remove(id)
+        MiraiNative.INSTANCE.launch {
             MiraiNative.INSTANCE.bot.recall(
                 messageId = message.seq.toLong().shl(32) or id.toLong().and(0xFFffFFffL),
                 groupId = message.groupId,
-                senderId = message.groupId
+                senderId = MiraiNative.INSTANCE.bot.uin
             )
         }
         return true
