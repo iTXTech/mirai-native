@@ -176,6 +176,8 @@ class Bridge {
 
     public native String callStringMethod(int pluginId, String name);
 
+    public native void processMessage();
+
     // Helper
 
     private static HashMap<Integer, NativePlugin> getPlugins() {

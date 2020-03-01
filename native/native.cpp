@@ -86,6 +86,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 		return -1;
 	}
 	jvm = vm;
+
 	return JNI_VERSION_1_8;
 }
 
@@ -94,11 +95,11 @@ JNIEnv* AttachJava()
 	JNIEnv* java = nullptr;
 	if (jvm)
 	{
-		int getEnvStat = jvm->GetEnv((void**)&java, JNI_VERSION_1_8);
+		int getEnvStat = jvm->GetEnv(reinterpret_cast<void**>(&java), JNI_VERSION_1_8);
 		if (getEnvStat == JNI_EDETACHED)
 		{
 			JavaVMAttachArgs args = {JNI_VERSION_1_8, 0, 0};
-			jvm->AttachCurrentThread((void**)&java, &args);
+			jvm->AttachCurrentThread(reinterpret_cast<void**>(&java), &args);
 		}
 		else if (getEnvStat == JNI_EVERSION)
 		{
@@ -152,6 +153,20 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin(
 	return GetLastError();
 }
 
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage(JNIEnv* env, jobject obj)
+{
+	MSG msg;
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
+	{
+		if (msg.message == WM_QUIT)
+		{
+			break;
+		}
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+}
+
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(
 	JNIEnv* env, jobject obj, jint id, jstring method)
 {
@@ -160,7 +175,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(
 	{
 		return m();
 	}
-	return -1;
+	return 0;
 }
 
 JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(

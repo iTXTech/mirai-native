@@ -1,11 +1,9 @@
 package org.itxtech.mirainative
 
-import kotlinx.atomicfu.AtomicInt
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
+import net.mamoe.mirai.LowLevelAPI
 import net.mamoe.mirai.message.data.MessageSource
-import net.mamoe.mirai.message.data.messageRandom
-import net.mamoe.mirai.message.data.sequenceId
 
 /*
  *
@@ -34,9 +32,9 @@ object MessageCache {
     private val cache: HashMap<Int, CachedMessage> = HashMap()
     private val internalId = atomic(0)
 
-    fun nextId() : Int = internalId.getAndIncrement()
+    fun nextId(): Int = internalId.getAndIncrement()
 
-    fun cacheMessage(message: MessageSource, id: Int = nextId()) : Int {
+    fun cacheMessage(message: MessageSource, id: Int = nextId()): Int {
         if (message.groupId == 0L) {
             cache[id] = CachedMessage(message.id, message.id, true)
         } else {
@@ -45,18 +43,22 @@ object MessageCache {
         return id
     }
 
+    @LowLevelAPI
     fun recall(id: Int): Boolean {
         val message = cache[id] ?: return false
         cache.remove(id)
         MiraiNative.INSTANCE.launch {
-            MiraiNative.INSTANCE.bot.recall(
-                messageId = message.msgId,
-                groupId = message.groupId,
-                senderId = MiraiNative.INSTANCE.bot.uin
-            )
+            if (message.isFriend) {
+                //MiraiNative.INSTANCE.bot._lowLevelRecallFriendMessage(message.id)
+            } else {
+                MiraiNative.INSTANCE.bot._lowLevelRecallGroupMessage(
+                    groupId = message.id,
+                    messageId = message.msgId
+                )
+            }
         }
         return true
     }
 }
 
-data class CachedMessage(val msgId: Long, val groupId: Long, val isFriend: Boolean)
+data class CachedMessage(val msgId: Long, val id: Long, val isFriend: Boolean)

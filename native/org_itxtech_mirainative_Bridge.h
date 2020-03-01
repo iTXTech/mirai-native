@@ -93,6 +93,14 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod
 JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod
   (JNIEnv *, jobject, jint, jstring);
 
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    processMessage
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,5 +1,7 @@
 package org.itxtech.mirainative
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
@@ -88,6 +90,13 @@ class MiraiNative : PluginBase() {
 
         registerCommands()
         registerEvents()
+
+        launch {
+            while (true) {
+                bridge.processMessage()
+                delay(10)
+            }
+        }
     }
 
     private fun registerCommands() {

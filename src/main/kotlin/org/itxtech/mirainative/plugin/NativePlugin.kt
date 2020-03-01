@@ -58,8 +58,8 @@ data class NativePlugin(val file: File, val id: Int) {
     }
 
     @JvmOverloads
-    fun shouldCallEvent(key: Int, ignorePluginState: Boolean = false): Boolean {
-        if (!enabled && !ignorePluginState){
+    fun shouldCallEvent(key: Int, ignoreState: Boolean = false): Boolean {
+        if (!enabled && !ignoreState) {
             return false
         }
         if (events == null) {
