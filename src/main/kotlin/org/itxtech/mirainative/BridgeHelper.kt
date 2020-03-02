@@ -1,17 +1,3 @@
-package org.itxtech.mirainative
-
-import io.ktor.util.InternalAPI
-import io.ktor.util.encodeBase64
-import kotlinx.coroutines.launch
-import kotlinx.io.core.BytePacketBuilder
-import kotlinx.io.core.buildPacket
-import kotlinx.io.core.readBytes
-import kotlinx.io.core.writeFully
-import net.mamoe.mirai.contact.sendMessage
-import net.mamoe.mirai.getGroupOrNull
-import net.mamoe.mirai.utils.MiraiExperimentalAPI
-import java.nio.charset.Charset
-
 /*
  *
  * Mirai Native
@@ -35,6 +21,21 @@ import java.nio.charset.Charset
  * @website https://github.com/iTXTech/mirai-native
  *
  */
+
+package org.itxtech.mirainative
+
+import io.ktor.util.InternalAPI
+import io.ktor.util.encodeBase64
+import kotlinx.coroutines.launch
+import kotlinx.io.core.BytePacketBuilder
+import kotlinx.io.core.buildPacket
+import kotlinx.io.core.readBytes
+import kotlinx.io.core.writeFully
+import net.mamoe.mirai.contact.sendMessage
+import net.mamoe.mirai.getGroupOrNull
+import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import java.nio.charset.Charset
+
 object BridgeHelper {
     @JvmStatic
     fun sendFriendMessage(id: Long, message: String): Int {

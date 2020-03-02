@@ -1,10 +1,3 @@
-package org.itxtech.mirainative
-
-import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.launch
-import net.mamoe.mirai.LowLevelAPI
-import net.mamoe.mirai.message.data.MessageSource
-
 /*
  *
  * Mirai Native
@@ -28,6 +21,14 @@ import net.mamoe.mirai.message.data.MessageSource
  * @website https://github.com/iTXTech/mirai-native
  *
  */
+
+package org.itxtech.mirainative
+
+import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.launch
+import net.mamoe.mirai.LowLevelAPI
+import net.mamoe.mirai.message.data.MessageSource
+
 object MessageCache {
     private val cache: HashMap<Int, CachedMessage> = HashMap()
     private val internalId = atomic(0)

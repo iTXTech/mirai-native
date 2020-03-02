@@ -3,6 +3,7 @@
 native/.vs
 native/Debug
 native/Release
+native/x64
 libs
 *.aps
 build
