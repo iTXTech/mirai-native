@@ -56,11 +56,10 @@ class MiraiNative : PluginBase() {
             get() = _instance
     }
 
-    private var pluginId: Int = 0
-    private var bridge: Bridge = Bridge()
-
+    private var pluginId = 0
+    private var bridge = Bridge()
+    private var botOnline = false
     var plugins: HashMap<Int, NativePlugin> = HashMap()
-
     val bot: Bot by lazy { Bot.instances.first().get()!! }
 
     @UnstableDefault
@@ -129,16 +128,20 @@ class MiraiNative : PluginBase() {
                         }
                     }
                     "enable" -> {
-                        if (plugins.containsKey(it[1].toInt())) {
-                            val p = plugins[it[1].toInt()]!!
-                            if (!p.enabled) {
-                                launch(NativeDispatcher) {
-                                    bridge.enablePlugin(p)
-                                }
-                            }
-                            appendMessage("插件 " + p.identifier + " 已启用。")
+                        if (!botOnline) {
+                            appendMessage("Bot 还未上线，无法调用 Enable 事件。")
                         } else {
-                            appendMessage("Id " + it[1] + " 不存在。")
+                            if (plugins.containsKey(it[1].toInt())) {
+                                val p = plugins[it[1].toInt()]!!
+                                if (!p.enabled) {
+                                    launch(NativeDispatcher) {
+                                        bridge.enablePlugin(p)
+                                    }
+                                }
+                                appendMessage("插件 " + p.identifier + " 已启用。")
+                            } else {
+                                appendMessage("Id " + it[1] + " 不存在。")
+                            }
                         }
                     }
                     "disable" -> {
@@ -158,13 +161,13 @@ class MiraiNative : PluginBase() {
                         if (it.size < 3) {
                             return@onCommand false
                         }
-                        if (plugins.containsKey(it[1].toInt())) {
+                        if (plugins.containsKey(it[1].toInt()) && plugins[it[1].toInt()]!!.verifyMenuFunc(it[2])) {
                             launch(NativeDispatcher) {
                                 bridge.callIntMethod(it[1].toInt(), it[2])
                             }
                             appendMessage("已调用 Id " + it[1] + " 的 " + it[2] + " 方法。")
                         } else {
-                            appendMessage("Id " + it[2] + " 不存在。")
+                            appendMessage("Id " + it[2] + " 不存在，或未注册该菜单入口。")
                         }
                     }
                     "info" -> {
@@ -211,6 +214,7 @@ class MiraiNative : PluginBase() {
 
     private fun registerEvents() {
         subscribeAlways<BotOnlineEvent> {
+            botOnline = true
             launch(NativeDispatcher) {
                 logger.info("Mirai Native 正启用所有 DLL 插件。")
                 bridge.eventEnable()

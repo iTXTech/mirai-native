@@ -116,7 +116,7 @@
   "status": [],
   "menu": [
     {
-      "name": "主窗口",
+      "name": "loadWin",
       "function": "_menuA"
     }
   ],

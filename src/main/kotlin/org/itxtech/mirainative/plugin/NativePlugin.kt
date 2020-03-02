@@ -72,4 +72,16 @@ data class NativePlugin(val file: File, val id: Int) {
         //TODO: regex
         return msg
     }
+
+    fun verifyMenuFunc(name: String): Boolean {
+        if (pluginInfo == null) {
+            return true
+        }
+        pluginInfo!!.menu.forEach {
+            if (it.function == name) {
+                return true
+            }
+        }
+        return false
+    }
 }
