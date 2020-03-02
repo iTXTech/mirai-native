@@ -1,6 +1,8 @@
 package org.itxtech.mirainative
 
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
@@ -17,6 +19,8 @@ import net.mamoe.mirai.utils.currentTimeSeconds
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
 import java.io.File
+import java.util.concurrent.Executors
+import kotlin.coroutines.ContinuationInterceptor
 
 /*
  *
@@ -77,22 +81,23 @@ class MiraiNative : PluginBase() {
                     if (json.exists()) {
                         plugin.pluginInfo = Json.nonstrict.parse(PluginInfo.serializer(), json.readText())
                     }
-                    bridge.loadPlugin(plugin)
+                    launch(NativeDispatcher) {
+                        bridge.loadPlugin(plugin)
+                    }
                 }
             }
-            bridge.eventStartup()
-            logger.info("Mirai Native 已调用 Startup 事件")
         }
     }
 
     override fun onEnable() {
-        logger.info("Mirai Native 正启用所有 DLL 插件。")
-
         registerCommands()
         registerEvents()
 
-        launch {
-            while (true) {
+        launch(NativeDispatcher) {
+            bridge.eventStartup()
+            logger.info("Mirai Native 已调用 Startup 事件")
+
+            while (isActive) {
                 bridge.processMessage()
                 delay(10)
             }
@@ -126,7 +131,9 @@ class MiraiNative : PluginBase() {
                         if (plugins.containsKey(it[1].toInt())) {
                             val p = plugins[it[1].toInt()]!!
                             if (!p.enabled) {
-                                bridge.enablePlugin(p)
+                                launch(NativeDispatcher) {
+                                    bridge.enablePlugin(p)
+                                }
                             }
                             appendMessage("插件 " + p.identifier + " 已启用。")
                         } else {
@@ -137,7 +144,9 @@ class MiraiNative : PluginBase() {
                         if (plugins.containsKey(it[1].toInt())) {
                             val p = plugins[it[1].toInt()]!!
                             if (p.enabled) {
-                                bridge.disablePlugin(p)
+                                launch(NativeDispatcher) {
+                                    bridge.disablePlugin(p)
+                                }
                             }
                             appendMessage("插件 " + p.identifier + " 已禁用。")
                         } else {
@@ -149,7 +158,9 @@ class MiraiNative : PluginBase() {
                             return@onCommand false
                         }
                         if (plugins.containsKey(it[1].toInt())) {
-                            bridge.callIntMethod(it[1].toInt(), it[2])
+                            launch(NativeDispatcher) {
+                                bridge.callIntMethod(it[1].toInt(), it[2])
+                            }
                             appendMessage("已调用 Id " + it[1] + " 的 " + it[2] + " 方法。")
                         } else {
                             appendMessage("Id " + it[2] + " 不存在。")
@@ -199,84 +210,114 @@ class MiraiNative : PluginBase() {
 
     private fun registerEvents() {
         subscribeAlways<BotOnlineEvent> {
-            bridge.eventEnable()
+            launch(NativeDispatcher) {
+                logger.info("Mirai Native 正启用所有 DLL 插件。")
+                bridge.eventEnable()
+            }
         }
 
         // 消息事件
         subscribeAlways<FriendMessage> {
-            bridge.eventPrivateMessage(
-                Bridge.PRI_MSG_SUBTYPE_FRIEND,
-                MessageCache.cacheMessage(message[MessageSource]),
-                sender.id,
-                message.toString(),
-                0
-            )
+            launch(NativeDispatcher) {
+                bridge.eventPrivateMessage(
+                    Bridge.PRI_MSG_SUBTYPE_FRIEND,
+                    MessageCache.cacheMessage(message[MessageSource]),
+                    sender.id,
+                    message.toString(),
+                    0
+                )
+            }
         }
         subscribeAlways<GroupMessage> {
-            bridge.eventGroupMessage(
-                1,
-                MessageCache.cacheMessage(message[MessageSource]),
-                group.id,
-                sender.id,
-                "",
-                message.toString(),
-                0
-            )
+            launch(NativeDispatcher) {
+                bridge.eventGroupMessage(
+                    1,
+                    MessageCache.cacheMessage(message[MessageSource]),
+                    group.id,
+                    sender.id,
+                    "",
+                    message.toString(),
+                    0
+                )
+            }
         }
 
         // 权限事件
         subscribeAlways<MemberPermissionChangeEvent> {
-            if (new == MemberPermission.MEMBER) {
-                bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, member.id)
-            } else {
-                bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, member.id)
+            launch(NativeDispatcher) {
+                if (new == MemberPermission.MEMBER) {
+                    bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, member.id)
+                } else {
+                    bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, member.id)
+                }
             }
         }
 
         // 退群事件
         subscribeAlways<MemberLeaveEvent.Kick> {
-            val op = operator?.id ?: bot.uin
-            bridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_KICK, getTimestamp(), group.id, op, member.id)
+            launch(NativeDispatcher) {
+                val op = operator?.id ?: bot.uin
+                bridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_KICK, getTimestamp(), group.id, op, member.id)
+            }
         }
         subscribeAlways<MemberLeaveEvent.Quit> {
-            bridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_QUIT, getTimestamp(), group.id, 0, member.id)
+            launch(NativeDispatcher) {
+                bridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_QUIT, getTimestamp(), group.id, 0, member.id)
+            }
         }
 
         // 禁言事件
         subscribeAlways<MemberMuteEvent> {
-            val op = operator?.id ?: bot.uin
-            bridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, member.id, durationSeconds.toLong())
+            launch(NativeDispatcher) {
+                val op = operator?.id ?: bot.uin
+                bridge.eventGroupBan(
+                    Bridge.GROUP_MUTE,
+                    getTimestamp(),
+                    group.id,
+                    op,
+                    member.id,
+                    durationSeconds.toLong()
+                )
+            }
         }
         subscribeAlways<MemberUnmuteEvent> {
-            val op = operator?.id ?: bot.uin
-            bridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, member.id, 0)
+            launch(NativeDispatcher) {
+                val op = operator?.id ?: bot.uin
+                bridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, member.id, 0)
+            }
         }
         subscribeAlways<BotMuteEvent> {
-            bridge.eventGroupBan(
-                Bridge.GROUP_MUTE,
-                getTimestamp(),
-                group.id,
-                operator.id,
-                bot.uin,
-                durationSeconds.toLong()
-            )
+            launch(NativeDispatcher) {
+                bridge.eventGroupBan(
+                    Bridge.GROUP_MUTE,
+                    getTimestamp(),
+                    group.id,
+                    operator.id,
+                    bot.uin,
+                    durationSeconds.toLong()
+                )
+            }
         }
         subscribeAlways<BotUnmuteEvent> {
-            bridge.eventGroupBan(
-                Bridge.GROUP_UNMUTE,
-                getTimestamp(),
-                group.id,
-                operator.id,
-                bot.uin,
-                0
-            )
+            launch(NativeDispatcher) {
+                bridge.eventGroupBan(
+                    Bridge.GROUP_UNMUTE,
+                    getTimestamp(),
+                    group.id,
+                    operator.id,
+                    bot.uin,
+                    0
+                )
+            }
         }
         subscribeAlways<GroupMuteAllEvent> {
-            val op = operator?.id ?: bot.uin
-            if (new) {
-                bridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, 0, 0)
-            } else {
-                bridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, 0, 0)
+            launch(NativeDispatcher) {
+                val op = operator?.id ?: bot.uin
+                if (new) {
+                    bridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, 0, 0)
+                } else {
+                    bridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, 0, 0)
+                }
             }
         }
     }
@@ -286,10 +327,14 @@ class MiraiNative : PluginBase() {
     }
 
     override fun onDisable() {
-        logger.info("Mirai Native 正停用所有DLL插件。")
-        bridge.eventDisable()
+        launch(NativeDispatcher) {
+            logger.info("Mirai Native 正停用所有DLL插件。")
+            bridge.eventDisable()
 
-        logger.info("Mirai Native 正调用 Exit 事件")
-        bridge.eventExit()
+            logger.info("Mirai Native 正调用 Exit 事件")
+            bridge.eventExit()
+        }
     }
 }
+
+object NativeDispatcher : ContinuationInterceptor by Executors.newFixedThreadPool(1).asCoroutineDispatcher()

@@ -1,5 +1,6 @@
 #pragma once
 
+#define GB18030 54936
 #define CQAPI(ReturnType) extern "C" __declspec(dllexport) ReturnType __stdcall
 
 typedef int32_t (__stdcall* IntMethod)();

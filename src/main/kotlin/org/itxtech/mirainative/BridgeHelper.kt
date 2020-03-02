@@ -10,6 +10,7 @@ import kotlinx.io.core.writeFully
 import net.mamoe.mirai.contact.sendMessage
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import java.nio.charset.Charset
 
 /*
  *
@@ -85,6 +86,24 @@ object BridgeHelper {
         }
     }
 
+    private inline fun BytePacketBuilder.writeShortLVPacket(
+        lengthOffset: ((Long) -> Long) = { it },
+        builder: BytePacketBuilder.() -> Unit
+    ): Int =
+        BytePacketBuilder().apply(builder).build().use {
+            val length = lengthOffset.invoke(it.remaining)
+            writeShort(length.toShort())
+            writePacket(it)
+            return length.toInt()
+        }
+
+
+    private fun BytePacketBuilder.writeString(string: String) {
+        val b = string.toByteArray(Charset.forName("GB18030"))
+        writeShort(b.size.toShort())
+        writeFully(b)
+    }
+
     @InternalAPI
     @JvmStatic
     fun getFriendList(): String {
@@ -92,18 +111,14 @@ object BridgeHelper {
         return buildPacket {
             writeInt(list.size)
             list.forEach { qq ->
-                writeLong(qq.id)
-                writeString(qq.nick)
-                //TODO: 备注
-                writeString("")
+                writeShortLVPacket {
+                    writeLong(qq.id)
+                    writeString(qq.nick)
+                    //TODO: 备注
+                    writeString("")
+                }
             }
         }.readBytes().encodeBase64()
-    }
-
-    private fun BytePacketBuilder.writeString(string: String) {
-        val b = string.toByteArray()
-        writeShort(b.size.toShort())
-        writeFully(b)
     }
 
     @InternalAPI
@@ -129,8 +144,10 @@ object BridgeHelper {
         return buildPacket {
             writeInt(list.size)
             list.forEach {
-                writeLong(it.id)
-                writeString(it.name)
+                writeShortLVPacket {
+                    writeLong(it.id)
+                    writeString(it.name)
+                }
             }
         }.readBytes().encodeBase64()
     }

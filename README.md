@@ -30,6 +30,11 @@ Mirai Native 致力于通过实现 酷Q 的兼容API使 酷Q 的应用（插件�
 
 `npm [list|enable|disable|menu|info] (插件 Id) (方法名)`
 
+## 使用须知
+
+1. 可使用`酷Q SDK编写`，部分API暂不可用，见上文 TODO列表
+1. `DLL` 字符串编码请采用 `GB18030`
+
 ## 如何获取酷Q插件
 
 1. 启动酷Q

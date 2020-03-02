@@ -31,10 +31,10 @@ char* JstringToGb(JNIEnv* env, jstring jstr)
 {
 	int length = env->GetStringLength(jstr);
 	auto jcstr = env->GetStringChars(jstr, nullptr);
-	auto clen = WideCharToMultiByte(CP_ACP, 0, LPCWSTR(jcstr), length, nullptr, 0, nullptr, nullptr);
+	auto clen = WideCharToMultiByte(GB18030, 0, LPCWSTR(jcstr), length, nullptr, 0, nullptr, nullptr);
 	auto rtn = static_cast<char*>(malloc(clen));
 	int size = 0;
-	size = WideCharToMultiByte(CP_ACP, 0, LPCWSTR(jcstr), length, rtn, clen, nullptr, nullptr);
+	size = WideCharToMultiByte(GB18030, 0, LPCWSTR(jcstr), length, rtn, clen, nullptr, nullptr);
 	if (size <= 0)
 	{
 		return nullptr;
@@ -55,9 +55,9 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 	}
 	else
 	{
-		int length = MultiByteToWideChar(CP_ACP, 0, LPCSTR(str), slen, nullptr, 0);
+		int length = MultiByteToWideChar(GB18030, 0, LPCSTR(str), slen, nullptr, 0);
 		buffer = static_cast<unsigned short*>(malloc(length * 2 + 1));
-		if (MultiByteToWideChar(CP_ACP, 0, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
+		if (MultiByteToWideChar(GB18030, 0, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
 		{
 			rtn = env->NewString(static_cast<jchar*>(buffer), length);
 		}
@@ -158,10 +158,6 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage(JNIEnv
 	MSG msg;
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) > 0)
 	{
-		if (msg.message == WM_QUIT)
-		{
-			break;
-		}
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -404,7 +400,8 @@ const char* __stdcall CQ_getFriendList(int32_t plugin_id, BOOL reserved)
 	auto env = AttachJava();
 	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
 	auto method = env->GetStaticMethodID(clazz, "getFriendList", "(IZ)Ljava/lang/String;");
-	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, reserved != FALSE)), nullptr);
+	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, reserved != FALSE)),
+	                              nullptr);
 }
 
 const char* __stdcall CQ_getGroupInfo(int32_t plugin_id, int64_t group, BOOL cache)
@@ -412,7 +409,8 @@ const char* __stdcall CQ_getGroupInfo(int32_t plugin_id, int64_t group, BOOL cac
 	auto env = AttachJava();
 	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
 	auto method = env->GetStaticMethodID(clazz, "getGroupInfo", "(IJZ)Ljava/lang/String;");
-	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, group, cache != FALSE)), nullptr);
+	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, group, cache != FALSE)),
+	                              nullptr);
 }
 
 const char* __stdcall CQ_getGroupList(int32_t plugin_id)
