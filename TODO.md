@@ -14,13 +14,13 @@
 - [x] `CQ_addLog`
 - [x] `CQ_canSendImage`
 - [x] `CQ_canSendRecord`
-- [ ] `CQ_deleteMsg`
+- [x] `CQ_deleteMsg`
 - [x] `CQ_getAppDirectory`
 - [ ] `CQ_getCookiesV2`
 - [ ] `CQ_getCsrfToken`
-- [ ] `CQ_getFriendList`
-- [ ] `CQ_getGroupInfo`
-- [ ] `CQ_getGroupList`
+- [x] `CQ_getFriendList`
+- [x] `CQ_getGroupInfo`
+- [x] `CQ_getGroupList`
 - [ ] `CQ_getGroupMemberInfoV2`
 - [ ] `CQ_getGroupMemberList`
 - [ ] `CQ_getImage`

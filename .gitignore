@@ -5,3 +5,7 @@ native/Debug
 native/Release
 libs
 *.aps
+build
+out
+epl-test/*.dll
+epl-test/*.bak

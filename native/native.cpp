@@ -95,10 +95,10 @@ JNIEnv* AttachJava()
 	JNIEnv* java = nullptr;
 	if (jvm)
 	{
-		int getEnvStat = jvm->GetEnv(reinterpret_cast<void**>(&java), JNI_VERSION_1_8);
+		const int getEnvStat = jvm->GetEnv(reinterpret_cast<void**>(&java), JNI_VERSION_1_8);
 		if (getEnvStat == JNI_EDETACHED)
 		{
-			JavaVMAttachArgs args = {JNI_VERSION_1_8, 0, 0};
+			JavaVMAttachArgs args = {JNI_VERSION_1_8, nullptr, nullptr};
 			jvm->AttachCurrentThread(reinterpret_cast<void**>(&java), &args);
 		}
 		else if (getEnvStat == JNI_EVERSION)
@@ -156,7 +156,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin(
 JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage(JNIEnv* env, jobject obj)
 {
 	MSG msg;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) > 0)
 	{
 		if (msg.message == WM_QUIT)
 		{
@@ -325,8 +325,7 @@ const char* __stdcall CQ_getLoginNick(int32_t plugin_id)
 	auto env = AttachJava();
 	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
 	auto method = env->GetStaticMethodID(clazz, "getLoginNick", "(I)Ljava/lang/String;");
-	auto result = jstring(env->CallStaticObjectMethod(clazz, method, plugin_id));
-	return JstringToGb(env, result);
+	return JstringToGb(env, jstring(env->CallStaticObjectMethod(clazz, method, plugin_id)));
 }
 
 int32_t __stdcall CQ_setGroupAnonymous(int32_t plugin_id, int64_t group, BOOL enable)
@@ -398,4 +397,28 @@ int32_t __stdcall CQ_deleteMsg(int32_t plugin_id, int64_t msg_id)
 	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
 	auto method = env->GetStaticMethodID(clazz, "recallMsg", "(IJ)I");
 	return env->CallStaticIntMethod(clazz, method, plugin_id, msg_id);
+}
+
+const char* __stdcall CQ_getFriendList(int32_t plugin_id, BOOL reserved)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "getFriendList", "(IZ)Ljava/lang/String;");
+	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, reserved != FALSE)), nullptr);
+}
+
+const char* __stdcall CQ_getGroupInfo(int32_t plugin_id, int64_t group, BOOL cache)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "getGroupInfo", "(IJZ)Ljava/lang/String;");
+	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, group, cache != FALSE)), nullptr);
+}
+
+const char* __stdcall CQ_getGroupList(int32_t plugin_id)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto method = env->GetStaticMethodID(clazz, "getGroupList", "(I)Ljava/lang/String;");
+	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id)), nullptr);
 }

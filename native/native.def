@@ -17,3 +17,6 @@ CQ_setGroupLeave @ 14
 CQ_setGroupSpecialTitle @ 15
 CQ_setGroupWholeBan @ 16
 CQ_deleteMsg @ 17
+CQ_getFriendList @ 18
+CQ_getGroupInfo @ 19
+CQ_getGroupList @ 20

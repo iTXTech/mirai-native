@@ -1,9 +1,14 @@
 package org.itxtech.mirainative
 
+import io.ktor.util.InternalAPI
+import io.ktor.util.encodeBase64
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.io.core.BytePacketBuilder
+import kotlinx.io.core.buildPacket
+import kotlinx.io.core.readBytes
+import kotlinx.io.core.writeFully
 import net.mamoe.mirai.contact.sendMessage
-import net.mamoe.mirai.message.data.messageRandom
+import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
 
 /*
@@ -78,5 +83,55 @@ object BridgeHelper {
         MiraiNative.INSTANCE.launch {
             MiraiNative.INSTANCE.bot.getGroup(groupId).quit()
         }
+    }
+
+    @InternalAPI
+    @JvmStatic
+    fun getFriendList(): String {
+        val list = MiraiNative.INSTANCE.bot.qqs
+        return buildPacket {
+            writeInt(list.size)
+            list.forEach { qq ->
+                writeLong(qq.id)
+                writeString(qq.nick)
+                //TODO: 备注
+                writeString("")
+            }
+        }.readBytes().encodeBase64()
+    }
+
+    private fun BytePacketBuilder.writeString(string: String) {
+        val b = string.toByteArray()
+        writeShort(b.size.toShort())
+        writeFully(b)
+    }
+
+    @InternalAPI
+    @JvmStatic
+    fun getGroupInfo(id: Long): String {
+        val info = MiraiNative.INSTANCE.bot.getGroupOrNull(id)
+        if (info != null) {
+            return buildPacket {
+                writeLong(id)
+                writeString(info.name)
+                writeInt(info.members.size + 1)
+                //TODO: 上限
+                writeInt(1000)
+            }.readBytes().encodeBase64()
+        }
+        return ""
+    }
+
+    @InternalAPI
+    @JvmStatic
+    fun getGroupList(): String {
+        val list = MiraiNative.INSTANCE.bot.groups
+        return buildPacket {
+            writeInt(list.size)
+            list.forEach {
+                writeLong(it.id)
+                writeString(it.name)
+            }
+        }.readBytes().encodeBase64()
     }
 }

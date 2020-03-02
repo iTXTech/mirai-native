@@ -283,6 +283,21 @@ class Bridge {
         return MessageCache.INSTANCE.recall(Long.valueOf(msgId).intValue()) ? 0 : -1;
     }
 
+    @NativeBridgeMethod
+    public static String getFriendList(int pluginId, boolean reserved) {
+        return BridgeHelper.getFriendList();
+    }
+
+    @NativeBridgeMethod
+    public static String getGroupInfo(int pluginId, long groupId, boolean cache) {
+        return BridgeHelper.getGroupInfo(groupId);
+    }
+
+    @NativeBridgeMethod
+    public static String getGroupList(int pluginId) {
+        return BridgeHelper.getGroupList();
+    }
+
     /**
      * Indicates the method is called from native code
      */
