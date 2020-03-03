@@ -31,6 +31,8 @@ import kotlinx.io.core.BytePacketBuilder
 import kotlinx.io.core.buildPacket
 import kotlinx.io.core.readBytes
 import kotlinx.io.core.writeFully
+import net.mamoe.mirai.contact.Member
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.sendMessage
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
@@ -105,6 +107,38 @@ object BridgeHelper {
         writeFully(b)
     }
 
+    private fun BytePacketBuilder.writeBool(bool: Boolean) {
+        writeInt(if (bool) 1 else 0)
+    }
+
+    private fun BytePacketBuilder.writeMember(member: Member) {
+        writeLong(member.group.id)
+        writeLong(member.id)
+        writeString(member.nick)
+        writeString(member.nameCard)
+        writeInt(0) // TODO: 性别
+        writeInt(0) // TODO: 年龄
+        writeString("未知") // TODO: 地区
+        writeInt(0) // TODO: 加群时间
+        writeInt(0) // TODO: 最后发言
+        writeString("") // TODO: 等级名称
+        when (member.permission) {
+            MemberPermission.MEMBER -> {
+                writeInt(1)
+            }
+            MemberPermission.ADMINISTRATOR -> {
+                writeInt(2)
+            }
+            MemberPermission.OWNER -> {
+                writeInt(3)
+            }
+        }
+        writeBool(false) // TODO: 不良记录成员
+        writeString(member.specialTitle)
+        writeInt(-1) // TODO: 头衔过期时间
+        writeBool(true) // TODO: 允许修改名片
+    }
+
     @InternalAPI
     @JvmStatic
     fun getFriendList(): String {
@@ -148,6 +182,29 @@ object BridgeHelper {
                 writeShortLVPacket {
                     writeLong(it.id)
                     writeString(it.name)
+                }
+            }
+        }.readBytes().encodeBase64()
+    }
+
+    @InternalAPI
+    @JvmStatic
+    fun getGroupMemberInfo(groupId: Long, memberId: Long): String {
+        val member = MiraiNative.INSTANCE.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
+        return buildPacket {
+            writeMember(member)
+        }.readBytes().encodeBase64()
+    }
+
+    @InternalAPI
+    @JvmStatic
+    fun getGroupMemberList(groupId: Long): String {
+        val group = MiraiNative.INSTANCE.bot.getGroupOrNull(groupId) ?: return ""
+        return buildPacket {
+            writeInt(group.members.size)
+            group.members.forEach {
+                writeShortLVPacket {
+                    writeMember(it)
                 }
             }
         }.readBytes().encodeBase64()

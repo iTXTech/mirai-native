@@ -298,6 +298,16 @@ class Bridge {
         return BridgeHelper.getGroupList();
     }
 
+    @NativeBridgeMethod
+    public static String getGroupMemberInfo(int pluginId, long group, long member, boolean cache) {
+        return BridgeHelper.getGroupMemberInfo(group, member);
+    }
+
+    @NativeBridgeMethod
+    public static String getGroupMemberList(int pluginId, long group) {
+        return BridgeHelper.getGroupMemberList(group);
+    }
+
     /**
      * Indicates the method is called from native code
      */

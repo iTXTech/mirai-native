@@ -370,7 +370,7 @@ CQAPI(int32_t, CQ_setGroupLeave, 16)(int32_t plugin_id, int64_t group, BOOL dism
 }
 
 CQAPI(int32_t, CQ_setGroupSpecialTitle, 32)(int32_t plugin_id, int64_t group, int64_t member,
-                                                        const char* title, int64_t duration)
+                                            const char* title, int64_t duration)
 {
 	auto env = AttachJava();
 	auto clazz = env->FindClass(BRIDGE);
@@ -421,4 +421,21 @@ CQAPI(const char*, CQ_getGroupList, 4)(int32_t plugin_id)
 	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "getGroupList", "(I)Ljava/lang/String;");
 	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id)), nullptr);
+}
+
+CQAPI(const char*, CQ_getGroupMemberInfoV2, 24)(int32_t plugin_id, int64_t group, int64_t account, BOOL cache)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "getGroupMemberInfo", "(IJJZ)Ljava/lang/String;");
+	return env->GetStringUTFChars(
+		jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, group, account, cache != FALSE)), nullptr);
+}
+
+CQAPI(const char*, CQ_getGroupMemberList, 12)(int32_t plugin_id, int64_t group)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "getGroupMemberList", "(IJ)Ljava/lang/String;");
+	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, group)), nullptr);
 }

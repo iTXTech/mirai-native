@@ -21,8 +21,8 @@
 - [x] `CQ_getFriendList`
 - [x] `CQ_getGroupInfo`
 - [x] `CQ_getGroupList`
-- [ ] `CQ_getGroupMemberInfoV2`
-- [ ] `CQ_getGroupMemberList`
+- [x] `CQ_getGroupMemberInfoV2`
+- [x] `CQ_getGroupMemberList`
 - [ ] `CQ_getImage`
 - [x] `CQ_getLoginNick`
 - [x] `CQ_getLoginQQ`
