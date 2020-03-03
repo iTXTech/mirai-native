@@ -132,7 +132,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 		if (info)
 		{
 			const auto jstr = GbToJstring(env, info());
-			const auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+			const auto clazz = env->FindClass(BRIDGE);
 			const auto method = env->GetStaticMethodID(clazz, "updatePluginInfo", "(ILjava/lang/String;)V");
 			env->CallStaticVoidMethod(clazz, method, plugin.id, jstr);
 			env->DeleteLocalRef(jstr);
@@ -248,12 +248,12 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan(
 
 // CQ APIs
 
-int32_t __stdcall CQ_addLog(int32_t plugin_id, int32_t priority, const char* type, const char* content)
+CQAPI(int32_t, CQ_addLog, 16)(int32_t plugin_id, int32_t priority, const char* type, const char* content)
 {
 	auto env = AttachJava();
 	auto t = GbToJstring(env, type);
 	auto c = GbToJstring(env, content);
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "addLog", "(IILjava/lang/String;Ljava/lang/String;)V");
 	jint result = env->CallStaticIntMethod(clazz, method, plugin_id, priority, t, c);
 	env->DeleteLocalRef(t);
@@ -261,47 +261,47 @@ int32_t __stdcall CQ_addLog(int32_t plugin_id, int32_t priority, const char* typ
 	return 0;
 }
 
-int32_t __stdcall CQ_canSendImage(int32_t)
+CQAPI(int32_t, CQ_canSendImage, 4)(int32_t)
 {
 	return 1;
 }
 
-int32_t __stdcall CQ_canSendRecord(int32_t)
+CQAPI(int32_t, CQ_canSendRecord, 4)(int32_t)
 {
 	return 1;
 }
 
-int32_t __stdcall sendMsg(int32_t plugin_id, int64_t acc, const char* msg, const char* m)
+int32_t sendMsg(int32_t plugin_id, int64_t acc, const char* msg, const char* m)
 {
 	auto env = AttachJava();
 	auto jstr = GbToJstring(env, msg);
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, m, "(IJLjava/lang/String;)I");
 	jint result = env->CallStaticIntMethod(clazz, method, plugin_id, acc, jstr);
 	env->DeleteLocalRef(jstr);
 	return result;
 }
 
-int32_t __stdcall CQ_sendPrivateMsg(int32_t plugin_id, int64_t account, const char* msg)
+CQAPI(int32_t, CQ_sendPrivateMsg, 16)(int32_t plugin_id, int64_t account, const char* msg)
 {
 	return sendMsg(plugin_id, account, msg, "sendFriendMessage");
 }
 
-int32_t __stdcall CQ_sendGroupMsg(int32_t plugin_id, int64_t group, const char* msg)
+CQAPI(int32_t, CQ_sendGroupMsg, 16)(int32_t plugin_id, int64_t group, const char* msg)
 {
 	return sendMsg(plugin_id, group, msg, "sendGroupMessage");
 }
 
-int32_t __stdcall CQ_setFatal(int32_t plugin_id, const char* info)
+CQAPI(int32_t, CQ_setFatal, 8)(int32_t plugin_id, const char* info)
 {
 	CQ_addLog(plugin_id, 22, "", info);
 	return 0;
 }
 
-const char* __stdcall CQ_getAppDirectory(int32_t plugin_id)
+CQAPI(const char*, CQ_getAppDirectory, 4)(int32_t plugin_id)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "getPluginDataDir", "(I)Ljava/lang/String;");
 	jstring result = jstring(env->CallStaticObjectMethod(clazz, method, plugin_id));
 	auto r = JstringToGb(env, result);
@@ -309,42 +309,43 @@ const char* __stdcall CQ_getAppDirectory(int32_t plugin_id)
 	return r;
 }
 
-int64_t __stdcall CQ_getLoginQQ(int32_t plugin_id)
+CQAPI(int64_t, CQ_getLoginQQ, 4)(int32_t plugin_id)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "getLoginQQ", "(I)J");
 	return env->CallStaticLongMethod(clazz, method, plugin_id);
 }
 
-const char* __stdcall CQ_getLoginNick(int32_t plugin_id)
+CQAPI(const char*, CQ_getLoginNick, 4)(int32_t plugin_id)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "getLoginNick", "(I)Ljava/lang/String;");
 	return JstringToGb(env, jstring(env->CallStaticObjectMethod(clazz, method, plugin_id)));
 }
 
-int32_t __stdcall CQ_setGroupAnonymous(int32_t plugin_id, int64_t group, BOOL enable)
+
+CQAPI(int32_t, CQ_setGroupAnonymous, 16)(int32_t plugin_id, int64_t group, BOOL enable)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "setGroupAnonymous", "(IJZ)I");
 	return env->CallStaticIntMethod(clazz, method, plugin_id, group, enable != FALSE);
 }
 
-int32_t __stdcall CQ_setGroupBan(int32_t plugin_id, int64_t group, int64_t member, int64_t duration)
+CQAPI(int32_t, CQ_setGroupBan, 28)(int32_t plugin_id, int64_t group, int64_t member, int64_t duration)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "setGroupBan", "(IJJJ)I");
 	return env->CallStaticIntMethod(clazz, method, plugin_id, group, member, duration);
 }
 
-int32_t __stdcall CQ_setGroupCard(int32_t plugin_id, int64_t group, int64_t member, const char* card)
+CQAPI(int32_t, CQ_setGroupCard, 24)(int32_t plugin_id, int64_t group, int64_t member, const char* card)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "setGroupCard", "(IJJLjava/lang/String;)I");
 	auto jstr = GbToJstring(env, card);
 	auto result = env->CallStaticIntMethod(clazz, method, plugin_id, group, member, jstr);
@@ -352,27 +353,27 @@ int32_t __stdcall CQ_setGroupCard(int32_t plugin_id, int64_t group, int64_t memb
 	return result;
 }
 
-int32_t __stdcall CQ_setGroupKick(int32_t plugin_id, int64_t group, int64_t member, BOOL reject)
+CQAPI(int32_t, CQ_setGroupKick, 24)(int32_t plugin_id, int64_t group, int64_t member, BOOL reject)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "setGroupKick", "(IJJZ)I");
 	return env->CallStaticIntMethod(clazz, method, plugin_id, group, member, reject != FALSE);
 }
 
-int32_t __stdcall CQ_setGroupLeave(int32_t plugin_id, int64_t group, BOOL dismiss)
+CQAPI(int32_t, CQ_setGroupLeave, 16)(int32_t plugin_id, int64_t group, BOOL dismiss)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "setGroupLeave", "(IJZ)I");
 	return env->CallStaticIntMethod(clazz, method, plugin_id, group, dismiss != FALSE);
 }
 
-int32_t __stdcall CQ_setGroupSpecialTitle(int32_t plugin_id, int64_t group, int64_t member,
-                                          const char* title, int64_t duration)
+CQAPI(int32_t, CQ_setGroupSpecialTitle, 32)(int32_t plugin_id, int64_t group, int64_t member,
+                                                        const char* title, int64_t duration)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "setGroupSpecialTitle", "(IJJLjava/lang/String;J)I");
 	auto jstr = GbToJstring(env, title);
 	auto result = env->CallStaticIntMethod(clazz, method, plugin_id, group, member, jstr, duration);
@@ -380,44 +381,44 @@ int32_t __stdcall CQ_setGroupSpecialTitle(int32_t plugin_id, int64_t group, int6
 	return result;
 }
 
-int32_t __stdcall CQ_setGroupWholeBan(int32_t plugin_id, int64_t group, BOOL enable)
+CQAPI(int32_t, CQ_setGroupWholeBan, 16)(int32_t plugin_id, int64_t group, BOOL enable)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "setGroupWholeBan", "(IJZ)I");
 	return env->CallStaticIntMethod(clazz, method, plugin_id, group, enable != FALSE);
 }
 
-int32_t __stdcall CQ_deleteMsg(int32_t plugin_id, int64_t msg_id)
+CQAPI(int32_t, CQ_deleteMsg, 12)(int32_t plugin_id, int64_t msg_id)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "recallMsg", "(IJ)I");
 	return env->CallStaticIntMethod(clazz, method, plugin_id, msg_id);
 }
 
-const char* __stdcall CQ_getFriendList(int32_t plugin_id, BOOL reserved)
+CQAPI(const char*, CQ_getFriendList, 8)(int32_t plugin_id, BOOL reserved)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "getFriendList", "(IZ)Ljava/lang/String;");
 	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, reserved != FALSE)),
 	                              nullptr);
 }
 
-const char* __stdcall CQ_getGroupInfo(int32_t plugin_id, int64_t group, BOOL cache)
+CQAPI(const char*, CQ_getGroupInfo, 16)(int32_t plugin_id, int64_t group, BOOL cache)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "getGroupInfo", "(IJZ)Ljava/lang/String;");
 	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, group, cache != FALSE)),
 	                              nullptr);
 }
 
-const char* __stdcall CQ_getGroupList(int32_t plugin_id)
+CQAPI(const char*, CQ_getGroupList, 4)(int32_t plugin_id)
 {
 	auto env = AttachJava();
-	auto clazz = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "getGroupList", "(I)Ljava/lang/String;");
 	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id)), nullptr);
 }
