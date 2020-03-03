@@ -1,8 +1,10 @@
 # TODO
 
+1. 带有 `[PART]` 的表示部分实现不完整
+
 ## 功能
 
-- [x] 应用 `JSON`
+- [x] 应用 `JSON` `[PART]`
 - [ ] `CQ码` 转 `mirai码` 
 - [ ] 悬浮窗
 - [ ] 菜单
@@ -21,10 +23,10 @@
 - [x] `CQ_getFriendList`
 - [x] `CQ_getGroupInfo`
 - [x] `CQ_getGroupList`
-- [x] `CQ_getGroupMemberInfoV2`
-- [x] `CQ_getGroupMemberList`
+- [x] `CQ_getGroupMemberInfoV2` `[PART]`
+- [x] `CQ_getGroupMemberList` `[PART]`
 - [ ] `CQ_getImage`
-- [x] `CQ_getLoginNick`
+- [x] `CQ_getLoginNick` `[PART]`
 - [x] `CQ_getLoginQQ`
 - [ ] `CQ_getRecord`
 - [ ] `CQ_getRecordV2`
@@ -38,7 +40,7 @@
 - [ ] `CQ_setFriendAddRequest`
 - [ ] `CQ_setGroupAddRequestV2`
 - [ ] `CQ_setGroupAdmin`
-- [x] `CQ_setGroupAnonymous`
+- [x] `CQ_setGroupAnonymous` `[PART]`
 - [ ] `CQ_setGroupAnonymousBan`
 - [x] `CQ_setGroupBan`
 - [x] `CQ_setGroupCard`
@@ -63,4 +65,4 @@
 - [x] `_eventSystem_GroupAdmin`
 - [x] `_eventSystem_GroupBan`
 - [x] `_eventSystem_GroupMemberDecrease`
-- [ ] `_eventSystem_GroupMemberIncrease`
+- [x] `_eventSystem_GroupMemberIncrease` `[PART]`

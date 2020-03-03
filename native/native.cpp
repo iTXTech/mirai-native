@@ -223,10 +223,10 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin(
 	return 0;
 }
 
-JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMemberLeave(
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMember(
 	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint time, jlong grp, jlong acct, jlong mbr)
 {
-	const auto m = EvGroupMemberLeave(GetMethod(env, id, method));
+	const auto m = EvGroupMember(GetMethod(env, id, method));
 	if (m)
 	{
 		return m(type, time, grp, acct, mbr);

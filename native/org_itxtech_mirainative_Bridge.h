@@ -63,10 +63,10 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    pEvGroupMemberLeave
+ * Method:    pEvGroupMember
  * Signature: (ILjava/lang/String;IIJJJ)I
  */
-JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMemberLeave
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMember
   (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong, jlong);
 
 /*

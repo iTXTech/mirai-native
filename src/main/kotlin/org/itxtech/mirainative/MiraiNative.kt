@@ -257,6 +257,23 @@ class MiraiNative : PluginBase() {
                 }
             }
         }
+        subscribeAlways<BotGroupPermissionChangeEvent> {
+            launch(NativeDispatcher) {
+                if (new == MemberPermission.MEMBER) {
+                    bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, bot.uin)
+                } else {
+                    bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, bot.uin)
+                }
+            }
+        }
+
+        // 加群事件
+        subscribeAlways<MemberJoinEvent> {
+            launch(NativeDispatcher) {
+                // TODO: 区分管理员批准/邀请，添加批准者
+                bridge.eventGroupMemberJoin(Bridge.MEMBER_JOIN_PERMITTED, getTimestamp(), group.id, 0, member.id)
+            }
+        }
 
         // 退群事件
         subscribeAlways<MemberLeaveEvent.Kick> {

@@ -43,6 +43,9 @@ class Bridge {
     public static final int MEMBER_LEAVE_QUIT = 1;
     public static final int MEMBER_LEAVE_KICK = 2;
 
+    public static final int MEMBER_JOIN_PERMITTED = 1;
+    public static final int MEMBER_JOIN_INVITED_BY_ADMIN = 2;
+
     public static final int GROUP_UNMUTE = 1;
     public static final int GROUP_MUTE = 2;
 
@@ -138,7 +141,7 @@ class Bridge {
 
     public void eventGroupMemberLeave(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
         for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_DEC) && pEvGroupMemberLeave(plugin.getId(),
+            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_DEC) && pEvGroupMember(plugin.getId(),
                     plugin.getEventOrDefault(Event.EVENT_GROUP_MEMBER_DEC, "_eventSystem_GroupMemberDecrease"),
                     subType, time, fromGroup, fromAccount, beingOperateAccount) == 1) {
                 break;
@@ -156,6 +159,16 @@ class Bridge {
         }
     }
 
+    public void eventGroupMemberJoin(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_INC) && pEvGroupMember(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_GROUP_MEMBER_INC, "_eventSystem_GroupMemberIncrease"),
+                    subType, time, fromGroup, fromAccount, beingOperateAccount) == 1) {
+                break;
+            }
+        }
+    }
+
     // Native
 
     public native int loadNativePlugin(String file, int id);
@@ -168,7 +181,7 @@ class Bridge {
 
     public native int pEvGroupAdmin(int pluginId, String name, int subType, int time, long fromGroup, long beingOperateAccount);
 
-    public native int pEvGroupMemberLeave(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount);
+    public native int pEvGroupMember(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount);
 
     public native int pEvGroupBan(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration);
 
