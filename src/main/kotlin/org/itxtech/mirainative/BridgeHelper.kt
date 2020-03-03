@@ -108,7 +108,7 @@ object BridgeHelper {
     @InternalAPI
     @JvmStatic
     fun getFriendList(): String {
-        val list = MiraiNative.INSTANCE.bot.qqs
+        val list = MiraiNative.INSTANCE.bot.friends
         return buildPacket {
             writeInt(list.size)
             list.forEach { qq ->

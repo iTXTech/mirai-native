@@ -37,7 +37,7 @@ object MessageCache {
 
     fun cacheMessage(message: MessageSource, id: Int = nextId()): Int {
         if (message.groupId == 0L) {
-            cache[id] = CachedMessage(message.id, message.id, true)
+            cache[id] = CachedMessage(message.id, message.senderId, true)
         } else {
             cache[id] = CachedMessage(message.id, message.groupId, false)
         }

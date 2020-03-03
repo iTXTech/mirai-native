@@ -46,21 +46,22 @@ char* JstringToGb(JNIEnv* env, jstring jstr)
 
 jstring GbToJstring(JNIEnv* env, const char* str)
 {
-	jstring rtn = 0;
+	if (str == nullptr)
+	{
+		str = "";
+	}
 	int slen = strlen(str);
-	unsigned short* buffer = 0;
 	if (slen == 0)
 	{
-		rtn = env->NewStringUTF(str);
+		return env->NewStringUTF(str);
 	}
-	else
+	jstring rtn = nullptr;
+	unsigned short* buffer = 0;
+	const auto length = MultiByteToWideChar(GB18030, 0, LPCSTR(str), slen, nullptr, 0);
+	buffer = static_cast<unsigned short*>(malloc(length * 2 + 1));
+	if (MultiByteToWideChar(GB18030, 0, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
 	{
-		int length = MultiByteToWideChar(GB18030, 0, LPCSTR(str), slen, nullptr, 0);
-		buffer = static_cast<unsigned short*>(malloc(length * 2 + 1));
-		if (MultiByteToWideChar(GB18030, 0, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
-		{
-			rtn = env->NewString(static_cast<jchar*>(buffer), length);
-		}
+		rtn = env->NewString(static_cast<jchar*>(buffer), length);
 	}
 	if (buffer)
 	{
