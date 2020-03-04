@@ -33,7 +33,6 @@ import kotlinx.io.core.readBytes
 import kotlinx.io.core.writeFully
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
-import net.mamoe.mirai.contact.sendMessage
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
 import java.nio.charset.Charset
@@ -43,7 +42,7 @@ object BridgeHelper {
     fun sendFriendMessage(id: Long, message: String): Int {
         val internalId = MessageCache.nextId()
         MiraiNative.INSTANCE.launch {
-            MiraiNative.INSTANCE.bot.getFriend(id).sendMessage(message).apply {
+            MiraiNative.INSTANCE.bot.getFriend(id).sendMessage(ChainCodeConverter.codeToChain(message)).apply {
                 source.ensureSequenceIdAvailable()
                 MessageCache.cacheMessage(source, internalId)
             }
@@ -55,7 +54,7 @@ object BridgeHelper {
     fun sendGroupMessage(id: Long, message: String): Int {
         val internalId = MessageCache.nextId()
         MiraiNative.INSTANCE.launch {
-            MiraiNative.INSTANCE.bot.getGroup(id).sendMessage(message).apply {
+            MiraiNative.INSTANCE.bot.getGroup(id).sendMessage(ChainCodeConverter.codeToChain(message)).apply {
                 source.ensureSequenceIdAvailable()
                 MessageCache.cacheMessage(source, internalId)
             }
@@ -122,17 +121,13 @@ object BridgeHelper {
         writeInt(0) // TODO: 加群时间
         writeInt(0) // TODO: 最后发言
         writeString("") // TODO: 等级名称
-        when (member.permission) {
-            MemberPermission.MEMBER -> {
-                writeInt(1)
+        writeInt(
+            when (member.permission) {
+                MemberPermission.MEMBER -> 1
+                MemberPermission.ADMINISTRATOR -> 2
+                MemberPermission.OWNER -> 3
             }
-            MemberPermission.ADMINISTRATOR -> {
-                writeInt(2)
-            }
-            MemberPermission.OWNER -> {
-                writeInt(3)
-            }
-        }
+        )
         writeBool(false) // TODO: 不良记录成员
         writeString(member.specialTitle)
         writeInt(-1) // TODO: 头衔过期时间

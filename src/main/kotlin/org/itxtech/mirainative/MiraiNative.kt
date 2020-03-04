@@ -228,7 +228,7 @@ class MiraiNative : PluginBase() {
                     Bridge.PRI_MSG_SUBTYPE_FRIEND,
                     MessageCache.cacheMessage(message[MessageSource]),
                     sender.id,
-                    message.toString(),
+                    ChainCodeConverter.chainToCode(message),
                     0
                 )
             }
@@ -241,7 +241,7 @@ class MiraiNative : PluginBase() {
                     group.id,
                     sender.id,
                     "",
-                    message.toString(),
+                    ChainCodeConverter.chainToCode(message),
                     0
                 )
             }
