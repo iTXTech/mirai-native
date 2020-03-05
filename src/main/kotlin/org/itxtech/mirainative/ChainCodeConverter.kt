@@ -68,7 +68,7 @@ object ChainCodeConverter {
                                 MiraiNative.INSTANCE.logger.debug("你人没了：${args["qq"]}")
                                 return PlainText.Empty
                             }
-                            return At(member)
+                            At(member)
                         }
                     }
                     "face" -> {
@@ -76,15 +76,15 @@ object ChainCodeConverter {
                     }
                     else -> {
                         MiraiNative.INSTANCE.logger.debug("不支持的 CQ码：$c")
-                        return PlainText.Empty
+                        PlainText.Empty
                     }
                 }
             } else {
                 MiraiNative.INSTANCE.logger.debug("不支持的 CQ码 ：$c")
-                return PlainText.Empty
+                PlainText.Empty
             }
         } else {
-            return PlainText(this)
+            PlainText(this)
         }
     }
 
