@@ -24,7 +24,6 @@
 
 package org.itxtech.mirainative.plugin
 
-import io.ktor.util.InternalAPI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -33,7 +32,6 @@ import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.NativeDispatcher
 import java.io.File
 
-@InternalAPI
 data class NativePlugin(val file: File, val id: Int) {
     var enabled: Boolean = false
     var api: Int = -1
@@ -63,8 +61,8 @@ data class NativePlugin(val file: File, val id: Int) {
                 while (isActive) {
                     if (enabled) {
                         BridgeHelper.updateFwe(id, entry)
-                        delay(it.period.toLong())
                     }
+                    delay(it.period.toLong())
                 }
             }
         }

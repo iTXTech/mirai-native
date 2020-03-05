@@ -38,6 +38,7 @@ import java.nio.charset.Charset
 import kotlin.io.use
 import kotlin.text.toByteArray
 
+@UseExperimental(InternalAPI::class)
 object BridgeHelper {
     @JvmStatic
     fun sendFriendMessage(id: Long, message: String): Int {
@@ -135,7 +136,6 @@ object BridgeHelper {
         writeBool(true) // TODO: 允许修改名片
     }
 
-    @InternalAPI
     @JvmStatic
     fun getFriendList(): String {
         val list = MiraiNative.INSTANCE.bot.friends
@@ -152,7 +152,6 @@ object BridgeHelper {
         }.readBytes().encodeBase64()
     }
 
-    @InternalAPI
     @JvmStatic
     fun getGroupInfo(id: Long): String {
         val info = MiraiNative.INSTANCE.bot.getGroupOrNull(id)
@@ -168,7 +167,6 @@ object BridgeHelper {
         return ""
     }
 
-    @InternalAPI
     @JvmStatic
     fun getGroupList(): String {
         val list = MiraiNative.INSTANCE.bot.groups
@@ -183,7 +181,6 @@ object BridgeHelper {
         }.readBytes().encodeBase64()
     }
 
-    @InternalAPI
     @JvmStatic
     fun getGroupMemberInfo(groupId: Long, memberId: Long): String {
         val member = MiraiNative.INSTANCE.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
@@ -192,7 +189,6 @@ object BridgeHelper {
         }.readBytes().encodeBase64()
     }
 
-    @InternalAPI
     @JvmStatic
     fun getGroupMemberList(groupId: Long): String {
         val group = MiraiNative.INSTANCE.bot.getGroupOrNull(groupId) ?: return ""
@@ -210,7 +206,6 @@ object BridgeHelper {
         return readBytes(readShort().toInt()).toString()
     }
 
-    @InternalAPI
     fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {
         val pk = ByteReadPacket(
             MiraiNative.INSTANCE.bridge.callStringMethod(pluginId, fwe.status.function).decodeBase64Bytes()

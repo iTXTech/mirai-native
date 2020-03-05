@@ -74,6 +74,9 @@ object ChainCodeConverter {
                     "face" -> {
                         Face(args["id"]!!.toInt())
                     }
+                    "emoji" -> {
+                        PlainText(String(Character.toChars(args["id"]!!.toInt())))
+                    }
                     else -> {
                         MiraiNative.INSTANCE.logger.debug("不支持的 CQ码：$c")
                         PlainText.Empty
