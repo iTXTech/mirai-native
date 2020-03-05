@@ -1,7 +1,3 @@
-package org.itxtech.mirainative.plugin
-
-import java.io.File
-
 /*
  *
  * Mirai Native
@@ -25,6 +21,19 @@ import java.io.File
  * @website https://github.com/iTXTech/mirai-native
  *
  */
+
+package org.itxtech.mirainative.plugin
+
+import io.ktor.util.InternalAPI
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import org.itxtech.mirainative.BridgeHelper
+import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.NativeDispatcher
+import java.io.File
+
+@InternalAPI
 data class NativePlugin(val file: File, val id: Int) {
     var enabled: Boolean = false
     var api: Int = -1
@@ -38,9 +47,28 @@ data class NativePlugin(val file: File, val id: Int) {
             v!!.event.forEach {
                 events!![it.type] = it.function
             }
+            if (v.status.isNotEmpty()) {
+                registerFws(v.status)
+            }
             field = v
         }
     private var events: HashMap<Int, String>? = null
+    private val entries: ArrayList<FloatingWindowEntry> = ArrayList()
+
+    private fun registerFws(fws: ArrayList<Status>) {
+        fws.forEach {
+            val entry = FloatingWindowEntry(it)
+            entries.add(entry)
+            MiraiNative.INSTANCE.launch(NativeDispatcher) {
+                while (isActive) {
+                    if (enabled) {
+                        BridgeHelper.updateFwe(id, entry)
+                        delay(it.period.toLong())
+                    }
+                }
+            }
+        }
+    }
 
     fun setInfo(i: String) {
         val parts = i.split(",")

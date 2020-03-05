@@ -57,8 +57,8 @@ class MiraiNative : PluginBase() {
     }
 
     private var pluginId = 0
-    private var bridge = Bridge()
     private var botOnline = false
+    val bridge = Bridge()
     var plugins: HashMap<Int, NativePlugin> = HashMap()
     val bot: Bot by lazy { Bot.instances.first().get()!! }
 

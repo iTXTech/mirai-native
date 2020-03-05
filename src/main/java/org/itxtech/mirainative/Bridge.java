@@ -34,7 +34,7 @@ import java.util.HashMap;
  * @website https://github.com/iTXTech/mirai-native
  *
  */
-class Bridge {
+public class Bridge {
     public static final int PRI_MSG_SUBTYPE_FRIEND = 11;
 
     public static final int PERM_SUBTYPE_CANCEL_ADMIN = 1;

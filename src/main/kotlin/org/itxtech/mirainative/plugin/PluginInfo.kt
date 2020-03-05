@@ -92,3 +92,9 @@ data class Regex(
     val key: ArrayList<String>,
     val expression: ArrayList<String>
 )
+
+data class FloatingWindowEntry(val status: Status) {
+    lateinit var data: String
+    lateinit var unit: String
+    var color: Int = 0
+}

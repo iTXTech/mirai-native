@@ -25,17 +25,18 @@
 package org.itxtech.mirainative
 
 import io.ktor.util.InternalAPI
+import io.ktor.util.decodeBase64Bytes
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.launch
-import kotlinx.io.core.BytePacketBuilder
-import kotlinx.io.core.buildPacket
-import kotlinx.io.core.readBytes
-import kotlinx.io.core.writeFully
+import kotlinx.io.core.*
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import org.itxtech.mirainative.plugin.FloatingWindowEntry
 import java.nio.charset.Charset
+import kotlin.io.use
+import kotlin.text.toByteArray
 
 object BridgeHelper {
     @JvmStatic
@@ -203,5 +204,19 @@ object BridgeHelper {
                 }
             }
         }.readBytes().encodeBase64()
+    }
+
+    private fun ByteReadPacket.readString(): String {
+        return readBytes(readShort().toInt()).toString()
+    }
+
+    @InternalAPI
+    fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {
+        val pk = ByteReadPacket(
+            MiraiNative.INSTANCE.bridge.callStringMethod(pluginId, fwe.status.function).decodeBase64Bytes()
+        )
+        fwe.data = pk.readString()
+        fwe.unit = pk.readString()
+        fwe.color = pk.readInt()
     }
 }

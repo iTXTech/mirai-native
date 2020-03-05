@@ -184,7 +184,7 @@ JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
 	{
 		rtn = m();
 	}
-	return GbToJstring(env, rtn);
+	return env->NewStringUTF(rtn);
 }
 
 // Event
