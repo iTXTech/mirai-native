@@ -24,8 +24,11 @@
 
 package org.itxtech.mirainative
 
+import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.uploadImage
+import java.io.File
 
 object ChainCodeConverter {
     private fun String.escape(c: Boolean = false): String {
@@ -47,7 +50,7 @@ object ChainCodeConverter {
         return map
     }
 
-    private fun String.toMessageInternal(id: Long): Message {
+    private suspend fun String.toMessageInternal(contact: Contact?): Message {
         return if (this.startsWith("[CQ:") && this.endsWith("]")) {
             val c = this.substring(4, this.length - 1)
             if (c.contains(",")) { // TODO: 支持更多码
@@ -58,9 +61,9 @@ object ChainCodeConverter {
                         if (args["qq"] == "all") {
                             AtAll
                         } else {
-                            val group = MiraiNative.INSTANCE.bot.getGroupOrNull(id)
+                            val group = MiraiNative.INSTANCE.bot.getGroupOrNull(contact!!.id)
                             if (group == null) {
-                                MiraiNative.INSTANCE.logger.debug("你群没了：$id")
+                                MiraiNative.INSTANCE.logger.debug("你群没了：${contact.id}")
                                 return PlainText("")
                             }
                             val member = group.getOrNull(args["qq"]!!.toLong())
@@ -76,6 +79,17 @@ object ChainCodeConverter {
                     }
                     "emoji" -> {
                         PlainText(String(Character.toChars(args["id"]!!.toInt())))
+                    }
+                    "image" -> {
+                        val file = File(
+                            MiraiNative.INSTANCE.dataFolder.absolutePath +
+                                    File.separatorChar + "data" + File.separatorChar + "image" + File.separatorChar + args["file"]!!
+                        )
+                        if (file.exists()) {
+                            contact!!.uploadImage(file)
+                        } else {
+                            PlainText.Empty
+                        }
                     }
                     else -> {
                         MiraiNative.INSTANCE.logger.debug("不支持的 CQ码：$c")
@@ -104,7 +118,7 @@ object ChainCodeConverter {
         }
     }
 
-    fun codeToChain(message: String, groupId: Long = 0): MessageChain {
+    suspend fun codeToChain(message: String, contact: Contact?): MessageChain {
         return buildMessageChain {
             if (message.contains("[CQ:")) {
                 var interpreting = false
@@ -120,7 +134,7 @@ object ChainCodeConverter {
                             if (sb.isNotEmpty()) {
                                 val lastMsg = sb.toString()
                                 sb.delete(0, sb.length)
-                                +lastMsg.toMessageInternal(groupId)
+                                +lastMsg.toMessageInternal(contact)
                             }
                             sb.append(c)
                         }
@@ -134,7 +148,7 @@ object ChainCodeConverter {
                             if (sb.isNotEmpty()) {
                                 val lastMsg = sb.toString()
                                 sb.delete(0, sb.length)
-                                +lastMsg.toMessageInternal(groupId)
+                                +lastMsg.toMessageInternal(contact)
                             }
                         }
                     } else {
@@ -143,7 +157,7 @@ object ChainCodeConverter {
                     index++
                 }
                 if (sb.isNotEmpty()) {
-                    +sb.toString().toMessageInternal(groupId)
+                    +sb.toString().toMessageInternal(contact)
                 }
             } else {
                 +PlainText(message)
