@@ -1,6 +1,6 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.3.61"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.3.61"
+    id("org.jetbrains.kotlin.jvm") version "1.3.70"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.3.70"
 }
 
 group = "org.itxtech"
@@ -24,10 +24,10 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
 
-    implementation("net.mamoe:mirai-core-jvm:0.24.1")
-    implementation("net.mamoe:mirai-console:0.3.1")
+    implementation("net.mamoe:mirai-core-jvm:0.27.0")
+    implementation("net.mamoe:mirai-console:0.3.3")
 }
 
 tasks.named<Jar>("jar") {

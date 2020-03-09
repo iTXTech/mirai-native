@@ -1,7 +1,3 @@
-package org.itxtech.mirainative.plugin
-
-import kotlinx.serialization.Serializable
-
 /*
  *
  * Mirai Native
@@ -25,6 +21,11 @@ import kotlinx.serialization.Serializable
  * @website https://github.com/iTXTech/mirai-native
  *
  */
+
+package org.itxtech.mirainative.plugin
+
+import kotlinx.serialization.Serializable
+
 @Serializable
 data class PluginInfo(
     val ret: Int = 1,

@@ -38,7 +38,7 @@ import java.nio.charset.Charset
 import kotlin.io.use
 import kotlin.text.toByteArray
 
-@UseExperimental(InternalAPI::class)
+@OptIn(InternalAPI::class)
 object BridgeHelper {
     @JvmStatic
     fun sendFriendMessage(id: Long, message: String): Int {
