@@ -323,7 +323,7 @@ public class Bridge {
     }
 
     @NativeBridgeMethod
-    public static String getCookiesV2(int pluginId, String domain) {
+    public static String getCookies(int pluginId, String domain) {
         return "";
     }
 
@@ -338,7 +338,7 @@ public class Bridge {
     }
 
     @NativeBridgeMethod
-    public static String getRecordV2(int pluginId, String file, String format) {
+    public static String getRecord(int pluginId, String file, String format) {
         return "";
     }
 
@@ -347,12 +347,58 @@ public class Bridge {
         return "";
     }
 
+    @NativeBridgeMethod
+    public static int sendDiscussMessage(int pluginId, long group, String msg) {
+        return 0;
+    }
+
+    @NativeBridgeMethod
+    public static int setDiscussLeave(int pluginId, long group) {
+        return 0;
+    }
+
+    @NativeBridgeMethod
+    public static int setFriendAddRequest(int pluginId, String requestId, int type, String remark) {
+        return 0;
+    }
+
+    @NativeBridgeMethod
+    public static int setGroupAddRequest(int pluginId, String requestId, int reqType, int fbType, String reason) {
+        return 0;
+    }
+
+    @NativeBridgeMethod
+    public static int setGroupAdmin(int pluginId, long group, long account, boolean admin) {
+        //true => set, false => revoke
+        return 0;
+    }
+
+    @NativeBridgeMethod
+    public static int setGroupAnonymousBan(int pluginId, long group, String id, long duration) {
+        return 0;
+    }
+
+    // Wont' Implement
+
+    @NativeBridgeMethod
+    public static int sendLike(int pluginId, long account, int times) {
+        return 0;
+    }
+
+    // Legacy Methods
+
+    // TODO
+
+    // Annotation
+
     /**
      * Indicates the method is called from native code
      */
     @Retention(value = RetentionPolicy.SOURCE)
     @interface NativeBridgeMethod {
     }
+
+    // Logger
 
     static class NativeLoggerHelper {
         public static final int LOG_DEBUG = 0;

@@ -1,7 +1,8 @@
 # TODO
 
-1. 带有 `[Incomplete]` 的表示部分实现不完整
-1. 带有 `[Placeholder]` 的表示该方法仅占位，无法实现具体功能
+1. 带有 `[Incomplete]` 的代表该方法实现不完整
+1. 带有 `[Placeholder]` 的代表该方法仅占位，无法实现具体功能
+1. 带有 `[Won't Implement]` 的代表该方法不会实现    
 
 ## 功能
 
@@ -17,7 +18,7 @@
 - [x] At
 - [x] 表情
 - [x] Emoji
-- [x] 图片
+- [x] 图片 `[Incomplete]`
 
 ## 酷Q API
 
@@ -38,17 +39,17 @@
 - [x] `CQ_getLoginQQ`
 - [x] `CQ_getRecordV2` `[Placeholder]`
 - [x] `CQ_getStrangerInfo` `[Placeholder]`
-- [ ] `CQ_sendDiscussMsg`
+- [x] `CQ_sendDiscussMsg` `[Placeholder]`
 - [x] `CQ_sendGroupMsg`
-- [ ] `CQ_sendLikeV2`
+- [x] `CQ_sendLikeV2` `[Placeholder]` `[Won't Implement]`
 - [x] `CQ_sendPrivateMsg`
-- [ ] `CQ_setDiscussLeave`
+- [x] `CQ_setDiscussLeave` `[Placeholder]`
 - [x] `CQ_setFatal`
-- [ ] `CQ_setFriendAddRequest`
-- [ ] `CQ_setGroupAddRequestV2`
-- [ ] `CQ_setGroupAdmin`
+- [x] `CQ_setFriendAddRequest` `[Placeholder]`
+- [x] `CQ_setGroupAddRequestV2` `[Placeholder]`
+- [x] `CQ_setGroupAdmin` `[Placeholder]`
 - [x] `CQ_setGroupAnonymous` `[Placeholder]`
-- [ ] `CQ_setGroupAnonymousBan`
+- [x] `CQ_setGroupAnonymousBan` `[Placeholder]`
 - [x] `CQ_setGroupBan`
 - [x] `CQ_setGroupCard`
 - [x] `CQ_setGroupKick`
@@ -62,7 +63,7 @@
 - [ ] `CQ_getGroupMemberInfo`
 - [ ] `CQ_setGroupAddRequest`
 - [ ] `CQ_getRecord`
-- [ ] `CQ_sendLike`
+- [ ] `CQ_sendLike` `[Won't Implement]`
 
 ## 事件
 

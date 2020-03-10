@@ -325,7 +325,6 @@ CQAPI(const char*, CQ_getLoginNick, 4)(int32_t plugin_id)
 	return JstringToGb(env, jstring(env->CallStaticObjectMethod(clazz, method, plugin_id)));
 }
 
-
 CQAPI(int32_t, CQ_setGroupAnonymous, 16)(int32_t plugin_id, int64_t group, BOOL enable)
 {
 	auto env = AttachJava();
@@ -444,7 +443,7 @@ CQAPI(const char*, CQ_getCookiesV2, 8)(int32_t plugin_id, const char* domain)
 {
 	auto env = AttachJava();
 	auto clazz = env->FindClass(BRIDGE);
-	auto method = env->GetStaticMethodID(clazz, "getCookiesV2", "(ILjava/lang/String;)Ljava/lang/String;");
+	auto method = env->GetStaticMethodID(clazz, "getCookies", "(ILjava/lang/String;)Ljava/lang/String;");
 	auto jstr = GbToJstring(env, domain);
 	auto result = env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, jstr)), nullptr);
 	env->DeleteLocalRef(jstr);
@@ -474,7 +473,7 @@ CQAPI(const char*, CQ_getRecordV2, 12)(int32_t plugin_id, const char* file, cons
 {
 	auto env = AttachJava();
 	auto clazz = env->FindClass(BRIDGE);
-	auto method = env->GetStaticMethodID(clazz, "getRecordV2",
+	auto method = env->GetStaticMethodID(clazz, "getRecord",
 	                                     "(ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 	auto f = GbToJstring(env, file);
 	auto fmt = GbToJstring(env, format);
@@ -485,11 +484,78 @@ CQAPI(const char*, CQ_getRecordV2, 12)(int32_t plugin_id, const char* file, cons
 	return result;
 }
 
-CQAPI(const char*, CQ_getStrangerInfo, 8)(int32_t plugin_id, int64_t account, BOOL cache)
+CQAPI(const char*, CQ_getStrangerInfo, 16)(int32_t plugin_id, int64_t account, BOOL cache)
 {
 	auto env = AttachJava();
 	auto clazz = env->FindClass(BRIDGE);
 	auto method = env->GetStaticMethodID(clazz, "getStrangerInfo", "(IJZ)Ljava/lang/String;");
 	return env->GetStringUTFChars(
 		jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, account, cache != FALSE)), nullptr);
+}
+
+CQAPI(int32_t, CQ_sendDiscussMsg, 16)(int32_t plugin_id, int64_t group, const char* msg)
+{
+	return sendMsg(plugin_id, group, msg, "sendDiscussMessage");
+}
+
+CQAPI(int32_t, CQ_sendLikeV2, 16)(int32_t plugin_id, int64_t account, int32_t times)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "sendLike", "(IJI)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, account, times);
+}
+
+CQAPI(int32_t, CQ_setDiscussLeave, 12)(int32_t plugin_id, int64_t group)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "setDiscussLeave", "(IJ)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, group);
+}
+
+CQAPI(int32_t, CQ_setFriendAddRequest, 16)(int32_t plugin_id, const char* id, int32_t type, const char* remark)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "setFriendAddRequest", "(ILjava/lang/String;ILjava/lang/String;)I");
+	auto i = env->NewStringUTF(id);
+	auto r = GbToJstring(env, remark);
+	auto result = env->CallStaticIntMethod(clazz, method, plugin_id, i, type, r);
+	env->DeleteLocalRef(i);
+	env->DeleteLocalRef(r);
+	return result;
+}
+
+CQAPI(int32_t, CQ_setGroupAddRequestV2, 20)(int32_t plugin_id, const char* id, int32_t req_type, int32_t fb_type,
+                                            const char* reason)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "setGroupAddRequest", "(ILjava/lang/String;IILjava/lang/String;)I");
+	auto i = env->NewStringUTF(id);
+	auto r = GbToJstring(env, reason);
+	auto result = env->CallStaticIntMethod(clazz, method, plugin_id, i, req_type, fb_type, r);
+	env->DeleteLocalRef(i);
+	env->DeleteLocalRef(r);
+	return result;
+}
+
+CQAPI(int32_t, CQ_setGroupAdmin, 24)(int32_t plugin_id, int64_t group, int64_t account, BOOL admin)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "setGroupAdmin", "(IJJZ)I");
+	return env->CallStaticIntMethod(clazz, method, plugin_id, group, account, admin != FALSE);
+}
+
+CQAPI(int32_t, CQ_setGroupAnonymousBan, 24)(int32_t plugin_id, int64_t group, const char* id, int64_t duration)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "setGroupAnonymousBan", "(IJLjava/lang/String;J)I");
+	auto i = env->NewStringUTF(id);
+	auto result = env->CallStaticIntMethod(clazz, method, plugin_id, group, i, duration);
+	env->DeleteLocalRef(i);
+	return result;
 }
