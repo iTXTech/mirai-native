@@ -79,7 +79,12 @@ class MiraiNative : PluginBase() {
                     plugins[pluginId++] = plugin
                     val json = File(file.parent + File.separatorChar + file.name.replace(".dll", ".json"))
                     if (json.exists()) {
-                        plugin.pluginInfo = Json.nonstrict.parse(PluginInfo.serializer(), json.readText())
+                        plugin.pluginInfo = Json {
+                            isLenient = true
+                            ignoreUnknownKeys = true
+                            serializeSpecialFloatingPointValues = true
+                            useArrayPolymorphism = true
+                        }.parse(PluginInfo.serializer(), json.readText())
                     }
                     launch(NativeDispatcher) {
                         bridge.loadPlugin(plugin)

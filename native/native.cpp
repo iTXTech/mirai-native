@@ -439,3 +439,57 @@ CQAPI(const char*, CQ_getGroupMemberList, 12)(int32_t plugin_id, int64_t group)
 	auto method = env->GetStaticMethodID(clazz, "getGroupMemberList", "(IJ)Ljava/lang/String;");
 	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, group)), nullptr);
 }
+
+CQAPI(const char*, CQ_getCookiesV2, 8)(int32_t plugin_id, const char* domain)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "getCookiesV2", "(ILjava/lang/String;)Ljava/lang/String;");
+	auto jstr = GbToJstring(env, domain);
+	auto result = env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, jstr)), nullptr);
+	env->DeleteLocalRef(jstr);
+	return result;
+}
+
+CQAPI(const char*, CQ_getCsrfToken, 4)(int32_t plugin_id)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "getCsrfToken", "(I)Ljava/lang/String;");
+	return env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id)), nullptr);
+}
+
+CQAPI(const char*, CQ_getImage, 8)(int32_t plugin_id, const char* image)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "getImage", "(ILjava/lang/String;)Ljava/lang/String;");
+	auto jstr = GbToJstring(env, image);
+	auto result = env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, jstr)), nullptr);
+	env->DeleteLocalRef(jstr);
+	return result;
+}
+
+CQAPI(const char*, CQ_getRecordV2, 12)(int32_t plugin_id, const char* file, const char* format)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "getRecordV2",
+	                                     "(ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+	auto f = GbToJstring(env, file);
+	auto fmt = GbToJstring(env, format);
+	auto result = env->GetStringUTFChars(
+		jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, f, fmt)), nullptr);
+	env->DeleteLocalRef(f);
+	env->DeleteLocalRef(fmt);
+	return result;
+}
+
+CQAPI(const char*, CQ_getStrangerInfo, 8)(int32_t plugin_id, int64_t account, BOOL cache)
+{
+	auto env = AttachJava();
+	auto clazz = env->FindClass(BRIDGE);
+	auto method = env->GetStaticMethodID(clazz, "getStrangerInfo", "(IJZ)Ljava/lang/String;");
+	return env->GetStringUTFChars(
+		jstring(env->CallStaticObjectMethod(clazz, method, plugin_id, account, cache != FALSE)), nullptr);
+}

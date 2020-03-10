@@ -250,12 +250,6 @@ public class Bridge {
     }
 
     @NativeBridgeMethod
-    public static int setGroupAnonymous(int pluginId, long group, boolean enable) {
-        // TODO: 2020/2/28 core 还不支持
-        return 0;
-    }
-
-    @NativeBridgeMethod
     public static int setGroupBan(int pluginId, long group, long member, long duration) {
         BridgeHelper.setGroupBan(group, member, (int) duration);
         return 0;
@@ -319,6 +313,38 @@ public class Bridge {
     @NativeBridgeMethod
     public static String getGroupMemberList(int pluginId, long group) {
         return BridgeHelper.getGroupMemberList(group);
+    }
+
+    // Placeholder methods which mirai hasn't supported yet
+
+    @NativeBridgeMethod
+    public static int setGroupAnonymous(int pluginId, long group, boolean enable) {
+        return 0;
+    }
+
+    @NativeBridgeMethod
+    public static String getCookiesV2(int pluginId, String domain) {
+        return "";
+    }
+
+    @NativeBridgeMethod
+    public static String getCsrfToken(int pluginId) {
+        return "";
+    }
+
+    @NativeBridgeMethod
+    public static String getImage(int pluginId, String image) {
+        return "";
+    }
+
+    @NativeBridgeMethod
+    public static String getRecordV2(int pluginId, String file, String format) {
+        return "";
+    }
+
+    @NativeBridgeMethod
+    public static String getStrangerInfo(int pluginId, long account, boolean cache) {
+        return "";
     }
 
     /**
