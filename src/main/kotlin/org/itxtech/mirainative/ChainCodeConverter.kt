@@ -91,6 +91,9 @@ object ChainCodeConverter {
                             PlainText.Empty
                         }
                     }
+                    "share" -> {
+                        XmlMessageHelper.share(args["url"]!!, args["title"], args["content"], args["image"])
+                    }
                     else -> {
                         MiraiNative.INSTANCE.logger.debug("不支持的 CQ码：$c")
                         PlainText.Empty
