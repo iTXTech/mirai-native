@@ -19,6 +19,7 @@
 - [x] 表情
 - [x] Emoji
 - [x] 图片 `[Incomplete]`
+- [x] 名片 `[Incomplete]`
 
 ## 酷Q API
 

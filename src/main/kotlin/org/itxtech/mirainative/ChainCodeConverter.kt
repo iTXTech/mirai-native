@@ -100,6 +100,13 @@ object ChainCodeConverter {
                     "share" -> {
                         XmlMessageHelper.share(args["url"]!!, args["title"], args["content"], args["image"])
                     }
+                    "contact" -> {
+                        if (args["type"] == "qq") {
+                            XmlMessageHelper.contactQQ(args["id"]!!.toLong())
+                        } else {
+                            XmlMessageHelper.contactGroup(args["id"]!!.toLong())
+                        }
+                    }
                     else -> {
                         MiraiNative.INSTANCE.logger.debug("不支持的 CQ码：$c")
                         PlainText.Empty

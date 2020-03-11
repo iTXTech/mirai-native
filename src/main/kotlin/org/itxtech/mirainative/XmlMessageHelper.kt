@@ -24,6 +24,7 @@
 
 package org.itxtech.mirainative
 
+import net.mamoe.mirai.message.data.XmlMessage
 import net.mamoe.mirai.message.data.buildXMLMessage
 
 object XmlMessageHelper {
@@ -31,7 +32,7 @@ object XmlMessageHelper {
         templateId = 12345
         serviceId = 1
         action = "web"
-        brief = "[分享] $title"
+        brief = "[分享] " + (title ?: "")
         url = u
         item {
             layout = 2
@@ -45,5 +46,34 @@ object XmlMessageHelper {
                 summary(content)
             }
         }
+    }
+
+    fun contactQQ(id: Long): XmlMessage {
+        val nick = MiraiNative.INSTANCE.bot.getFriend(id).nick
+        return XmlMessage(
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                    "<msg templateID=\"12345\" action=\"plugin\" p_actionData=\"AppCmd://OpenContactInfo/?uin=$id\" " +
+                    "brief=\"推荐了$nick\" serviceID=\"14\" " +
+                    "i_actionData=\"mqqapi://card/show_pslcard?src_type=internal&amp;source=sharecard&amp;version=1&amp;uin=$id\" " +
+                    "a_actionData=\"mqqapi://card/show_pslcard?src_type=internal&amp;source=sharecard&amp;version=1&amp;uin=$id\">" +
+                    "<item layout=\"0\" mode=\"1\"><summary>推荐联系人</summary><hr/></item>" +
+                    "<item layout=\"2\" mode=\"1\">" +
+                    "<picture cover=\"mqqapi://card/show_pslcard?src_type=internal&amp;source=sharecard&amp;version=1&amp;uin=$id\"/>" +
+                    "<title>$nick</title><summary>帐号：$id</summary></item><source/></msg>"
+        )
+    }
+
+    fun contactGroup(id: Long): XmlMessage {
+        val group = MiraiNative.INSTANCE.bot.getGroup(id)
+        // TODO: 创建人，链接
+        val founder = "未知创建人"
+        val url = "https://github.com/mamoe/mirai"
+        return XmlMessage(
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                    "<msg templateID=\"-1\" action=\"web\" brief=\"推荐了${group.name}群\" serviceID=\"15\"" +
+                    " i_actionData=\"group:$id\" url=\"$url\"><item layout=\"0\" mode=\"1\"><summary>推荐群</summary><hr/></item>" +
+                    "<item layout=\"2\" mode=\"1\"><picture cover=\"http://p.qlogo.cn/gh/$id/$id/100\"/>" +
+                    "<title>${group.name}</title><summary>创建人：$founder</summary></item><source/></msg>"
+        )
     }
 }
