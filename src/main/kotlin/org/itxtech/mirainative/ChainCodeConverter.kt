@@ -41,10 +41,16 @@ object ChainCodeConverter {
         return s
     }
 
+    private fun String.unescape(): String {
+        return replace("&amp;", "&")
+            .replace("&#91;", "[")
+            .replace("&#93;", "]")
+    }
+
     private fun String.toMap(): HashMap<String, String> {
         val map = HashMap<String, String>()
         this.split(",").forEach {
-            val parts = it.split("=")
+            val parts = it.split(delimiters = *arrayOf("="), ignoreCase = false, limit = 2)
             map[parts[0]] = parts[1].escape(true)
         }
         return map
@@ -54,7 +60,7 @@ object ChainCodeConverter {
         return if (this.startsWith("[CQ:") && this.endsWith("]")) {
             val c = this.substring(4, this.length - 1)
             if (c.contains(",")) { // TODO: 支持更多码
-                val parts = c.split(",")
+                val parts = c.split(delimiters = *arrayOf(","), ignoreCase = false, limit = 2)
                 val args = parts[1].toMap()
                 when (parts[0]) {
                     "at" -> {
@@ -104,7 +110,7 @@ object ChainCodeConverter {
                 PlainText.Empty
             }
         } else {
-            PlainText(this)
+            PlainText(this.unescape())
         }
     }
 
@@ -116,6 +122,7 @@ object ChainCodeConverter {
                 is AtAll -> "[CQ:at,qq=all]"
                 is PlainText -> it.stringValue.escape(false)
                 is Face -> "[CQ:face,id=${it.id}]"
+                is Image -> "[CQ:image,id=${it.imageId}]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
             }
         }
@@ -163,9 +170,8 @@ object ChainCodeConverter {
                     +sb.toString().toMessageInternal(contact)
                 }
             } else {
-                +PlainText(message)
+                +PlainText(message.unescape())
             }
         }
     }
 }
-

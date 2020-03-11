@@ -27,7 +27,23 @@ package org.itxtech.mirainative
 import net.mamoe.mirai.message.data.buildXMLMessage
 
 object XmlMessageHelper {
-    fun share(url: String, title: String?, content: String?, image: String?) = buildXMLMessage {
-
+    fun share(u: String, title: String?, content: String?, image: String?) = buildXMLMessage {
+        templateId = 12345
+        serviceId = 1
+        action = "web"
+        brief = "[分享] $title"
+        url = u
+        item {
+            layout = 2
+            if (image != null) {
+                picture(image)
+            }
+            if (title != null) {
+                title(title)
+            }
+            if (content != null) {
+                summary(content)
+            }
+        }
     }
 }
