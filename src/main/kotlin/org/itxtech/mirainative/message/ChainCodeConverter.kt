@@ -22,12 +22,14 @@
  *
  */
 
-package org.itxtech.mirainative
+package org.itxtech.mirainative.message
 
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.uploadImage
+import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.util.QQMusic
 import java.io.File
 
 object ChainCodeConverter {
@@ -98,13 +100,25 @@ object ChainCodeConverter {
                         }
                     }
                     "share" -> {
-                        XmlMessageHelper.share(args["url"]!!, args["title"], args["content"], args["image"])
+                        XmlMessageHelper.share(
+                            args["url"]!!,
+                            args["title"],
+                            args["content"],
+                            args["image"]
+                        )
                     }
                     "contact" -> {
                         if (args["type"] == "qq") {
                             XmlMessageHelper.contactQQ(args["id"]!!.toLong())
                         } else {
                             XmlMessageHelper.contactGroup(args["id"]!!.toLong())
+                        }
+                    }
+                    "music" -> {
+                        if (args["type"] == "qq") {
+                            QQMusic.send(args["id"]!!)
+                        } else {
+                            PlainText.Empty
                         }
                     }
                     else -> {

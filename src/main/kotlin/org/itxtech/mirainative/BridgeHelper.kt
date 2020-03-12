@@ -33,6 +33,8 @@ import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import org.itxtech.mirainative.message.ChainCodeConverter
+import org.itxtech.mirainative.message.MessageCache
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
 import java.nio.charset.Charset
 import kotlin.io.use

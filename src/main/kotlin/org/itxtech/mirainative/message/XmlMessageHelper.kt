@@ -22,10 +22,11 @@
  *
  */
 
-package org.itxtech.mirainative
+package org.itxtech.mirainative.message
 
 import net.mamoe.mirai.message.data.XmlMessage
 import net.mamoe.mirai.message.data.buildXMLMessage
+import org.itxtech.mirainative.MiraiNative
 
 object XmlMessageHelper {
     fun share(u: String, title: String?, content: String?, image: String?) = buildXMLMessage {

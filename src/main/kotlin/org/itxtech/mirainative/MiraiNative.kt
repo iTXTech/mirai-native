@@ -40,6 +40,8 @@ import net.mamoe.mirai.message.FriendMessage
 import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.utils.currentTimeSeconds
+import org.itxtech.mirainative.message.ChainCodeConverter
+import org.itxtech.mirainative.message.MessageCache
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
 import java.io.File

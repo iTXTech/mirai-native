@@ -2,6 +2,7 @@ package org.itxtech.mirainative;
 
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.utils.MiraiLogger;
+import org.itxtech.mirainative.message.MessageCache;
 import org.itxtech.mirainative.plugin.Event;
 import org.itxtech.mirainative.plugin.NativePlugin;
 import org.itxtech.mirainative.plugin.PluginInfo;

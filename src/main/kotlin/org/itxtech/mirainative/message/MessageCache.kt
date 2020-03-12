@@ -22,12 +22,13 @@
  *
  */
 
-package org.itxtech.mirainative
+package org.itxtech.mirainative.message
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.LowLevelAPI
 import net.mamoe.mirai.message.data.MessageSource
+import org.itxtech.mirainative.MiraiNative
 
 object MessageCache {
     private val cache: HashMap<Int, CachedMessage> = HashMap()
@@ -37,9 +38,11 @@ object MessageCache {
 
     fun cacheMessage(message: MessageSource, id: Int = nextId()): Int {
         if (message.groupId == 0L) {
-            cache[id] = CachedMessage(message.id, message.senderId, true)
+            cache[id] =
+                CachedMessage(message.id, message.senderId, true)
         } else {
-            cache[id] = CachedMessage(message.id, message.groupId, false)
+            cache[id] =
+                CachedMessage(message.id, message.groupId, false)
         }
         return id
     }
