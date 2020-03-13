@@ -400,6 +400,13 @@ public class Bridge {
 
     // TODO
 
+    // Mirai Unique Methods
+
+    @NativeBridgeMethod
+    public static int quoteMessage(int pluginId, int msgId, String msg) {
+        return BridgeHelper.quoteMessage(msgId, msg);
+    }
+
     // Annotation
 
     /**

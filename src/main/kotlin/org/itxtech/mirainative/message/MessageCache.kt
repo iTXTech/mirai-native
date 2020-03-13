@@ -31,18 +31,16 @@ import net.mamoe.mirai.message.data.MessageSource
 import org.itxtech.mirainative.MiraiNative
 
 object MessageCache {
-    private val cache: HashMap<Int, CachedMessage> = HashMap()
+    private val cache: HashMap<Int, MessageSource> = HashMap()
     private val internalId = atomic(0)
 
     fun nextId(): Int = internalId.getAndIncrement()
 
     fun cacheMessage(message: MessageSource, id: Int = nextId()): Int {
         if (message.groupId == 0L) {
-            cache[id] =
-                CachedMessage(message.id, message.senderId, true)
+            cache[id] = message
         } else {
-            cache[id] =
-                CachedMessage(message.id, message.groupId, false)
+            cache[id] = message
         }
         return id
     }
@@ -52,17 +50,19 @@ object MessageCache {
         val message = cache[id] ?: return false
         cache.remove(id)
         MiraiNative.INSTANCE.launch {
-            if (message.isFriend) {
+            if (message.groupId == 0L) {
                 //MiraiNative.INSTANCE.bot._lowLevelRecallFriendMessage(message.id)
             } else {
                 MiraiNative.INSTANCE.bot._lowLevelRecallGroupMessage(
                     groupId = message.id,
-                    messageId = message.msgId
+                    messageId = message.id
                 )
             }
         }
         return true
     }
-}
 
-data class CachedMessage(val msgId: Long, val id: Long, val isFriend: Boolean)
+    fun getMessage(id: Int): MessageSource? {
+        return cache[id]
+    }
+}

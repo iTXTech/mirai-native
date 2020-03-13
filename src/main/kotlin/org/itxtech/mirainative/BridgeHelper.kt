@@ -32,6 +32,8 @@ import kotlinx.io.core.*
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.getGroupOrNull
+import net.mamoe.mirai.message.data.asMessageChain
+import net.mamoe.mirai.message.data.quote
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.message.MessageCache
@@ -42,6 +44,25 @@ import kotlin.text.toByteArray
 
 @OptIn(InternalAPI::class)
 object BridgeHelper {
+    @JvmStatic
+    fun quoteMessage(msgId: Int, message: String): Int {
+        val internalId = MessageCache.nextId()
+        MiraiNative.INSTANCE.launch {
+            val source = MessageCache.getMessage(msgId)
+            if (source != null) {
+                val sender = if (source.groupId == 0L) {
+                    MiraiNative.INSTANCE.bot.getFriend(source.senderId)
+                } else {
+                    MiraiNative.INSTANCE.bot.getGroup(source.groupId)[source.senderId]
+                }
+                sender.sendMessage(
+                    (source.quote(sender) + ChainCodeConverter.codeToChain(message, sender)).asMessageChain()
+                )
+            }
+        }
+        return internalId
+    }
+
     @JvmStatic
     fun sendFriendMessage(id: Long, message: String): Int {
         val internalId = MessageCache.nextId()

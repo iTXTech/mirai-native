@@ -250,12 +250,27 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan(
 	return 0;
 }
 
-// Mirai
+// Mirai Unique
 
 CQAPI(int32_t, isMiraiNative, 0)()
 {
 	return 1;
 }
+
+CQAPI(int32_t, mQuoteMessage, 12)(int32_t plugin_id, int32_t msg_id, const char* msg)
+{
+	auto env = attach_java();
+	auto m = GbToJstring(env, msg);
+	auto method = env->GetStaticMethodID(bclz, "quoteMessage", "(IILjava/lang/String;)I");
+	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, msg_id, m);
+	env->DeleteLocalRef(m);
+	detach_java();
+	return result;
+}
+
+/*CQAPI(int32_t, mGroupAnnouncement, 12)(int32_t plugin_id, int64_t group, const char* content)
+{
+}*/
 
 // CQ APIs
 
@@ -265,7 +280,7 @@ CQAPI(int32_t, CQ_addLog, 16)(int32_t plugin_id, int32_t priority, const char* t
 	auto t = GbToJstring(env, type);
 	auto c = GbToJstring(env, content);
 	auto method = env->GetStaticMethodID(bclz, "addLog", "(IILjava/lang/String;Ljava/lang/String;)V");
-	jint result = env->CallStaticIntMethod(bclz, method, plugin_id, priority, t, c);
+	env->CallStaticIntMethod(bclz, method, plugin_id, priority, t, c);
 	env->DeleteLocalRef(t);
 	env->DeleteLocalRef(c);
 	detach_java();

@@ -125,7 +125,7 @@ class MiraiNative : PluginBase() {
         registerCommand {
             name = "npm"
             description = "Mirai Native 插件管理器"
-            usage = "npm [list|enable|disable|menu|info] (插件 Id) (方法名)"
+            usage = "npm [list|enable|disable|menu|info|load|unload] (插件 Id / 路径) (方法名)"
             onCommand {
                 if ((it.isEmpty() || (it[0] != "list" && it.size < 2))) {
                     return@onCommand false
