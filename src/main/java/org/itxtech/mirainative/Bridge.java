@@ -55,15 +55,25 @@ public class Bridge {
         int code = loadNativePlugin(plugin.getFile().getAbsolutePath().replace("\\", "\\\\"), plugin.getId());
         if (plugin.getPluginInfo() != null) {
             PluginInfo info = plugin.getPluginInfo();
-            getLogger().info("Native Plugin (w json) " + info.getName() + " loaded with code " + code);
+            getLogger().info("Native Plugin (w json) " + info.getName() + " has been loaded with code " + code);
         } else {
-            getLogger().info("Native Plugin (w/o json) " + plugin.getFile().getName() + " loaded with code " + code);
+            getLogger().info("Native Plugin (w/o json) " + plugin.getFile().getName() + " has been loaded with code " + code);
+        }
+        if (code == 0) {
+            plugin.setLoaded(true);
         }
         return code;
     }
 
+    public int unloadPlugin(NativePlugin plugin) {
+        int code = freeNativePlugin(plugin.getId());
+        getLogger().info("Native Plugin " + plugin.getId() + " has been unloaded with code " + code);
+        plugin.setLoaded(false);
+        return code;
+    }
+
     public void disablePlugin(NativePlugin plugin) {
-        if (plugin.getEnabled()) {
+        if (plugin.getLoaded() && plugin.getEnabled()) {
             plugin.setEnabled(false);
             if (plugin.shouldCallEvent(Event.EVENT_DISABLE, true)) {
                 callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable"));
@@ -72,7 +82,7 @@ public class Bridge {
     }
 
     public void enablePlugin(NativePlugin plugin) {
-        if (!plugin.getEnabled()) {
+        if (plugin.getLoaded() && !plugin.getEnabled()) {
             plugin.setEnabled(true);
             if (plugin.shouldCallEvent(Event.EVENT_ENABLE, true)) {
                 callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable"));

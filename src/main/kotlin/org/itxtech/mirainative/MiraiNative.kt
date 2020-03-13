@@ -48,6 +48,7 @@ import java.io.File
 import java.util.concurrent.Executors
 import kotlin.coroutines.ContinuationInterceptor
 
+@OptIn(UnstableDefault::class)
 class MiraiNative : PluginBase() {
     companion object {
         @Suppress("ObjectPropertyName")
@@ -64,7 +65,6 @@ class MiraiNative : PluginBase() {
     var plugins: HashMap<Int, NativePlugin> = HashMap()
     val bot: Bot by lazy { Bot.instances.first().get()!! }
 
-    @UnstableDefault
     override fun onLoad() {
         _instance = this
 
@@ -77,22 +77,32 @@ class MiraiNative : PluginBase() {
         } else {
             dataFolder.listFiles()?.forEach { file ->
                 if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
-                    val plugin = NativePlugin(file, pluginId)
-                    plugins[pluginId++] = plugin
-                    val json = File(file.parent + File.separatorChar + file.name.replace(".dll", ".json"))
-                    if (json.exists()) {
-                        plugin.pluginInfo = Json {
-                            isLenient = true
-                            ignoreUnknownKeys = true
-                            serializeSpecialFloatingPointValues = true
-                            useArrayPolymorphism = true
-                        }.parse(PluginInfo.serializer(), json.readText())
-                    }
-                    launch(NativeDispatcher) {
-                        bridge.loadPlugin(plugin)
-                    }
+                    loadPlugin(file)
                 }
             }
+        }
+    }
+
+    private fun loadPlugin(file: File) {
+        val plugin = NativePlugin(file, pluginId)
+        plugins[pluginId++] = plugin
+        val json = File(file.parent + File.separatorChar + file.name.replace(".dll", ".json"))
+        if (json.exists()) {
+            plugin.pluginInfo = Json {
+                isLenient = true
+                ignoreUnknownKeys = true
+                serializeSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+            }.parse(PluginInfo.serializer(), json.readText())
+        }
+        launch(NativeDispatcher) {
+            bridge.loadPlugin(plugin)
+        }
+    }
+
+    private fun unloadPlugin(plugin: NativePlugin) {
+        launch(NativeDispatcher) {
+            bridge.unloadPlugin(plugin)
         }
     }
 
@@ -206,6 +216,21 @@ class MiraiNative : PluginBase() {
                                     appendMessage("名称：" + m.name + " 方法名：" + m.function)
                                 }
                             }
+                        } else {
+                            appendMessage("Id " + it[1] + " 不存在。")
+                        }
+                    }
+                    "load" -> {
+                        val file = File(dataFolder.absolutePath + File.separatorChar + it[1])
+                        if (file.exists()) {
+                            loadPlugin(file)
+                        } else {
+                            appendMessage("文件 ${file.absolutePath} 不存在")
+                        }
+                    }
+                    "unload" -> {
+                        if (plugins.containsKey(it[1].toInt())) {
+                            unloadPlugin(plugins[it[1].toInt()]!!)
                         } else {
                             appendMessage("Id " + it[1] + " 不存在。")
                         }

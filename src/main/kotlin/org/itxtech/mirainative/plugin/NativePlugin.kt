@@ -33,8 +33,9 @@ import org.itxtech.mirainative.NativeDispatcher
 import java.io.File
 
 data class NativePlugin(val file: File, val id: Int) {
-    var enabled: Boolean = false
-    var api: Int = -1
+    var loaded = false
+    var enabled = false
+    var api = -1
     var identifier: String = file.name
     val appDir: File by lazy {
         File(file.parent + File.separatorChar + identifier).also { it.mkdir() }
