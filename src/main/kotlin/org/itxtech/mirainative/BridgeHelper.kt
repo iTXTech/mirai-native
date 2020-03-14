@@ -48,16 +48,19 @@ object BridgeHelper {
     fun quoteMessage(msgId: Int, message: String): Int {
         val internalId = MessageCache.nextId()
         MiraiNative.INSTANCE.launch {
-            val source = MessageCache.getMessage(msgId)
-            if (source != null) {
-                val sender = if (source.groupId == 0L) {
-                    MiraiNative.INSTANCE.bot.getFriend(source.senderId)
+            val src = MessageCache.getMessage(msgId)
+            if (src != null) {
+                val sender = if (src.groupId == 0L) {
+                    MiraiNative.INSTANCE.bot.getFriend(src.senderId)
                 } else {
-                    MiraiNative.INSTANCE.bot.getGroup(source.groupId)[source.senderId]
+                    MiraiNative.INSTANCE.bot.getGroup(src.groupId)[src.senderId]
                 }
                 sender.sendMessage(
-                    (source.quote(sender) + ChainCodeConverter.codeToChain(message, sender)).asMessageChain()
-                )
+                    (src.quote(sender) + ChainCodeConverter.codeToChain(message, sender)).asMessageChain()
+                ).apply {
+                    source.ensureSequenceIdAvailable()
+                    MessageCache.cacheMessage(source, internalId)
+                }
             }
         }
         return internalId
