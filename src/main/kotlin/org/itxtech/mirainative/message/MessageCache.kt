@@ -54,7 +54,7 @@ object MessageCache {
                 //MiraiNative.INSTANCE.bot._lowLevelRecallFriendMessage(message.id)
             } else {
                 MiraiNative.bot._lowLevelRecallGroupMessage(
-                    groupId = message.id,
+                    groupId = message.groupId,
                     messageId = message.id
                 )
             }

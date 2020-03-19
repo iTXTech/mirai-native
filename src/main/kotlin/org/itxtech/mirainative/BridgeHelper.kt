@@ -58,7 +58,6 @@ object BridgeHelper {
                 sender.sendMessage(
                     (src.quote(sender) + ChainCodeConverter.codeToChain(message, sender)).asMessageChain()
                 ).apply {
-                    source.ensureSequenceIdAvailable()
                     MessageCache.cacheMessage(source, internalId)
                 }
             }
@@ -72,7 +71,6 @@ object BridgeHelper {
         MiraiNative.launch {
             val contact = MiraiNative.bot.getFriend(id)
             contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
-                source.ensureSequenceIdAvailable()
                 MessageCache.cacheMessage(source, internalId)
             }
         }
@@ -85,7 +83,6 @@ object BridgeHelper {
         MiraiNative.launch {
             val contact = MiraiNative.bot.getGroup(id)
             contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
-                source.ensureSequenceIdAvailable()
                 MessageCache.cacheMessage(source, internalId)
             }
         }
