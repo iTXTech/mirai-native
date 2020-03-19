@@ -103,6 +103,13 @@ public class Bridge {
         }
     }
 
+    public void updateInfo(NativePlugin plugin) {
+        String info = callStringMethod(plugin.getId(), "AppInfo");
+        if (!"".equals(info)) {
+            plugin.setInfo(info);
+        }
+    }
+
     // Events
 
     public void eventExit() {
@@ -233,14 +240,6 @@ public class Bridge {
     @NativeBridgeMethod
     public static int sendGroupMessage(int pluginId, long group, String msg) {
         return BridgeHelper.sendGroupMessage(group, msg);
-    }
-
-    @NativeBridgeMethod
-    public static void updatePluginInfo(int pluginId, String info) {
-        NativePlugin plugin = getPlugin(pluginId);
-        if (plugin != null) {
-            plugin.setInfo(info);
-        }
     }
 
     @NativeBridgeMethod

@@ -97,6 +97,7 @@ object MiraiNative : PluginBase() {
             }
             if (bridge.loadPlugin(plugin) == 0) {
                 plugins[pluginId.getAndIncrement()] = plugin
+                bridge.updateInfo(plugin)
                 bridge.startPlugin(plugin)
             }
         }

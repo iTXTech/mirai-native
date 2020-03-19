@@ -133,15 +133,6 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 			init(plugin.id);
 		}
 
-		const auto info = StringMethod(GetProcAddress(dll, "AppInfo"));
-		if (info)
-		{
-			const auto jstr = env->NewStringUTF(info());
-			const auto method = env->GetStaticMethodID(bclz, "updatePluginInfo", "(ILjava/lang/String;)V");
-			env->CallStaticVoidMethod(bclz, method, plugin.id, jstr);
-			env->DeleteLocalRef(jstr);
-		}
-
 		return 0;
 	}
 	return GetLastError();
