@@ -50,7 +50,7 @@ object XmlMessageHelper {
     }
 
     fun contactQQ(id: Long): XmlMessage {
-        val nick = MiraiNative.INSTANCE.bot.getFriend(id).nick
+        val nick = MiraiNative.bot.getFriend(id).nick
         return XmlMessage(
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                     "<msg templateID=\"12345\" action=\"plugin\" p_actionData=\"AppCmd://OpenContactInfo/?uin=$id\" " +
@@ -65,7 +65,7 @@ object XmlMessageHelper {
     }
 
     fun contactGroup(id: Long): XmlMessage {
-        val group = MiraiNative.INSTANCE.bot.getGroup(id)
+        val group = MiraiNative.bot.getGroup(id)
         // TODO: 创建人，链接
         val founder = "未知创建人"
         val url = "https://github.com/mamoe/mirai"

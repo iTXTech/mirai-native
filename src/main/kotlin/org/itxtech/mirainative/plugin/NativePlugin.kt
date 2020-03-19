@@ -58,7 +58,7 @@ data class NativePlugin(val file: File, val id: Int) {
         fws.forEach {
             val entry = FloatingWindowEntry(it)
             entries.add(entry)
-            MiraiNative.INSTANCE.launch(NativeDispatcher) {
+            MiraiNative.launch(NativeDispatcher) {
                 while (isActive) {
                     if (enabled) {
                         BridgeHelper.updateFwe(id, entry)

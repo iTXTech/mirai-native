@@ -69,14 +69,14 @@ object ChainCodeConverter {
                         if (args["qq"] == "all") {
                             AtAll
                         } else {
-                            val group = MiraiNative.INSTANCE.bot.getGroupOrNull(contact!!.id)
+                            val group = MiraiNative.bot.getGroupOrNull(contact!!.id)
                             if (group == null) {
-                                MiraiNative.INSTANCE.logger.debug("你群没了：${contact.id}")
+                                MiraiNative.logger.debug("你群没了：${contact.id}")
                                 return PlainText("")
                             }
                             val member = group.getOrNull(args["qq"]!!.toLong())
                             if (member == null) {
-                                MiraiNative.INSTANCE.logger.debug("你人没了：${args["qq"]}")
+                                MiraiNative.logger.debug("你人没了：${args["qq"]}")
                                 return PlainText.Empty
                             }
                             At(member)
@@ -90,7 +90,7 @@ object ChainCodeConverter {
                     }
                     "image" -> {
                         val file = File(
-                            MiraiNative.INSTANCE.dataFolder.absolutePath +
+                            MiraiNative.dataFolder.absolutePath +
                                     File.separatorChar + "data" + File.separatorChar + "image" + File.separatorChar + args["file"]!!
                         )
                         if (file.exists()) {
@@ -122,12 +122,12 @@ object ChainCodeConverter {
                         }
                     }
                     else -> {
-                        MiraiNative.INSTANCE.logger.debug("不支持的 CQ码：$c")
+                        MiraiNative.logger.debug("不支持的 CQ码：$c")
                         PlainText.Empty
                     }
                 }
             } else {
-                MiraiNative.INSTANCE.logger.debug("不支持的 CQ码 ：$c")
+                MiraiNative.logger.debug("不支持的 CQ码 ：$c")
                 PlainText.Empty
             }
         } else {
@@ -158,7 +158,7 @@ object ChainCodeConverter {
                 message.forEach { c: Char ->
                     if (c == '[') {
                         if (interpreting) {
-                            MiraiNative.INSTANCE.logger.error("CQ消息解析失败：$message，索引：$index")
+                            MiraiNative.logger.error("CQ消息解析失败：$message，索引：$index")
                             return@forEach
                         } else {
                             interpreting = true
@@ -171,7 +171,7 @@ object ChainCodeConverter {
                         }
                     } else if (c == ']') {
                         if (!interpreting) {
-                            MiraiNative.INSTANCE.logger.error("CQ消息解析失败：$message，索引：$index")
+                            MiraiNative.logger.error("CQ消息解析失败：$message，索引：$index")
                             return@forEach
                         } else {
                             interpreting = false

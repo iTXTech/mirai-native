@@ -49,11 +49,11 @@ object MessageCache {
     fun recall(id: Int): Boolean {
         val message = cache[id] ?: return false
         cache.remove(id)
-        MiraiNative.INSTANCE.launch {
+        MiraiNative.launch {
             if (message.groupId == 0L) {
                 //MiraiNative.INSTANCE.bot._lowLevelRecallFriendMessage(message.id)
             } else {
-                MiraiNative.INSTANCE.bot._lowLevelRecallGroupMessage(
+                MiraiNative.bot._lowLevelRecallGroupMessage(
                     groupId = message.id,
                     messageId = message.id
                 )

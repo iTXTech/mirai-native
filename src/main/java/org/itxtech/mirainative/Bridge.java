@@ -69,6 +69,7 @@ public class Bridge {
         int code = freeNativePlugin(plugin.getId());
         getLogger().info("Native Plugin " + plugin.getId() + " has been unloaded with code " + code);
         plugin.setLoaded(false);
+        plugin.setEnabled(false);
         return code;
     }
 
@@ -90,21 +91,23 @@ public class Bridge {
         }
     }
 
-    // Events
-
-    public void eventStartup() {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_STARTUP, true)) {
-                callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup"));
-            }
+    public void startPlugin(NativePlugin plugin) {
+        if (plugin.shouldCallEvent(Event.EVENT_STARTUP, true)) {
+            callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup"));
         }
     }
 
+    public void exitPlugin(NativePlugin plugin) {
+        if (plugin.shouldCallEvent(Event.EVENT_EXIT, true)) {
+            callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit"));
+        }
+    }
+
+    // Events
+
     public void eventExit() {
         for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_EXIT, true)) {
-                callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit"));
-            }
+            exitPlugin(plugin);
         }
     }
 
@@ -205,7 +208,7 @@ public class Bridge {
     // Helper
 
     private static HashMap<Integer, NativePlugin> getPlugins() {
-        return MiraiNative._instance.getPlugins();
+        return MiraiNative.INSTANCE.getPlugins();
     }
 
     private static NativePlugin getPlugin(int pluginId) {
@@ -213,11 +216,11 @@ public class Bridge {
     }
 
     private static MiraiLogger getLogger() {
-        return MiraiNative._instance.getLogger();
+        return MiraiNative.INSTANCE.getLogger();
     }
 
     private static Bot getBot() {
-        return MiraiNative._instance.getBot();
+        return MiraiNative.INSTANCE.getBot();
     }
 
     // Bridge

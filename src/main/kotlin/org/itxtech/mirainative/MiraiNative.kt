@@ -24,6 +24,7 @@
 
 package org.itxtech.mirainative
 
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -49,28 +50,21 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.ContinuationInterceptor
 
 @OptIn(UnstableDefault::class)
-class MiraiNative : PluginBase() {
-    companion object {
-        @Suppress("ObjectPropertyName")
-        internal lateinit var _instance: MiraiNative
-
-        @JvmStatic
-        val INSTANCE: MiraiNative
-            get() = _instance
-    }
-
-    private var pluginId = 0
+object MiraiNative : PluginBase() {
+    private var pluginId = atomic(0)
     private var botOnline = false
     val bridge = Bridge()
     var plugins: HashMap<Int, NativePlugin> = HashMap()
     val bot: Bot by lazy { Bot.instances.first().get()!! }
 
     override fun onLoad() {
-        _instance = this
-
         val dll = dataFolder.absolutePath + File.separatorChar + "CQP.dll"
-        logger.info("Mirai Native 正在加载 $dll")
-        System.load(dll)
+        if (File(dataFolder.absolutePath + File.separatorChar + "CQP.dll").exists()) {
+            logger.info("Mirai Native 正在加载 $dll")
+            System.load(dll)
+        } else {
+            logger.error("Mirai Native 找不到 $dll")
+        }
 
         if (!dataFolder.isDirectory) {
             logger.error("数据文件夹不是一个文件夹！" + dataFolder.absolutePath)
@@ -84,24 +78,35 @@ class MiraiNative : PluginBase() {
     }
 
     private fun loadPlugin(file: File) {
-        val plugin = NativePlugin(file, pluginId)
-        plugins[pluginId++] = plugin
-        val json = File(file.parent + File.separatorChar + file.name.replace(".dll", ".json"))
-        if (json.exists()) {
-            plugin.pluginInfo = Json {
-                isLenient = true
-                ignoreUnknownKeys = true
-                serializeSpecialFloatingPointValues = true
-                useArrayPolymorphism = true
-            }.parse(PluginInfo.serializer(), json.readText())
+        plugins.forEach {
+            if (it.value.file == file) {
+                logger.error("DLL ${file.absolutePath} 已被加载，无法重复加载。")
+                return
+            }
         }
         launch(NativeDispatcher) {
-            bridge.loadPlugin(plugin)
+            val plugin = NativePlugin(file, pluginId.value)
+            val json = File(file.parent + File.separatorChar + file.name.replace(".dll", ".json"))
+            if (json.exists()) {
+                plugin.pluginInfo = Json {
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                    serializeSpecialFloatingPointValues = true
+                    useArrayPolymorphism = true
+                }.parse(PluginInfo.serializer(), json.readText())
+            }
+            if (bridge.loadPlugin(plugin) == 0) {
+                plugins[pluginId.getAndIncrement()] = plugin
+                bridge.startPlugin(plugin)
+            }
         }
     }
 
     private fun unloadPlugin(plugin: NativePlugin) {
         launch(NativeDispatcher) {
+            bridge.disablePlugin(plugin)
+            bridge.exitPlugin(plugin)
+            delay(500)
             bridge.unloadPlugin(plugin)
         }
     }
@@ -111,9 +116,6 @@ class MiraiNative : PluginBase() {
         registerEvents()
 
         launch(NativeDispatcher) {
-            bridge.eventStartup()
-            logger.info("Mirai Native 已调用 Startup 事件")
-
             while (isActive) {
                 bridge.processMessage()
                 delay(10)
@@ -137,10 +139,14 @@ class MiraiNative : PluginBase() {
                             if (p.pluginInfo != null) {
                                 appendMessage(
                                     "Id：" + p.id + " 标识符：" + p.identifier + " 名称：" + p.pluginInfo!!.name +
-                                            " 版本：" + p.pluginInfo!!.version
+                                            " 版本：" + p.pluginInfo!!.version + " 状态：" +
+                                            if (p.enabled) "已启用 " else "已禁用 " + if (p.loaded) "已加载" else "已卸载"
                                 )
                             } else {
-                                appendMessage("Id：" + p.id + " 标识符：" + p.identifier + " （JSON文件缺失）")
+                                appendMessage(
+                                    "Id：" + p.id + " 标识符：" + p.identifier + " （JSON文件缺失）" +
+                                            " 状态：" + if (p.enabled) "已启用 " else "已禁用 " + if (p.loaded) "已加载" else "已卸载"
+                                )
                             }
                         }
                     }
@@ -191,13 +197,13 @@ class MiraiNative : PluginBase() {
                         if (plugins.containsKey(it[1].toInt())) {
                             val p = plugins[it[1].toInt()]!!
                             val i = p.pluginInfo
+                            appendMessage("标识符：" + p.identifier)
+                            appendMessage("状态：" + if (p.enabled) "已启用 " else "已禁用 " + if (p.loaded) "已加载" else "已卸载")
                             if (i == null) {
                                 appendMessage("Id：" + p.id + " （JSON文件缺失）")
-                                appendMessage("标识符：" + p.identifier)
                                 appendMessage("CQ API：" + p.api)
                             } else {
                                 appendMessage("Id：" + p.id)
-                                appendMessage("标识符：" + p.identifier)
                                 appendMessage("CQ API：" + p.api + " CQ API（JSON）：" + i.apiver)
                                 appendMessage("名称：" + i.name)
                                 appendMessage("版本：" + i.version + " 版本号：" + i.version_id)

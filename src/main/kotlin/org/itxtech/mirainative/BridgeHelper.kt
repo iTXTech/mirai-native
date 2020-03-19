@@ -47,13 +47,13 @@ object BridgeHelper {
     @JvmStatic
     fun quoteMessage(msgId: Int, message: String): Int {
         val internalId = MessageCache.nextId()
-        MiraiNative.INSTANCE.launch {
+        MiraiNative.launch {
             val src = MessageCache.getMessage(msgId)
             if (src != null) {
                 val sender = if (src.groupId == 0L) {
-                    MiraiNative.INSTANCE.bot.getFriend(src.senderId)
+                    MiraiNative.bot.getFriend(src.senderId)
                 } else {
-                    MiraiNative.INSTANCE.bot.getGroup(src.groupId)[src.senderId]
+                    MiraiNative.bot.getGroup(src.groupId)[src.senderId]
                 }
                 sender.sendMessage(
                     (src.quote(sender) + ChainCodeConverter.codeToChain(message, sender)).asMessageChain()
@@ -69,8 +69,8 @@ object BridgeHelper {
     @JvmStatic
     fun sendFriendMessage(id: Long, message: String): Int {
         val internalId = MessageCache.nextId()
-        MiraiNative.INSTANCE.launch {
-            val contact = MiraiNative.INSTANCE.bot.getFriend(id)
+        MiraiNative.launch {
+            val contact = MiraiNative.bot.getFriend(id)
             contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
                 source.ensureSequenceIdAvailable()
                 MessageCache.cacheMessage(source, internalId)
@@ -82,8 +82,8 @@ object BridgeHelper {
     @JvmStatic
     fun sendGroupMessage(id: Long, message: String): Int {
         val internalId = MessageCache.nextId()
-        MiraiNative.INSTANCE.launch {
-            val contact = MiraiNative.INSTANCE.bot.getGroup(id)
+        MiraiNative.launch {
+            val contact = MiraiNative.bot.getGroup(id)
             contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
                 source.ensureSequenceIdAvailable()
                 MessageCache.cacheMessage(source, internalId)
@@ -94,27 +94,27 @@ object BridgeHelper {
 
     @JvmStatic
     fun setGroupBan(groupId: Long, memberId: Long, duration: Int) {
-        MiraiNative.INSTANCE.launch {
+        MiraiNative.launch {
             if (duration == 0) {
-                MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].unmute()
+                MiraiNative.bot.getGroup(groupId)[memberId].unmute()
             } else {
-                MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].mute(duration)
+                MiraiNative.bot.getGroup(groupId)[memberId].mute(duration)
             }
         }
     }
 
     @JvmStatic
     fun setGroupKick(groupId: Long, memberId: Long) {
-        MiraiNative.INSTANCE.launch {
-            MiraiNative.INSTANCE.bot.getGroup(groupId)[memberId].kick()
+        MiraiNative.launch {
+            MiraiNative.bot.getGroup(groupId)[memberId].kick()
         }
     }
 
     @MiraiExperimentalAPI
     @JvmStatic
     fun setGroupLeave(groupId: Long) {
-        MiraiNative.INSTANCE.launch {
-            MiraiNative.INSTANCE.bot.getGroup(groupId).quit()
+        MiraiNative.launch {
+            MiraiNative.bot.getGroup(groupId).quit()
         }
     }
 
@@ -166,7 +166,7 @@ object BridgeHelper {
 
     @JvmStatic
     fun getFriendList(): String {
-        val list = MiraiNative.INSTANCE.bot.friends
+        val list = MiraiNative.bot.friends
         return buildPacket {
             writeInt(list.size)
             list.forEach { qq ->
@@ -182,7 +182,7 @@ object BridgeHelper {
 
     @JvmStatic
     fun getGroupInfo(id: Long): String {
-        val info = MiraiNative.INSTANCE.bot.getGroupOrNull(id)
+        val info = MiraiNative.bot.getGroupOrNull(id)
         if (info != null) {
             return buildPacket {
                 writeLong(id)
@@ -197,7 +197,7 @@ object BridgeHelper {
 
     @JvmStatic
     fun getGroupList(): String {
-        val list = MiraiNative.INSTANCE.bot.groups
+        val list = MiraiNative.bot.groups
         return buildPacket {
             writeInt(list.size)
             list.forEach {
@@ -211,7 +211,7 @@ object BridgeHelper {
 
     @JvmStatic
     fun getGroupMemberInfo(groupId: Long, memberId: Long): String {
-        val member = MiraiNative.INSTANCE.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
+        val member = MiraiNative.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
         return buildPacket {
             writeMember(member)
         }.readBytes().encodeBase64()
@@ -219,7 +219,7 @@ object BridgeHelper {
 
     @JvmStatic
     fun getGroupMemberList(groupId: Long): String {
-        val group = MiraiNative.INSTANCE.bot.getGroupOrNull(groupId) ?: return ""
+        val group = MiraiNative.bot.getGroupOrNull(groupId) ?: return ""
         return buildPacket {
             writeInt(group.members.size)
             group.members.forEach {
@@ -236,7 +236,7 @@ object BridgeHelper {
 
     fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {
         val pk = ByteReadPacket(
-            MiraiNative.INSTANCE.bridge.callStringMethod(pluginId, fwe.status.function).decodeBase64Bytes()
+            MiraiNative.bridge.callStringMethod(pluginId, fwe.status.function).decodeBase64Bytes()
         )
         fwe.data = pk.readString()
         fwe.unit = pk.readString()
