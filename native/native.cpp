@@ -27,7 +27,7 @@ struct native_plugin
 vector<native_plugin> plugins;
 
 // Helper
-char* JstringToGb(JNIEnv* env, jstring jstr)
+const char* JstringToGb(JNIEnv* env, jstring jstr)
 {
 	int length = env->GetStringLength(jstr);
 	auto jcstr = env->GetStringChars(jstr, nullptr);
@@ -37,7 +37,7 @@ char* JstringToGb(JNIEnv* env, jstring jstr)
 	size = WideCharToMultiByte(GB18030, 0, LPCWSTR(jcstr), length, rtn, clen, nullptr, nullptr);
 	if (size <= 0)
 	{
-		return nullptr;
+		return "";
 	}
 	env->ReleaseStringChars(jstr, jcstr);
 	rtn[size] = 0;
@@ -602,3 +602,5 @@ CQAPI(int32_t, CQ_setGroupAnonymousBan, 24)(int32_t plugin_id, int64_t group, co
 	detach_java();
 	return result;
 }
+
+// Legacy
