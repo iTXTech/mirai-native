@@ -1,5 +1,6 @@
 ﻿#include <jni.h>
 #include <vector>
+#include <string>
 #include <Windows.h>
 #include "org_itxtech_mirainative_Bridge.h"
 #include "native.h"
@@ -9,7 +10,7 @@ using namespace std;
 struct native_plugin
 {
 	int id;
-	char* file;
+	const char* file;
 	HMODULE dll;
 	bool enabled;
 
@@ -70,9 +71,26 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 	return rtn;
 }
 
+string JstringToString(JNIEnv* env, jstring str)
+{
+	auto jstr = env->GetStringUTFChars(str, nullptr);
+	if (jstr == nullptr)
+	{
+		return "";
+	}
+	string s(jstr);
+	env->ReleaseStringUTFChars(str, jstr);
+	return s;
+}
+
+const char* JstringToChars(JNIEnv* env, jstring str)
+{
+	return _strdup(JstringToString(env, str).c_str());
+}
+
 FARPROC GetMethod(JNIEnv* env, jint id, jstring method)
 {
-	return GetProcAddress(plugins[id].dll, env->GetStringUTFChars(method, nullptr));
+	return GetProcAddress(plugins[id].dll, JstringToString(env, method).c_str());
 }
 
 // Load
@@ -119,7 +137,7 @@ void detach_java()
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 	JNIEnv* env, jobject obj, jstring file, jint id)
 {
-	native_plugin plugin = {id, const_cast<char*>(env->GetStringUTFChars(file, nullptr))};
+	native_plugin plugin = {id, const_cast<char*>(JstringToChars(env, file))};
 	const auto dll = LoadLibraryA(plugin.file);
 
 	if (dll != nullptr)
@@ -142,6 +160,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin(
 	JNIEnv* env, jobject obj, jint id)
 {
 	auto r = FreeLibrary(plugins[id].dll);
+	delete[] plugins[id].file;
 	if (r != FALSE)
 	{
 		return 0;
@@ -425,8 +444,7 @@ CQAPI(const char*, CQ_getFriendList, 8)(int32_t plugin_id, BOOL reserved)
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getFriendList", "(IZ)Ljava/lang/String;");
-	auto result = env->GetStringUTFChars(
-		jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, reserved != FALSE)), nullptr);
+	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, reserved != FALSE)));
 	detach_java();
 	return result;
 }
@@ -435,8 +453,8 @@ CQAPI(const char*, CQ_getGroupInfo, 16)(int32_t plugin_id, int64_t group, BOOL c
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getGroupInfo", "(IJZ)Ljava/lang/String;");
-	auto result = env->GetStringUTFChars(
-		jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group, cache != FALSE)), nullptr);
+	auto result = JstringToChars(
+		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group, cache != FALSE)));
 	detach_java();
 	return result;
 }
@@ -445,7 +463,7 @@ CQAPI(const char*, CQ_getGroupList, 4)(int32_t plugin_id)
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getGroupList", "(I)Ljava/lang/String;");
-	auto result = env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)), nullptr);
+	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)));
 	detach_java();
 	return result;
 }
@@ -454,8 +472,8 @@ CQAPI(const char*, CQ_getGroupMemberInfoV2, 24)(int32_t plugin_id, int64_t group
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getGroupMemberInfo", "(IJJZ)Ljava/lang/String;");
-	auto result = env->GetStringUTFChars(
-		jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group, account, cache != FALSE)), nullptr);
+	auto result = JstringToChars(
+		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group, account, cache != FALSE)));
 	detach_java();
 	return result;
 }
@@ -464,7 +482,7 @@ CQAPI(const char*, CQ_getGroupMemberList, 12)(int32_t plugin_id, int64_t group)
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getGroupMemberList", "(IJ)Ljava/lang/String;");
-	auto result = env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group)), nullptr);
+	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group)));
 	detach_java();
 	return result;
 }
@@ -474,7 +492,7 @@ CQAPI(const char*, CQ_getCookiesV2, 8)(int32_t plugin_id, const char* domain)
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getCookies", "(ILjava/lang/String;)Ljava/lang/String;");
 	auto jstr = GbToJstring(env, domain);
-	auto result = env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr)), nullptr);
+	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr)));
 	env->DeleteLocalRef(jstr);
 	detach_java();
 	return result;
@@ -484,7 +502,7 @@ CQAPI(const char*, CQ_getCsrfToken, 4)(int32_t plugin_id)
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getCsrfToken", "(I)Ljava/lang/String;");
-	auto result = env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)), nullptr);
+	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)));
 	detach_java();
 	return result;
 }
@@ -494,7 +512,7 @@ CQAPI(const char*, CQ_getImage, 8)(int32_t plugin_id, const char* image)
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getImage", "(ILjava/lang/String;)Ljava/lang/String;");
 	auto jstr = GbToJstring(env, image);
-	auto result = env->GetStringUTFChars(jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr)), nullptr);
+	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr)));
 	env->DeleteLocalRef(jstr);
 	return result;
 }
@@ -506,8 +524,7 @@ CQAPI(const char*, CQ_getRecordV2, 12)(int32_t plugin_id, const char* file, cons
 	                                     "(ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 	auto f = GbToJstring(env, file);
 	auto fmt = GbToJstring(env, format);
-	auto result = env->GetStringUTFChars(
-		jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, f, fmt)), nullptr);
+	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, f, fmt)));
 	env->DeleteLocalRef(f);
 	env->DeleteLocalRef(fmt);
 	detach_java();
@@ -518,8 +535,8 @@ CQAPI(const char*, CQ_getStrangerInfo, 16)(int32_t plugin_id, int64_t account, B
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "getStrangerInfo", "(IJZ)Ljava/lang/String;");
-	auto result = env->GetStringUTFChars(
-		jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, account, cache != FALSE)), nullptr);
+	auto result = JstringToChars(
+		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, account, cache != FALSE)));
 	detach_java();
 	return result;
 }
