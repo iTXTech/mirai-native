@@ -10,3 +10,4 @@ build
 out
 epl-test/*.dll
 epl-test/*.bak
+epl-test/*.ec

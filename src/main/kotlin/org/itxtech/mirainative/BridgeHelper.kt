@@ -50,15 +50,21 @@ object BridgeHelper {
         MiraiNative.launch {
             val src = MessageCache.getMessage(msgId)
             if (src != null) {
-                val sender = if (src.groupId == 0L) {
-                    MiraiNative.bot.getFriend(src.senderId)
+                if (src.groupId == 0L) {
+                    val f = MiraiNative.bot.getFriend(src.senderId)
+                    f.sendMessage((src.quote(f) + ChainCodeConverter.codeToChain(message, f)).asMessageChain()).apply {
+                        MessageCache.cacheMessage(source, internalId)
+                    }
                 } else {
-                    MiraiNative.bot.getGroup(src.groupId)[src.senderId]
-                }
-                sender.sendMessage(
-                    (src.quote(sender) + ChainCodeConverter.codeToChain(message, sender)).asMessageChain()
-                ).apply {
-                    MessageCache.cacheMessage(source, internalId)
+                    val group = MiraiNative.bot.getGroup(src.groupId)
+                    group.sendMessage(
+                        (src.quote(group[src.senderId]) + ChainCodeConverter.codeToChain(
+                            message,
+                            group
+                        )).asMessageChain()
+                    ).apply {
+                        MessageCache.cacheMessage(source, internalId)
+                    }
                 }
             }
         }

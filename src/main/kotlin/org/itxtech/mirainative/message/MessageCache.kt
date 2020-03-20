@@ -50,6 +50,7 @@ object MessageCache {
         val message = cache[id] ?: return false
         cache.remove(id)
         MiraiNative.launch {
+            message.ensureSequenceIdAvailable()
             if (message.groupId == 0L) {
                 //MiraiNative.INSTANCE.bot._lowLevelRecallFriendMessage(message.id)
             } else {
@@ -62,7 +63,11 @@ object MessageCache {
         return true
     }
 
-    fun getMessage(id: Int): MessageSource? {
-        return cache[id]
+    suspend fun getMessage(id: Int): MessageSource? {
+        if (cache[id] != null) {
+            cache[id]!!.ensureSequenceIdAvailable()
+            return cache[id]
+        }
+        return null
     }
 }
