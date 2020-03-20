@@ -31,11 +31,10 @@ vector<native_plugin> plugins;
 const char* JstringToGb(JNIEnv* env, jstring jstr)
 {
 	int length = env->GetStringLength(jstr);
-	auto jcstr = env->GetStringChars(jstr, nullptr);
-	auto clen = WideCharToMultiByte(GB18030, 0, LPCWSTR(jcstr), length, nullptr, 0, nullptr, nullptr);
-	auto rtn = static_cast<char*>(malloc(clen));
-	int size = 0;
-	size = WideCharToMultiByte(GB18030, 0, LPCWSTR(jcstr), length, rtn, clen, nullptr, nullptr);
+	auto jcstr = env->GetStringChars(jstr, 0);
+	auto rtn = static_cast<char*>(malloc(length * 2 + 1));
+	auto size = WideCharToMultiByte(GB18030, 0, LPCWSTR(jcstr), length, rtn,
+	                                length * 2 + 1, nullptr, nullptr);
 	if (size <= 0)
 	{
 		return "";
