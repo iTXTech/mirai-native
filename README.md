@@ -23,6 +23,14 @@ Mirai Native 致力于通过实现 酷Q 的兼容API使 酷Q 的应用（插件�
 1. 将 `CQP.dll` 和 要加载的酷Q插件 **dll** (不是 **cpk**) 一起放入 `plugins\MiraiNative` 下（如果有插件对应的**json**文件，请使用和`dll`相同的文件名）
 1. 启动 `mirai-console`
 
+-----
+
+### 关于托盘菜单
+
+* 双击流泪猫猫头查看关于信息
+* 右键流泪猫猫头打开菜单
+* 插画由作者女朋友提供
+
 ### Mirai Native 插件管理器 `npm`
 
 1. 在 `mirai-console` 中键入 `npm` 获得帮助

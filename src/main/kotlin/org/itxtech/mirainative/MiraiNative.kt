@@ -45,6 +45,7 @@ import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.message.MessageCache
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
+import org.itxtech.mirainative.util.Tray
 import java.io.File
 import java.util.concurrent.Executors
 import kotlin.coroutines.ContinuationInterceptor
@@ -75,11 +76,13 @@ object MiraiNative : PluginBase() {
                 }
             }
         }
+
+        Tray.create()
     }
 
     private fun loadPlugin(file: File) {
-        plugins.forEach {
-            if (it.value.file == file) {
+        plugins.values.forEach {
+            if (it.loaded && it.file == file) {
                 logger.error("DLL ${file.absolutePath} 已被加载，无法重复加载。")
                 return
             }
@@ -99,6 +102,7 @@ object MiraiNative : PluginBase() {
                 plugins[pluginId.getAndIncrement()] = plugin
                 bridge.updateInfo(plugin)
                 bridge.startPlugin(plugin)
+                Tray.refresh()
             }
         }
     }
@@ -109,6 +113,7 @@ object MiraiNative : PluginBase() {
             bridge.exitPlugin(plugin)
             delay(500)
             bridge.unloadPlugin(plugin)
+            Tray.refresh()
         }
     }
 
