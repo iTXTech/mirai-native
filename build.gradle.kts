@@ -16,9 +16,7 @@ kotlin {
 }
 
 repositories {
-    jcenter()
-    mavenCentral()
-    maven { setUrl("https://dl.bintray.com/kotlin/kotlin-eap") }
+    maven { setUrl("https://mirrors.huaweicloud.com/repository/maven") }
     maven { setUrl("https://dl.bintray.com/him188moe/mirai") }
 }
 
@@ -31,7 +29,15 @@ dependencies {
 }
 
 tasks.named<Jar>("jar") {
-
+    manifest {
+        attributes(
+            mapOf(
+                "Revision" to Runtime.getRuntime().exec("git rev-parse --short HEAD")
+                    .inputStream.bufferedReader().readText().trim(),
+                "Name" to "iTXTech MiraiNative"
+            )
+        )
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

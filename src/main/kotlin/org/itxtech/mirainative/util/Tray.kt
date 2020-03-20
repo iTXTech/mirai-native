@@ -38,12 +38,14 @@ object Tray {
 
     fun create() {
         if (SystemTray.isSupported()) {
-            icon = TrayIcon(ImageIO.read(this.javaClass.classLoader.getResource("icon.jpg")), "Mirai Native 插件菜单")
+            icon = TrayIcon(ImageIO.read(MiraiNative.getResources("icon.jpg")), "Mirai Native 插件菜单")
             icon!!.addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     if (e?.clickCount == 2) {
                         JOptionPane.showMessageDialog(
-                            null, "Mirai Native\nCopyright (C) 2020 iTX Technologies",
+                            null, "Mirai Native " + MiraiNative.getVersion() +
+                                    "\nhttps://github.com/iTXTech/mirai-native" +
+                                    "\nCopyright (C) 2020 iTX Technologies",
                             "关于 Mirai Native", JOptionPane.INFORMATION_MESSAGE
                         )
                     }

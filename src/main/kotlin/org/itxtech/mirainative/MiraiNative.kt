@@ -34,6 +34,7 @@ import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.command.registerCommand
 import net.mamoe.mirai.console.plugins.PluginBase
+import net.mamoe.mirai.console.plugins.PluginManager
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.event.subscribeAlways
@@ -48,6 +49,7 @@ import org.itxtech.mirainative.plugin.PluginInfo
 import org.itxtech.mirainative.util.Tray
 import java.io.File
 import java.util.concurrent.Executors
+import java.util.jar.Manifest
 import kotlin.coroutines.ContinuationInterceptor
 
 @OptIn(UnstableDefault::class)
@@ -400,6 +402,18 @@ object MiraiNative : PluginBase() {
             logger.info("Mirai Native 正调用 Exit 事件")
             bridge.eventExit()
         }
+    }
+
+    fun getVersion(): String {
+        var version = PluginManager.getPluginDescription(MiraiNative).version
+        val mf = this.javaClass.classLoader.getResources("META-INF/MANIFEST.MF")
+        while (mf.hasMoreElements()) {
+            val manifest = Manifest(mf.nextElement().openStream())
+            if ("iTXTech MiraiNative" == manifest.mainAttributes.getValue("Name")) {
+                version += "-" + manifest.mainAttributes.getValue("Revision")
+            }
+        }
+        return version
     }
 }
 
