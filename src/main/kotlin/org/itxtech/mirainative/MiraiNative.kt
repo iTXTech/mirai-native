@@ -55,7 +55,7 @@ import kotlin.coroutines.ContinuationInterceptor
 @OptIn(UnstableDefault::class)
 object MiraiNative : PluginBase() {
     private var pluginId = atomic(0)
-    private var botOnline = false
+    var botOnline = false
     val bridge = Bridge()
     var plugins: HashMap<Int, NativePlugin> = HashMap()
     val bot: Bot by lazy { Bot.instances.first().get()!! }
@@ -82,7 +82,16 @@ object MiraiNative : PluginBase() {
         Tray.create()
     }
 
-    private fun loadPlugin(file: File) {
+    fun loadPluginFromFile(f: String): Boolean {
+        val file = File(dataFolder.absolutePath + File.separatorChar + f)
+        if (file.isFile && file.exists()) {
+            loadPlugin(file)
+            return true
+        }
+        return false
+    }
+
+    fun loadPlugin(file: File) {
         plugins.values.forEach {
             if (it.loaded && it.file == file) {
                 logger.error("DLL ${file.absolutePath} 已被加载，无法重复加载。")
@@ -109,7 +118,7 @@ object MiraiNative : PluginBase() {
         }
     }
 
-    private fun unloadPlugin(plugin: NativePlugin) {
+    fun unloadPlugin(plugin: NativePlugin) {
         launch(NativeDispatcher) {
             bridge.disablePlugin(plugin)
             bridge.exitPlugin(plugin)
@@ -117,6 +126,28 @@ object MiraiNative : PluginBase() {
             bridge.unloadPlugin(plugin)
             Tray.refresh()
         }
+    }
+
+    fun enablePlugin(plugin: NativePlugin): Boolean {
+        if (botOnline && !plugin.enabled) {
+            launch(NativeDispatcher) {
+                bridge.enablePlugin(plugin)
+            }
+            Tray.refresh()
+            return true
+        }
+        return false
+    }
+
+    fun disablePlugin(plugin: NativePlugin): Boolean {
+        if (plugin.enabled) {
+            launch(NativeDispatcher) {
+                bridge.disablePlugin(plugin)
+            }
+            Tray.refresh()
+            return true
+        }
+        return false
     }
 
     override fun onEnable() {
@@ -148,12 +179,12 @@ object MiraiNative : PluginBase() {
                                 appendMessage(
                                     "Id：" + p.id + " 标识符：" + p.identifier + " 名称：" + p.pluginInfo!!.name +
                                             " 版本：" + p.pluginInfo!!.version + " 状态：" +
-                                            if (p.enabled) "已启用 " else "已禁用 " + if (p.loaded) "已加载" else "已卸载"
+                                            (if (p.enabled) "已启用 " else "已禁用 ") + (if (p.loaded) "已加载" else "已卸载")
                                 )
                             } else {
                                 appendMessage(
                                     "Id：" + p.id + " 标识符：" + p.identifier + " （JSON文件缺失）" +
-                                            " 状态：" + if (p.enabled) "已启用 " else "已禁用 " + if (p.loaded) "已加载" else "已卸载"
+                                            " 状态：" + (if (p.enabled) "已启用 " else "已禁用 ") + (if (p.loaded) "已加载" else "已卸载")
                                 )
                             }
                         }
@@ -164,11 +195,7 @@ object MiraiNative : PluginBase() {
                         } else {
                             if (plugins.containsKey(it[1].toInt())) {
                                 val p = plugins[it[1].toInt()]!!
-                                if (!p.enabled) {
-                                    launch(NativeDispatcher) {
-                                        bridge.enablePlugin(p)
-                                    }
-                                }
+                                enablePlugin(p)
                                 appendMessage("插件 " + p.identifier + " 已启用。")
                             } else {
                                 appendMessage("Id " + it[1] + " 不存在。")
@@ -178,11 +205,7 @@ object MiraiNative : PluginBase() {
                     "disable" -> {
                         if (plugins.containsKey(it[1].toInt())) {
                             val p = plugins[it[1].toInt()]!!
-                            if (p.enabled) {
-                                launch(NativeDispatcher) {
-                                    bridge.disablePlugin(p)
-                                }
-                            }
+                            disablePlugin(p)
                             appendMessage("插件 " + p.identifier + " 已禁用。")
                         } else {
                             appendMessage("Id " + it[1] + " 不存在。")
@@ -235,11 +258,8 @@ object MiraiNative : PluginBase() {
                         }
                     }
                     "load" -> {
-                        val file = File(dataFolder.absolutePath + File.separatorChar + it[1])
-                        if (file.exists()) {
-                            loadPlugin(file)
-                        } else {
-                            appendMessage("文件 ${file.absolutePath} 不存在")
+                        if (!loadPluginFromFile(it[1])) {
+                            appendMessage("文件 ${it[1]} 不存在")
                         }
                     }
                     "unload" -> {
@@ -264,6 +284,7 @@ object MiraiNative : PluginBase() {
             launch(NativeDispatcher) {
                 logger.info("Mirai Native 正启用所有 DLL 插件。")
                 bridge.eventEnable()
+                Tray.refresh()
             }
         }
 
