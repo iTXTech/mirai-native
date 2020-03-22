@@ -24,8 +24,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
 
-    implementation("net.mamoe:mirai-core-jvm:0.28.0")
-    implementation("net.mamoe:mirai-console:0.3.3")
+    implementation("net.mamoe:mirai-core-jvm:0.29.0")
+    implementation("net.mamoe:mirai-console:0.3.5")
 }
 
 tasks.named<Jar>("jar") {

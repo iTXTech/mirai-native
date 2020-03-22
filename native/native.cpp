@@ -105,7 +105,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 		return -1;
 	}
 	jvm = vm;
-	jclass b = env->FindClass("org/itxtech/mirainative/Bridge");
+	auto b = env->FindClass("org/itxtech/mirainative/Bridge");
 	bclz = jclass(env->NewGlobalRef(b));
 
 	return JNI_VERSION_1_8;
