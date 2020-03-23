@@ -24,7 +24,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
 
-    implementation("net.mamoe:mirai-core-jvm:0.29.0")
+    implementation("net.mamoe:mirai-core-jvm:0.29.1")
     implementation("net.mamoe:mirai-console:0.3.5")
 }
 

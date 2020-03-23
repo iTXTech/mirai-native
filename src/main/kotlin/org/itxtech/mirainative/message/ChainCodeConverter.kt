@@ -51,7 +51,7 @@ object ChainCodeConverter {
 
     private fun String.toMap(): HashMap<String, String> {
         val map = HashMap<String, String>()
-        this.split(",").forEach {
+        split(",").forEach {
             val parts = it.split(delimiters = *arrayOf("="), ignoreCase = false, limit = 2)
             map[parts[0]] = parts[1].escape(true)
         }
@@ -59,80 +59,78 @@ object ChainCodeConverter {
     }
 
     private suspend fun String.toMessageInternal(contact: Contact?): Message {
-        return if (this.startsWith("[CQ:") && this.endsWith("]")) {
-            val c = this.substring(4, this.length - 1)
-            if (c.contains(",")) { // TODO: 支持更多码
-                val parts = c.split(delimiters = *arrayOf(","), ignoreCase = false, limit = 2)
-                val args = parts[1].toMap()
-                when (parts[0]) {
-                    "at" -> {
-                        if (args["qq"] == "all") {
-                            AtAll
-                        } else {
-                            val group = MiraiNative.bot.getGroupOrNull(contact!!.id)
-                            if (group == null) {
-                                MiraiNative.logger.debug("你群没了：${contact.id}")
-                                return PlainText("")
-                            }
-                            val member = group.getOrNull(args["qq"]!!.toLong())
-                            if (member == null) {
-                                MiraiNative.logger.debug("你人没了：${args["qq"]}")
-                                return PlainText.Empty
-                            }
-                            At(member)
+        if (startsWith("[CQ:") && endsWith("]")) {
+            val parts = substring(4, length - 1).split(delimiters = *arrayOf(","), ignoreCase = false, limit = 2)
+            val args = if (parts.size == 2) {
+                parts[1].toMap()
+            } else {
+                HashMap()
+            }
+            when (parts[0]) {
+                "at" -> {
+                    if (args["qq"] == "all") {
+                        return AtAll
+                    } else {
+                        val group = MiraiNative.bot.getGroupOrNull(contact!!.id)
+                        if (group == null) {
+                            MiraiNative.logger.debug("你群没了：${contact.id}")
+                            return PlainText.Empty
                         }
+                        val member = group.getOrNull(args["qq"]!!.toLong())
+                        if (member == null) {
+                            MiraiNative.logger.debug("你人没了：${args["qq"]}")
+                            return PlainText.Empty
+                        }
+                        return At(member)
                     }
-                    "face" -> {
-                        Face(args["id"]!!.toInt())
-                    }
-                    "emoji" -> {
-                        PlainText(String(Character.toChars(args["id"]!!.toInt())))
-                    }
-                    "image" -> {
+                }
+                "face" -> {
+                    return Face(args["id"]!!.toInt())
+                }
+                "emoji" -> {
+                    return PlainText(String(Character.toChars(args["id"]!!.toInt())))
+                }
+                "image" -> {
+                    if (args.containsKey("file")) {
+                        if (args["file"]!!.endsWith(".mnimg")) {
+                            return Image(args["file"]!!.replace(".mnimg", ""))
+                        }
                         val file = File(
                             MiraiNative.dataFolder.absolutePath +
                                     File.separatorChar + "data" + File.separatorChar + "image" + File.separatorChar + args["file"]!!
                         )
                         if (file.exists()) {
-                            contact!!.uploadImage(file)
-                        } else {
-                            PlainText.Empty
+                            return contact!!.uploadImage(file)
                         }
-                    }
-                    "share" -> {
-                        XmlMessageHelper.share(
-                            args["url"]!!,
-                            args["title"],
-                            args["content"],
-                            args["image"]
-                        )
-                    }
-                    "contact" -> {
-                        if (args["type"] == "qq") {
-                            XmlMessageHelper.contactQQ(args["id"]!!.toLong())
-                        } else {
-                            XmlMessageHelper.contactGroup(args["id"]!!.toLong())
-                        }
-                    }
-                    "music" -> {
-                        if (args["type"] == "qq") {
-                            QQMusic.send(args["id"]!!)
-                        } else {
-                            PlainText.Empty
-                        }
-                    }
-                    else -> {
-                        MiraiNative.logger.debug("不支持的 CQ码：$c")
-                        PlainText.Empty
                     }
                 }
-            } else {
-                MiraiNative.logger.debug("不支持的 CQ码 ：$c")
-                PlainText.Empty
+                "share" -> {
+                    return XmlMessageHelper.share(
+                        args["url"]!!,
+                        args["title"],
+                        args["content"],
+                        args["image"]
+                    )
+                }
+                "contact" -> {
+                    return if (args["type"] == "qq") {
+                        XmlMessageHelper.contactQQ(args["id"]!!.toLong())
+                    } else {
+                        XmlMessageHelper.contactGroup(args["id"]!!.toLong())
+                    }
+                }
+                "music" -> {
+                    if (args["type"] == "qq") {
+                        return QQMusic.send(args["id"]!!)
+                    }
+                }
+                else -> {
+                    MiraiNative.logger.debug("不支持的 CQ码：${parts[0]}")
+                }
             }
-        } else {
-            PlainText(this.unescape())
+            return PlainText.Empty
         }
+        return PlainText(unescape())
     }
 
     fun chainToCode(chain: MessageChain): String {
@@ -143,7 +141,7 @@ object ChainCodeConverter {
                 is AtAll -> "[CQ:at,qq=all]"
                 is PlainText -> it.stringValue.escape(false)
                 is Face -> "[CQ:face,id=${it.id}]"
-                is Image -> "[CQ:image,id=${it.imageId}]"
+                is Image -> "[CQ:image,file=${it.imageId}.mnimg]" // Real file not supported
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
             }
         }
