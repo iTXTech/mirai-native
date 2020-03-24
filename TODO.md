@@ -28,8 +28,8 @@
 - [x] `CQ_canSendRecord`
 - [x] `CQ_deleteMsg`
 - [x] `CQ_getAppDirectory`
-- [x] `CQ_getCookiesV2` `[Placeholder]`
-- [x] `CQ_getCsrfToken` `[Placeholder]`
+- [x] `CQ_getCookiesV2` `[Placeholder]` `[Won't Implement]`
+- [x] `CQ_getCsrfToken` `[Placeholder]` `[Won't Implement]`
 - [x] `CQ_getFriendList`
 - [x] `CQ_getGroupInfo`
 - [x] `CQ_getGroupList`
@@ -60,11 +60,11 @@
 
 ### 过时 酷Q API
 
-- [ ] `CQ_getCookies`
+- [x] `CQ_getCookies`
 - [ ] `CQ_getGroupMemberInfo`
-- [ ] `CQ_setGroupAddRequest`
+- [x] `CQ_setGroupAddRequest`
 - [ ] `CQ_getRecord`
-- [ ] `CQ_sendLike` `[Won't Implement]`
+- [x] `CQ_sendLike` `[Won't Implement]`
 
 ## 事件
 

@@ -611,3 +611,18 @@ CQAPI(int32_t, CQ_setGroupAnonymousBan, 24)(int32_t plugin_id, int64_t group, co
 }
 
 // Legacy
+
+CQAPI(const char*, CQ_getCookies, 4)(int32_t plugin_id)
+{
+	return CQ_getCookiesV2(plugin_id, "");
+}
+
+CQAPI(int32_t, CQ_setGroupAddRequest, 16)(int32_t plugin_id, const char* id, int32_t req_type, int32_t fb_type)
+{
+	return CQ_setGroupAddRequestV2(plugin_id, id, req_type, fb_type, "");
+}
+
+CQAPI(int32_t, CQ_sendLike, 16)(int32_t plugin_id, int64_t account)
+{
+	return CQ_sendLikeV2(plugin_id, account, 1);
+}
