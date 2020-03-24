@@ -622,7 +622,7 @@ CQAPI(int32_t, CQ_setGroupAddRequest, 16)(int32_t plugin_id, const char* id, int
 	return CQ_setGroupAddRequestV2(plugin_id, id, req_type, fb_type, "");
 }
 
-CQAPI(int32_t, CQ_sendLike, 16)(int32_t plugin_id, int64_t account)
+CQAPI(int32_t, CQ_sendLike, 12)(int32_t plugin_id, int64_t account)
 {
 	return CQ_sendLikeV2(plugin_id, account, 1);
 }

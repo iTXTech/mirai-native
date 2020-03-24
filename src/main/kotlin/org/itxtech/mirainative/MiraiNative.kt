@@ -79,7 +79,31 @@ object MiraiNative : PluginBase() {
             }
         }
 
+        initDataDir()
         Tray.create()
+    }
+
+    private fun initDataDir() {
+        File("data" + File.separatorChar + "image").mkdirs()
+        File(
+            System.getProperty("java.library.path")
+                .split(";")[0] + File.separatorChar + "data" + File.separatorChar + "image"
+        ).mkdirs()
+    }
+
+    fun getDataFile(type: String, name: String): File? {
+        arrayOf(
+            "data" + File.separatorChar + type + File.separatorChar,
+            System.getProperty("java.library.path")
+                .split(";")[0] + File.separatorChar + "data" + File.separatorChar + type + File.separatorChar,
+            ""
+        ).forEach {
+            val f = File(it + name)
+            if (f.exists()) {
+                return f
+            }
+        }
+        return null
     }
 
     fun loadPluginFromFile(f: String): Boolean {

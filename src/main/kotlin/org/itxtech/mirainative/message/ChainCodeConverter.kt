@@ -30,7 +30,6 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.uploadImage
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.util.QQMusic
-import java.io.File
 
 object ChainCodeConverter {
     private fun String.escape(c: Boolean = false): String {
@@ -95,11 +94,8 @@ object ChainCodeConverter {
                         if (args["file"]!!.endsWith(".mnimg")) {
                             return Image(args["file"]!!.replace(".mnimg", ""))
                         }
-                        val file = File(
-                            MiraiNative.dataFolder.absolutePath +
-                                    File.separatorChar + "data" + File.separatorChar + "image" + File.separatorChar + args["file"]!!
-                        )
-                        if (file.exists()) {
+                        val file = MiraiNative.getDataFile("image", args["file"]!!)
+                        if (file != null) {
                             return contact!!.uploadImage(file)
                         }
                     }
