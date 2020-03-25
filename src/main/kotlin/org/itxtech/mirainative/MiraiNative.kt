@@ -98,7 +98,7 @@ object MiraiNative : PluginBase() {
         File("data" + File.separatorChar + "image").mkdirs()
         File(
             System.getProperty("java.library.path")
-                .split(";")[0] + File.separatorChar + "data" + File.separatorChar + "image"
+                .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + "image"
         ).mkdirs()
     }
 
@@ -106,10 +106,10 @@ object MiraiNative : PluginBase() {
         arrayOf(
             "data" + File.separatorChar + type + File.separatorChar,
             System.getProperty("java.library.path")
-                .split(";")[0] + File.separatorChar + "data" + File.separatorChar + type + File.separatorChar,
+                .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + type + File.separatorChar,
             ""
         ).forEach {
-            val f = File(it + name)
+            val f = File(it + name).absoluteFile
             if (f.exists()) {
                 return f
             }
