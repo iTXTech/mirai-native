@@ -46,6 +46,7 @@ import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.message.MessageCache
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
+import org.itxtech.mirainative.util.NpmHelper
 import org.itxtech.mirainative.util.Tray
 import java.io.File
 import java.util.concurrent.Executors
@@ -60,14 +61,14 @@ object MiraiNative : PluginBase() {
     var plugins: HashMap<Int, NativePlugin> = HashMap()
     val bot: Bot by lazy { Bot.instances.first().get()!! }
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries") }
+    private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
 
     override fun onLoad() {
-        val dll = dataFolder.absolutePath + File.separatorChar + "CQP.dll"
-        if (File(dataFolder.absolutePath + File.separatorChar + "CQP.dll").exists()) {
-            logger.info("正在加载 $dll")
-            System.load(dll)
+        if (dll.exists()) {
+            logger.info("正在加载 ${dll.absolutePath}")
+            System.load(dll.absolutePath)
         } else {
-            logger.error("找不到 $dll")
+            logger.error("找不到 ${dll.absolutePath}")
             return
         }
 
@@ -213,13 +214,13 @@ object MiraiNative : PluginBase() {
                             if (p.pluginInfo != null) {
                                 appendMessage(
                                     "Id：" + p.id + " 标识符：" + p.identifier + " 名称：" + p.pluginInfo!!.name +
-                                            " 版本：" + p.pluginInfo!!.version + " 状态：" +
-                                            (if (p.enabled) "已启用 " else "已禁用 ") + (if (p.loaded) "已加载" else "已卸载")
+                                            " 版本：" + p.pluginInfo!!.version + NpmHelper.state(p)
+
                                 )
                             } else {
                                 appendMessage(
                                     "Id：" + p.id + " 标识符：" + p.identifier + " （JSON文件缺失）" +
-                                            " 状态：" + (if (p.enabled) "已启用 " else "已禁用 ") + (if (p.loaded) "已加载" else "已卸载")
+                                            NpmHelper.state(p)
                                 )
                             }
                         }
@@ -261,33 +262,7 @@ object MiraiNative : PluginBase() {
                     }
                     "info" -> {
                         if (plugins.containsKey(it[1].toInt())) {
-                            val p = plugins[it[1].toInt()]!!
-                            val i = p.pluginInfo
-                            appendMessage("标识符：" + p.identifier)
-                            appendMessage("状态：" + if (p.enabled) "已启用 " else "已禁用 " + if (p.loaded) "已加载" else "已卸载")
-                            if (i == null) {
-                                appendMessage("Id：" + p.id + " （JSON文件缺失）")
-                                appendMessage("CQ API：" + p.api)
-                            } else {
-                                appendMessage("Id：" + p.id)
-                                appendMessage("CQ API：" + p.api + " CQ API（JSON）：" + i.apiver)
-                                appendMessage("名称：" + i.name)
-                                appendMessage("版本：" + i.version + " 版本号：" + i.version_id)
-                                appendMessage("描述：" + i.description)
-                                appendMessage("作者：" + i.author)
-                                appendMessage("注册了 " + i.event.size + " 个事件")
-                                i.event.forEach { ev ->
-                                    appendMessage("类型：" + ev.type + " 描述：" + ev.name + " 方法名：" + ev.function)
-                                }
-                                appendMessage("注册了 " + i.status.size + " 个悬浮窗项目")
-                                i.status.forEach { s ->
-                                    appendMessage("名称：" + s.name + " 标题：" + s.title + " 方法名：" + s.function)
-                                }
-                                appendMessage("注册了 " + i.menu.size + " 个菜单入口")
-                                i.menu.forEach { m ->
-                                    appendMessage("名称：" + m.name + " 方法名：" + m.function)
-                                }
-                            }
+                            appendMessage(NpmHelper.summary(plugins[it[1].toInt()]!!))
                         } else {
                             appendMessage("Id " + it[1] + " 不存在。")
                         }

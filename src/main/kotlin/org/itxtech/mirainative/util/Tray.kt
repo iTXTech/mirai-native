@@ -90,7 +90,7 @@ object Tray {
 
             MiraiNative.plugins.values.forEach { plugin ->
                 if (plugin.loaded) {
-                    val p = Menu(if (plugin.pluginInfo != null) plugin.pluginInfo!!.name else plugin.identifier)
+                    val p = Menu(NpmHelper.name(plugin))
                     npm.add(p)
 
                     val ver =
@@ -98,10 +98,20 @@ object Tray {
                     ver.isEnabled = false
                     p.add(ver)
 
-                    val status =
-                        MenuItem("状态：" + (if (plugin.enabled) "已启用 " else "已禁用 ") + (if (plugin.loaded) "已加载" else "已卸载"))
+                    val status = MenuItem(NpmHelper.state(plugin))
                     status.isEnabled = false
                     p.add(status)
+
+                    val summary = MenuItem("信息")
+                    summary.addActionListener {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            NpmHelper.summary(plugin),
+                            "插件信息 " + NpmHelper.name(plugin),
+                            JOptionPane.INFORMATION_MESSAGE
+                        )
+                    }
+                    p.add(summary)
 
                     val unload = MenuItem("卸载")
                     unload.addActionListener {

@@ -54,7 +54,7 @@ object ChainCodeConverter {
     private fun String.toMap(): HashMap<String, String> {
         val map = HashMap<String, String>()
         split(",").forEach {
-            val parts = it.split(delimiters = arrayOf("="), limit = 2)
+            val parts = it.split(delimiters = *arrayOf("="), limit = 2)
             map[parts[0]] = parts[1].escape(true)
         }
         return map
@@ -62,7 +62,7 @@ object ChainCodeConverter {
 
     private suspend fun String.toMessageInternal(contact: Contact?): Message {
         if (startsWith("[CQ:") && endsWith("]")) {
-            val parts = substring(4, length - 1).split(delimiters = arrayOf(","), limit = 2)
+            val parts = substring(4, length - 1).split(delimiters = *arrayOf(","), limit = 2)
             val args = if (parts.size == 2) {
                 parts[1].toMap()
             } else {

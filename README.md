@@ -42,8 +42,10 @@ Mirai Native 致力于通过实现 酷Q 的兼容API使 酷Q 的应用（插件�
 
 ## 使用须知
 
-1. 可使用`酷Q SDK编写`，部分API暂不可用，见上文 TODO列表
-1. `DLL` 字符串编码请采用 `GB18030`
+1. 可使用`酷Q SDK编写`，部分API暂不可用，见上文 `Docs`
+1. 提供 `Mirai` 独有API，见 `Mirai Native Advance SDK`（建设中，见 `epl-test`文件夹）
+1. `DLL` 字符串编码采用 `GB18030`
+1. 待 `Bot` 上线后才会调用插件的 `Enable` 事件，托班菜单内才可以禁用插件
 
 ## 如何获取酷Q插件
 
