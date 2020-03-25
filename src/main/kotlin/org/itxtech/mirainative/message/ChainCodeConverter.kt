@@ -24,12 +24,15 @@
 
 package org.itxtech.mirainative.message
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.uploadImage
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.util.QQMusic
+import java.net.URL
 
 object ChainCodeConverter {
     private fun String.escape(c: Boolean = false): String {
@@ -51,7 +54,7 @@ object ChainCodeConverter {
     private fun String.toMap(): HashMap<String, String> {
         val map = HashMap<String, String>()
         split(",").forEach {
-            val parts = it.split(delimiters = *arrayOf("="), limit = 2)
+            val parts = it.split(delimiters = arrayOf("="), limit = 2)
             map[parts[0]] = parts[1].escape(true)
         }
         return map
@@ -59,7 +62,7 @@ object ChainCodeConverter {
 
     private suspend fun String.toMessageInternal(contact: Contact?): Message {
         if (startsWith("[CQ:") && endsWith("]")) {
-            val parts = substring(4, length - 1).split(delimiters = *arrayOf(","), limit = 2)
+            val parts = substring(4, length - 1).split(delimiters = arrayOf(","), limit = 2)
             val args = if (parts.size == 2) {
                 parts[1].toMap()
             } else {
@@ -98,6 +101,8 @@ object ChainCodeConverter {
                         if (file != null) {
                             return contact!!.uploadImage(file)
                         }
+                    } else if (args.containsKey("url")) {
+                        return withContext(Dispatchers.IO) { contact!!.uploadImage(URL(args["url"]!!)) }
                     }
                 }
                 "share" -> {
