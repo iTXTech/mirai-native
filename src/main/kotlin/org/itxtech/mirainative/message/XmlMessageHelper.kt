@@ -25,11 +25,11 @@
 package org.itxtech.mirainative.message
 
 import net.mamoe.mirai.message.data.XmlMessage
-import net.mamoe.mirai.message.data.buildXMLMessage
+import net.mamoe.mirai.message.data.buildXmlMessage
 import org.itxtech.mirainative.MiraiNative
 
 object XmlMessageHelper {
-    fun share(u: String, title: String?, content: String?, image: String?) = buildXMLMessage {
+    fun share(u: String, title: String?, content: String?, image: String?) = buildXmlMessage {
         templateId = 12345
         serviceId = 1
         action = "web"

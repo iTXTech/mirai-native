@@ -294,7 +294,7 @@ public class Bridge {
 
     @NativeBridgeMethod
     public static int setGroupWholeBan(int pluginId, long group, boolean enable) {
-        getBot().getGroup(group).setMuteAll(enable);
+        getBot().getGroup(group).getSettings().setMuteAll(enable);
         return 0;
     }
 

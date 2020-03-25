@@ -1,6 +1,6 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.3.70"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.3.70"
+    kotlin("jvm") version "1.4-M1"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.4-M1"
 }
 
 group = "org.itxtech"
@@ -16,16 +16,18 @@ kotlin {
 }
 
 repositories {
-    maven { setUrl("https://mirrors.huaweicloud.com/repository/maven") }
-    maven { setUrl("https://dl.bintray.com/him188moe/mirai") }
+    maven("https://mirrors.huaweicloud.com/repository/maven")
+    maven("https://dl.bintray.com/him188moe/mirai")
+    maven("https://dl.bintray.com/kotlin/kotlin-eap")
+    mavenCentral()
 }
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5-1.4-M1")
 
-    implementation("net.mamoe:mirai-core-jvm:0.29.1")
-    implementation("net.mamoe:mirai-console:0.3.6")
+    implementation("net.mamoe:mirai-core-jvm:0.30.0")
+    implementation("net.mamoe:mirai-console:0.3.7")
 }
 
 tasks.named<Jar>("jar") {

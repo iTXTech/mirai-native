@@ -59,14 +59,25 @@ object MiraiNative : PluginBase() {
     val bridge = Bridge()
     var plugins: HashMap<Int, NativePlugin> = HashMap()
     val bot: Bot by lazy { Bot.instances.first().get()!! }
+    private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries") }
 
     override fun onLoad() {
         val dll = dataFolder.absolutePath + File.separatorChar + "CQP.dll"
         if (File(dataFolder.absolutePath + File.separatorChar + "CQP.dll").exists()) {
-            logger.info("Mirai Native 正在加载 $dll")
+            logger.info("正在加载 $dll")
             System.load(dll)
         } else {
-            logger.error("Mirai Native 找不到 $dll")
+            logger.error("找不到 $dll")
+            return
+        }
+
+        initDataDir()
+
+        lib.listFiles()?.forEach { file ->
+            if (file.absolutePath.endsWith(".dll")) {
+                logger.info("正在加载外部库 " + file.absolutePath)
+                System.load(file.absolutePath)
+            }
         }
 
         if (!dataFolder.isDirectory) {
@@ -79,11 +90,11 @@ object MiraiNative : PluginBase() {
             }
         }
 
-        initDataDir()
         Tray.create()
     }
 
     private fun initDataDir() {
+        lib.mkdirs()
         File("data" + File.separatorChar + "image").mkdirs()
         File(
             System.getProperty("java.library.path")
