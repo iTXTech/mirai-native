@@ -46,8 +46,9 @@ import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.message.MessageCache
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
+import org.itxtech.mirainative.ui.FloatingWindow
+import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.NpmHelper
-import org.itxtech.mirainative.util.Tray
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.jar.Manifest
@@ -82,6 +83,7 @@ object MiraiNative : PluginBase() {
         }
 
         Tray.create()
+        FloatingWindow.create()
 
         if (!dataFolder.isDirectory) {
             logger.error("数据文件夹不是一个文件夹！" + dataFolder.absolutePath)
@@ -149,7 +151,7 @@ object MiraiNative : PluginBase() {
                 plugins[pluginId.getAndIncrement()] = plugin
                 bridge.updateInfo(plugin)
                 bridge.startPlugin(plugin)
-                Tray.refresh()
+                Tray.update()
             }
         }
     }
@@ -160,7 +162,7 @@ object MiraiNative : PluginBase() {
             bridge.exitPlugin(plugin)
             delay(500)
             bridge.unloadPlugin(plugin)
-            Tray.refresh()
+            Tray.update()
         }
     }
 
@@ -169,7 +171,7 @@ object MiraiNative : PluginBase() {
             launch(NativeDispatcher) {
                 bridge.enablePlugin(plugin)
             }
-            Tray.refresh()
+            Tray.update()
             return true
         }
         return false
@@ -180,7 +182,7 @@ object MiraiNative : PluginBase() {
             launch(NativeDispatcher) {
                 bridge.disablePlugin(plugin)
             }
-            Tray.refresh()
+            Tray.update()
             return true
         }
         return false
@@ -294,7 +296,7 @@ object MiraiNative : PluginBase() {
             launch(NativeDispatcher) {
                 logger.info("Mirai Native 正启用所有 DLL 插件。")
                 bridge.eventEnable()
-                Tray.refresh()
+                Tray.update()
             }
         }
 

@@ -113,7 +113,15 @@
       "function": "_eventDisable"
     }
   ],
-  "status": [],
+  "status": [
+    {
+      "id": 1,
+      "name": "随机数",
+      "title": "RAND",
+      "function": "_status",
+      "period": "1000"
+    }
+  ],
   "menu": [
     {
       "name": "loadWin",

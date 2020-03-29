@@ -95,7 +95,8 @@ data class Regex(
 )
 
 data class FloatingWindowEntry(val status: Status) {
-    lateinit var data: String
-    lateinit var unit: String
-    var color: Int = 0
+    var data = ""
+    var unit = ""
+    var color = 0
+    var visible = false
 }

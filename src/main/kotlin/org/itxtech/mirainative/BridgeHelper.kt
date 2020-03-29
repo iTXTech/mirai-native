@@ -244,7 +244,7 @@ object BridgeHelper {
     }
 
     private fun ByteReadPacket.readString(): String {
-        return readBytes(readShort().toInt()).toString()
+        return String(readBytes(readShort().toInt()))
     }
 
     fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {

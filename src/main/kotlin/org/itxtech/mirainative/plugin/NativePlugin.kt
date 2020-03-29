@@ -52,7 +52,7 @@ data class NativePlugin(val file: File, val id: Int) {
             field = v
         }
     private var events: HashMap<Int, String>? = null
-    private val entries: ArrayList<FloatingWindowEntry> = ArrayList()
+    val entries: ArrayList<FloatingWindowEntry> = ArrayList()
 
     private fun registerFws(fws: ArrayList<Status>) {
         fws.forEach {
@@ -60,7 +60,7 @@ data class NativePlugin(val file: File, val id: Int) {
             entries.add(entry)
             MiraiNative.launch(NativeDispatcher) {
                 while (isActive) {
-                    if (enabled) {
+                    if (enabled && entry.visible) {
                         BridgeHelper.updateFwe(id, entry)
                     }
                     delay(it.period.toLong())

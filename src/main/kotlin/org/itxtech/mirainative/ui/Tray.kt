@@ -22,11 +22,12 @@
  *
  */
 
-package org.itxtech.mirainative.util
+package org.itxtech.mirainative.ui
 
 import kotlinx.coroutines.launch
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.NativeDispatcher
+import org.itxtech.mirainative.util.NpmHelper
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -59,10 +60,19 @@ object Tray {
         }
     }
 
-    fun refresh() {
+    fun update() {
         if (icon != null) {
             val popupMenu = PopupMenu()
             icon!!.popupMenu = popupMenu
+
+            val fw = MenuItem(if (FloatingWindow.isVisible()) "隐藏悬浮窗" else "显示悬浮窗")
+            fw.addActionListener {
+                FloatingWindow.toggle()
+                update()
+            }
+            popupMenu.add(fw)
+
+            popupMenu.addSeparator()
 
             val m = MenuItem("NPM")
             m.isEnabled = false
@@ -101,6 +111,18 @@ object Tray {
                     val status = MenuItem(NpmHelper.state(plugin))
                     status.isEnabled = false
                     p.add(status)
+
+                    //悬浮窗状态项
+                    val fwes = Menu("状态")
+                    plugin.entries.forEach { e ->
+                        val entry = MenuItem(e.status.name + "：" + if (e.visible) "显示" else "隐藏")
+                        entry.addActionListener {
+                            e.visible = !e.visible
+                            update()
+                        }
+                        fwes.add(entry)
+                    }
+                    p.add(fwes)
 
                     val summary = MenuItem("信息")
                     summary.addActionListener {
