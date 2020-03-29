@@ -81,6 +81,8 @@ object MiraiNative : PluginBase() {
             }
         }
 
+        Tray.create()
+
         if (!dataFolder.isDirectory) {
             logger.error("数据文件夹不是一个文件夹！" + dataFolder.absolutePath)
         } else {
@@ -90,8 +92,6 @@ object MiraiNative : PluginBase() {
                 }
             }
         }
-
-        Tray.create()
     }
 
     private fun initDataDir() {

@@ -27,7 +27,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5-1.4-M1")
 
     implementation("net.mamoe:mirai-core-jvm:0.31.0")
-    implementation("net.mamoe:mirai-console:0.3.7")
+    implementation("net.mamoe:mirai-console:0.3.8")
 }
 
 tasks.named<Jar>("jar") {
