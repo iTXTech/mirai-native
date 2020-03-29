@@ -35,6 +35,8 @@ import org.itxtech.mirainative.util.QQMusic
 import java.net.URL
 
 object ChainCodeConverter {
+    private val MSG_EMPTY = PlainText("")
+
     private fun String.escape(c: Boolean = false): String {
         var s = replace("&", "&amp;")
             .replace("[", "&#91;")
@@ -76,12 +78,12 @@ object ChainCodeConverter {
                         val group = MiraiNative.bot.getGroupOrNull(contact!!.id)
                         if (group == null) {
                             MiraiNative.logger.debug("你群没了：${contact.id}")
-                            return PlainText.Empty
+                            return MSG_EMPTY
                         }
                         val member = group.getOrNull(args["qq"]!!.toLong())
                         if (member == null) {
                             MiraiNative.logger.debug("你人没了：${args["qq"]}")
-                            return PlainText.Empty
+                            return MSG_EMPTY
                         }
                         return At(member)
                     }
@@ -125,11 +127,14 @@ object ChainCodeConverter {
                         return QQMusic.send(args["id"]!!)
                     }
                 }
+                "shake" -> {
+                    return PokeMessage.Poke
+                }
                 else -> {
                     MiraiNative.logger.debug("不支持的 CQ码：${parts[0]}")
                 }
             }
-            return PlainText.Empty
+            return MSG_EMPTY
         }
         return PlainText(unescape())
     }

@@ -26,19 +26,15 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5-1.4-M1")
 
-    implementation("net.mamoe:mirai-core-jvm:0.30.0")
+    implementation("net.mamoe:mirai-core-jvm:0.31.0")
     implementation("net.mamoe:mirai-console:0.3.7")
 }
 
 tasks.named<Jar>("jar") {
     manifest {
-        attributes(
-            mapOf(
-                "Revision" to Runtime.getRuntime().exec("git rev-parse --short HEAD")
-                    .inputStream.bufferedReader().readText().trim(),
-                "Name" to "iTXTech MiraiNative"
-            )
-        )
+        attributes["Name"] = "iTXTech MiraiNative"
+        attributes["Revision"] = Runtime.getRuntime().exec("git rev-parse --short HEAD")
+            .inputStream.bufferedReader().readText().trim()
     }
 }
 
