@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.itxtech"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 kotlin {
     sourceSets {
@@ -27,7 +27,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5-1.4-M1")
 
     implementation("net.mamoe:mirai-core-jvm:0.31.1")
-    implementation("net.mamoe:mirai-console:0.3.8")
+    implementation("net.mamoe:mirai-console:0.4.0")
 }
 
 tasks.named<Jar>("jar") {

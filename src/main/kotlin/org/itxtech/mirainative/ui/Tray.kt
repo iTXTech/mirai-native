@@ -57,6 +57,7 @@ object Tray {
             })
             icon!!.popupMenu = PopupMenu()
             SystemTray.getSystemTray().add(icon)
+            update()
         }
     }
 
