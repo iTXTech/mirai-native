@@ -50,6 +50,7 @@ import org.itxtech.mirainative.ui.FloatingWindow
 import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.NpmHelper
 import java.io.File
+import java.io.FileOutputStream
 import java.util.concurrent.Executors
 import java.util.jar.Manifest
 import kotlin.coroutines.ContinuationInterceptor
@@ -65,13 +66,21 @@ object MiraiNative : PluginBase() {
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
 
     override fun onLoad() {
-        if (dll.exists()) {
-            logger.info("正在加载 ${dll.absolutePath}")
-            System.load(dll.absolutePath)
-        } else {
-            logger.error("找不到 ${dll.absolutePath}")
-            return
+        //暂时只支持 x86 平台运行，不兼容 amd64
+        val mode = System.getProperty("sun.arch.data.model")
+        if (mode != "32") {
+            logger.warning("当前运行环境 $mode 可能不与 Mirai Native 兼容，推荐使用 32位 JRE 运行 Mirai Native。")
+            logger.warning("如果您正在开发或调试其他环境下的 Mirai Native，请忽略此警告。")
         }
+
+        if (!dll.exists()) {
+            logger.error("找不到 ${dll.absolutePath}，写出自带的 CQP.dll。")
+            val cqp = FileOutputStream(dll)
+            getResources("CQP.dll")?.copyTo(cqp)
+            cqp.close()
+        }
+        logger.info("正在加载 ${dll.absolutePath}")
+        System.load(dll.absolutePath)
 
         initDataDir()
 

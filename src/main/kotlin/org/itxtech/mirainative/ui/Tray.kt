@@ -113,17 +113,19 @@ object Tray {
                     status.isEnabled = false
                     p.add(status)
 
-                    //悬浮窗状态项
-                    val fwes = Menu("状态")
-                    plugin.entries.forEach { e ->
-                        val entry = MenuItem(e.status.name + "：" + if (e.visible) "显示" else "隐藏")
-                        entry.addActionListener {
-                            e.visible = !e.visible
-                            update()
+                    if (plugin.entries.isNotEmpty()) {
+                        //悬浮窗状态项
+                        val fwes = Menu("状态")
+                        plugin.entries.forEach { e ->
+                            val entry = MenuItem(e.status.name + "：" + if (e.visible) "显示" else "隐藏")
+                            entry.addActionListener {
+                                e.visible = !e.visible
+                                update()
+                            }
+                            fwes.add(entry)
                         }
-                        fwes.add(entry)
+                        p.add(fwes)
                     }
-                    p.add(fwes)
 
                     val summary = MenuItem("信息")
                     summary.addActionListener {
