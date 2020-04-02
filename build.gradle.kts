@@ -19,15 +19,14 @@ repositories {
     maven("https://mirrors.huaweicloud.com/repository/maven")
     maven("https://dl.bintray.com/him188moe/mirai")
     maven("https://dl.bintray.com/kotlin/kotlin-eap")
-    mavenCentral()
 }
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5-1.4-M1")
 
-    implementation("net.mamoe:mirai-core-jvm:0.31.2")
-    implementation("net.mamoe:mirai-console:0.4.1")
+    implementation("net.mamoe:mirai-core-jvm:0.32.0")
+    implementation("net.mamoe:mirai-console:0.4.2")
 }
 
 tasks.named<Jar>("jar") {

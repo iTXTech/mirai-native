@@ -35,7 +35,6 @@ import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JTextArea
 
-
 object FloatingWindow {
     private val window = JFrame("悬浮窗")
     private val text = JTextArea()
@@ -77,7 +76,7 @@ object FloatingWindow {
         MiraiNative.plugins.values.forEach { p ->
             if (p.entries.isNotEmpty()) {
                 p.entries.forEach { e ->
-                    if (e.visible) {
+                    if (p.enabled && e.visible) {
                         t.append(e.status.title).append(": ").append(e.data).append(" ").appendln(e.unit)
                     }
                 }

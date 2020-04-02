@@ -164,9 +164,6 @@
     <ClCompile Include="native.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="native.def" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="native.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
