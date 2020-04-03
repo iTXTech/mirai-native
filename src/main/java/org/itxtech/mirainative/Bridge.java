@@ -51,7 +51,7 @@ public class Bridge {
     public static final int GROUP_MUTE = 2;
 
     // Plugin
-    public int loadPlugin(NativePlugin plugin) {
+    public static int loadPlugin(NativePlugin plugin) {
         int code = loadNativePlugin(plugin.getFile().getAbsolutePath().replace("\\", "\\\\"), plugin.getId());
         if (plugin.getPluginInfo() != null) {
             PluginInfo info = plugin.getPluginInfo();
@@ -65,7 +65,7 @@ public class Bridge {
         return code;
     }
 
-    public int unloadPlugin(NativePlugin plugin) {
+    public static int unloadPlugin(NativePlugin plugin) {
         int code = freeNativePlugin(plugin.getId());
         getLogger().info("Native Plugin " + plugin.getId() + " has been unloaded with code " + code);
         plugin.setLoaded(false);
@@ -73,7 +73,7 @@ public class Bridge {
         return code;
     }
 
-    public void disablePlugin(NativePlugin plugin) {
+    public static void disablePlugin(NativePlugin plugin) {
         if (plugin.getLoaded() && plugin.getEnabled()) {
             plugin.setEnabled(false);
             if (plugin.shouldCallEvent(Event.EVENT_DISABLE, true)) {
@@ -82,7 +82,7 @@ public class Bridge {
         }
     }
 
-    public void enablePlugin(NativePlugin plugin) {
+    public static void enablePlugin(NativePlugin plugin) {
         if (plugin.getLoaded() && !plugin.getEnabled()) {
             plugin.setEnabled(true);
             if (plugin.shouldCallEvent(Event.EVENT_ENABLE, true)) {
@@ -91,19 +91,19 @@ public class Bridge {
         }
     }
 
-    public void startPlugin(NativePlugin plugin) {
+    public static void startPlugin(NativePlugin plugin) {
         if (plugin.shouldCallEvent(Event.EVENT_STARTUP, true)) {
             callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup"));
         }
     }
 
-    public void exitPlugin(NativePlugin plugin) {
+    public static void exitPlugin(NativePlugin plugin) {
         if (plugin.shouldCallEvent(Event.EVENT_EXIT, true)) {
             callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit"));
         }
     }
 
-    public void updateInfo(NativePlugin plugin) {
+    public static void updateInfo(NativePlugin plugin) {
         String info = callStringMethod(plugin.getId(), "AppInfo");
         if (!"".equals(info)) {
             plugin.setInfo(info);
@@ -112,25 +112,25 @@ public class Bridge {
 
     // Events
 
-    public void eventExit() {
+    public static void eventExit() {
         for (NativePlugin plugin : getPlugins().values()) {
             exitPlugin(plugin);
         }
     }
 
-    public void eventEnable() {
+    public static void eventEnable() {
         for (NativePlugin plugin : getPlugins().values()) {
             enablePlugin(plugin);
         }
     }
 
-    public void eventDisable() {
+    public static void eventDisable() {
         for (NativePlugin plugin : getPlugins().values()) {
             disablePlugin(plugin);
         }
     }
 
-    public void eventPrivateMessage(int subType, int msgId, long fromAccount, String msg, int font) {
+    public static void eventPrivateMessage(int subType, int msgId, long fromAccount, String msg, int font) {
         for (NativePlugin plugin : getPlugins().values()) {
             if (plugin.shouldCallEvent(Event.EVENT_PRI_MSG) && pEvPrivateMessage(plugin.getId(),
                     plugin.getEventOrDefault(Event.EVENT_PRI_MSG, "_eventPrivateMsg"),
@@ -140,7 +140,7 @@ public class Bridge {
         }
     }
 
-    public void eventGroupMessage(int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font) {
+    public static void eventGroupMessage(int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font) {
         for (NativePlugin plugin : getPlugins().values()) {
             if (plugin.shouldCallEvent(Event.EVENT_GROUP_MSG) && pEvGroupMessage(plugin.getId(),
                     plugin.getEventOrDefault(Event.EVENT_GROUP_MSG, "_eventGroupMsg"),
@@ -150,7 +150,7 @@ public class Bridge {
         }
     }
 
-    public void eventGroupAdmin(int subType, int time, long fromGroup, long beingOperateAccount) {
+    public static void eventGroupAdmin(int subType, int time, long fromGroup, long beingOperateAccount) {
         for (NativePlugin plugin : getPlugins().values()) {
             if (plugin.shouldCallEvent(Event.EVENT_GROUP_ADMIN) && pEvGroupAdmin(plugin.getId(),
                     plugin.getEventOrDefault(Event.EVENT_GROUP_ADMIN, "_eventSystem_GroupAdmin"),
@@ -160,7 +160,7 @@ public class Bridge {
         }
     }
 
-    public void eventGroupMemberLeave(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
+    public static void eventGroupMemberLeave(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
         for (NativePlugin plugin : getPlugins().values()) {
             if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_DEC) && pEvGroupMember(plugin.getId(),
                     plugin.getEventOrDefault(Event.EVENT_GROUP_MEMBER_DEC, "_eventSystem_GroupMemberDecrease"),
@@ -170,7 +170,7 @@ public class Bridge {
         }
     }
 
-    public void eventGroupBan(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration) {
+    public static void eventGroupBan(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration) {
         for (NativePlugin plugin : getPlugins().values()) {
             if (plugin.shouldCallEvent(Event.EVENT_GROUP_BAN) && pEvGroupBan(plugin.getId(),
                     plugin.getEventOrDefault(Event.EVENT_GROUP_BAN, "_eventSystem_GroupBan"),
@@ -180,7 +180,7 @@ public class Bridge {
         }
     }
 
-    public void eventGroupMemberJoin(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
+    public static void eventGroupMemberJoin(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
         for (NativePlugin plugin : getPlugins().values()) {
             if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_INC) && pEvGroupMember(plugin.getId(),
                     plugin.getEventOrDefault(Event.EVENT_GROUP_MEMBER_INC, "_eventSystem_GroupMemberIncrease"),
@@ -192,30 +192,30 @@ public class Bridge {
 
     // Native
 
-    public native int loadNativePlugin(String file, int id);
+    public static native int loadNativePlugin(String file, int id);
 
-    public native int freeNativePlugin(int id);
+    public static native int freeNativePlugin(int id);
 
-    public native int pEvPrivateMessage(int pluginId, String name, int subType, int msgId, long fromAccount, String msg, int font);
+    public static native int pEvPrivateMessage(int pluginId, String name, int subType, int msgId, long fromAccount, String msg, int font);
 
-    public native int pEvGroupMessage(int pluginId, String name, int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font);
+    public static native int pEvGroupMessage(int pluginId, String name, int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font);
 
-    public native int pEvGroupAdmin(int pluginId, String name, int subType, int time, long fromGroup, long beingOperateAccount);
+    public static native int pEvGroupAdmin(int pluginId, String name, int subType, int time, long fromGroup, long beingOperateAccount);
 
-    public native int pEvGroupMember(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount);
+    public static native int pEvGroupMember(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount);
 
-    public native int pEvGroupBan(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration);
+    public static native int pEvGroupBan(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration);
 
-    public native int callIntMethod(int pluginId, String name);
+    public static native int callIntMethod(int pluginId, String name);
 
-    public native String callStringMethod(int pluginId, String name);
+    public static native String callStringMethod(int pluginId, String name);
 
-    public native void processMessage();
+    public static native void processMessage();
 
     // Helper
 
     private static HashMap<Integer, NativePlugin> getPlugins() {
-        return MiraiNative.INSTANCE.getPlugins();
+        return PluginManager.INSTANCE.getPlugins();
     }
 
     private static NativePlugin getPlugin(int pluginId) {

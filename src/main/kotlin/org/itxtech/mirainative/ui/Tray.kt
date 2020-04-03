@@ -25,8 +25,10 @@
 package org.itxtech.mirainative.ui
 
 import kotlinx.coroutines.launch
+import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.NativeDispatcher
+import org.itxtech.mirainative.PluginManager
 import org.itxtech.mirainative.util.NpmHelper
 import java.awt.*
 import java.awt.event.MouseAdapter
@@ -86,7 +88,7 @@ object Tray {
             load.addActionListener {
                 val file = JOptionPane.showInputDialog("请输入位于 MiraiNative 目录下的 DLL文件名")
                 if (file != null) {
-                    if (!MiraiNative.loadPluginFromFile(file)) {
+                    if (!PluginManager.loadPluginFromFile(file)) {
                         JOptionPane.showMessageDialog(null, "加载 DLL 文件出错 “$file”。", "错误", JOptionPane.ERROR_MESSAGE)
                     }
                 }
@@ -99,7 +101,7 @@ object Tray {
             pl.isEnabled = false
             popupMenu.add(pl)
 
-            MiraiNative.plugins.values.forEach { plugin ->
+            PluginManager.plugins.values.forEach { plugin ->
                 if (plugin.loaded) {
                     val p = Menu(NpmHelper.name(plugin))
                     npm.add(p)
@@ -140,7 +142,7 @@ object Tray {
 
                     val unload = MenuItem("卸载")
                     unload.addActionListener {
-                        MiraiNative.unloadPlugin(plugin)
+                        PluginManager.unloadPlugin(plugin)
                     }
                     p.add(unload)
 
@@ -148,9 +150,9 @@ object Tray {
                     en.isEnabled = MiraiNative.botOnline
                     en.addActionListener {
                         if (plugin.enabled) {
-                            MiraiNative.disablePlugin(plugin)
+                            PluginManager.disablePlugin(plugin)
                         } else {
-                            MiraiNative.enablePlugin(plugin)
+                            PluginManager.enablePlugin(plugin)
                         }
                     }
                     p.add(en)
@@ -162,7 +164,7 @@ object Tray {
                             val item = MenuItem(m.name)
                             item.addActionListener {
                                 MiraiNative.launch(NativeDispatcher) {
-                                    MiraiNative.bridge.callIntMethod(plugin.id, m.function)
+                                    Bridge.callIntMethod(plugin.id, m.function)
                                 }
                             }
                             menu.add(item)

@@ -26,6 +26,7 @@
  - 发送网络图片以 `.mnimg` 结尾，该文件不落地，例：`[CQ:image,file={247E6A8B-ED3A-1B98-15E8-07E2277C787A}.jpg.mnimg]`
  - 发送本地图片支持绝对和相对路径，相对路径支持java.exe目录下`data\image`和运行目录下`data\image`，例：`[CQ:image,file=2.png]`
  - 发送URL图片使用扩展CQ码，例：`[CQ:image,url=https://xxxx/xxxx.jpg]`
+ - 支持闪照，额外参数 `type=flash`
 
 ## 酷Q API
 
@@ -66,11 +67,11 @@
 
 ### 过时 酷Q API
 
-- [x] `CQ_getCookies`
+- [x] `CQ_getCookies` `[Placeholder]` `[Won't Implement]`
 - [ ] `CQ_getGroupMemberInfo`
 - [x] `CQ_setGroupAddRequest`
 - [ ] `CQ_getRecord`
-- [x] `CQ_sendLike` `[Won't Implement]`
+- [x] `CQ_sendLike` `[Placeholder]` `[Won't Implement]`
 
 ## 事件
 

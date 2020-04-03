@@ -52,7 +52,7 @@ object BridgeHelper {
             val src = MessageCache.getMessage(msgId)
             if (src != null) {
                 if (src.groupId == 0L) {
-                    if (src.senderId != MiraiNative.bot.uin) {
+                    if (src.senderId != MiraiNative.bot.id) {
                         val f = MiraiNative.bot.getFriend(src.senderId)
                         f.sendMessage(
                             ((src.quote(f) + ChainCodeConverter.codeToChain(
@@ -65,7 +65,7 @@ object BridgeHelper {
                     }
                 } else {
                     val group = MiraiNative.bot.getGroup(src.groupId)
-                    if (src.senderId != MiraiNative.bot.uin) {
+                    if (src.senderId != MiraiNative.bot.id) {
                         group.sendMessage(
                             ((src.quote(group[src.senderId]) + ChainCodeConverter.codeToChain(
                                 message,
@@ -249,7 +249,7 @@ object BridgeHelper {
 
     fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {
         val pk = ByteReadPacket(
-            MiraiNative.bridge.callStringMethod(pluginId, fwe.status.function).decodeBase64Bytes()
+            Bridge.callStringMethod(pluginId, fwe.status.function).decodeBase64Bytes()
         )
         fwe.data = pk.readString()
         fwe.unit = pk.readString()

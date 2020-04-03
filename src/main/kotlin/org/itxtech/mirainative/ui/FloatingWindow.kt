@@ -28,6 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.PluginManager
 import java.awt.GraphicsEnvironment
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -73,7 +74,7 @@ object FloatingWindow {
 
     private fun update() {
         val t = StringBuilder()
-        MiraiNative.plugins.values.forEach { p ->
+        PluginManager.plugins.values.forEach { p ->
             if (p.entries.isNotEmpty()) {
                 p.entries.forEach { e ->
                     if (p.enabled && e.visible) {
