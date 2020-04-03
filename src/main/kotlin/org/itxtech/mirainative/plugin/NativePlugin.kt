@@ -34,6 +34,7 @@ import org.itxtech.mirainative.ui.FloatingWindow
 import java.io.File
 
 data class NativePlugin(val file: File, val id: Int) {
+    var autoEnable = true
     var loaded = false
     var enabled = false
     var api = -1

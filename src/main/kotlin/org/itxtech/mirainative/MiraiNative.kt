@@ -28,7 +28,6 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.serialization.UnstableDefault
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.console.plugins.PluginManager.getPluginDescription
@@ -43,13 +42,13 @@ import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.message.MessageCache
 import org.itxtech.mirainative.ui.FloatingWindow
 import org.itxtech.mirainative.ui.Tray
+import org.itxtech.mirainative.util.ConfigMan
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.Executors
 import java.util.jar.Manifest
 import kotlin.coroutines.ContinuationInterceptor
 
-@OptIn(UnstableDefault::class)
 object MiraiNative : PluginBase() {
     var botOnline = false
     val bot: Bot by lazy { Bot.instances.first().get()!! }
@@ -132,12 +131,22 @@ object MiraiNative : PluginBase() {
         }
     }
 
+    override fun onDisable() {
+        ConfigMan.save()
+
+        launch(NativeDispatcher) {
+            logger.info("Mirai Native 正停用所有DLL插件并调用Exit事件。")
+            PluginManager.disableAndExitPlugins()
+        }
+    }
+
     private fun registerEvents() {
         subscribeAlways<BotOnlineEvent> {
             botOnline = true
             launch(NativeDispatcher) {
+                ConfigMan.init()
                 logger.info("Mirai Native 正启用所有 DLL 插件。")
-                Bridge.eventEnable()
+                PluginManager.enablePlugins()
                 Tray.update()
             }
         }
@@ -267,16 +276,6 @@ object MiraiNative : PluginBase() {
 
     private fun getTimestamp(): Int {
         return currentTimeSeconds.toInt()
-    }
-
-    override fun onDisable() {
-        launch(NativeDispatcher) {
-            logger.info("Mirai Native 正停用所有DLL插件。")
-            Bridge.eventDisable()
-
-            logger.info("Mirai Native 正调用 Exit 事件")
-            Bridge.eventExit()
-        }
     }
 
     fun getVersion(): String {

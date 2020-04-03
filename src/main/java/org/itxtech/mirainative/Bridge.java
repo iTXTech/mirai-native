@@ -59,23 +59,17 @@ public class Bridge {
         } else {
             getLogger().info("Native Plugin (w/o json) " + plugin.getFile().getName() + " has been loaded with code " + code);
         }
-        if (code == 0) {
-            plugin.setLoaded(true);
-        }
         return code;
     }
 
     public static int unloadPlugin(NativePlugin plugin) {
         int code = freeNativePlugin(plugin.getId());
         getLogger().info("Native Plugin " + plugin.getId() + " has been unloaded with code " + code);
-        plugin.setLoaded(false);
-        plugin.setEnabled(false);
         return code;
     }
 
     public static void disablePlugin(NativePlugin plugin) {
         if (plugin.getLoaded() && plugin.getEnabled()) {
-            plugin.setEnabled(false);
             if (plugin.shouldCallEvent(Event.EVENT_DISABLE, true)) {
                 callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable"));
             }
@@ -84,7 +78,6 @@ public class Bridge {
 
     public static void enablePlugin(NativePlugin plugin) {
         if (plugin.getLoaded() && !plugin.getEnabled()) {
-            plugin.setEnabled(true);
             if (plugin.shouldCallEvent(Event.EVENT_ENABLE, true)) {
                 callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable"));
             }
@@ -111,25 +104,6 @@ public class Bridge {
     }
 
     // Events
-
-    public static void eventExit() {
-        for (NativePlugin plugin : getPlugins().values()) {
-            exitPlugin(plugin);
-        }
-    }
-
-    public static void eventEnable() {
-        for (NativePlugin plugin : getPlugins().values()) {
-            enablePlugin(plugin);
-        }
-    }
-
-    public static void eventDisable() {
-        for (NativePlugin plugin : getPlugins().values()) {
-            disablePlugin(plugin);
-        }
-    }
-
     public static void eventPrivateMessage(int subType, int msgId, long fromAccount, String msg, int font) {
         for (NativePlugin plugin : getPlugins().values()) {
             if (plugin.shouldCallEvent(Event.EVENT_PRI_MSG) && pEvPrivateMessage(plugin.getId(),

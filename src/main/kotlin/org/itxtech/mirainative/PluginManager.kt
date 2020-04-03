@@ -41,6 +41,15 @@ object PluginManager {
     private var pluginId = atomic(0)
     var plugins: HashMap<Int, NativePlugin> = HashMap()
 
+    fun getPluginByIdentifier(id: String): NativePlugin? {
+        plugins.values.forEach {
+            if (it.identifier == id) {
+                return it
+            }
+        }
+        return null
+    }
+
     fun loadPluginFromFile(f: String): Boolean {
         val file = File(MiraiNative.dataFolder.absolutePath + File.separatorChar + f)
         if (file.isFile && file.exists()) {
@@ -69,6 +78,7 @@ object PluginManager {
                 }.parse(PluginInfo.serializer(), json.readText())
             }
             if (Bridge.loadPlugin(plugin) == 0) {
+                plugin.loaded = true
                 plugins[pluginId.getAndIncrement()] = plugin
                 Bridge.updateInfo(plugin)
                 Bridge.startPlugin(plugin)
@@ -79,11 +89,14 @@ object PluginManager {
 
     fun unloadPlugin(plugin: NativePlugin) {
         MiraiNative.launch(NativeDispatcher) {
-            Bridge.disablePlugin(plugin)
+            disablePlugin(plugin)
             Bridge.exitPlugin(plugin)
             delay(500)
-            Bridge.unloadPlugin(plugin)
-            Tray.update()
+            if (Bridge.unloadPlugin(plugin) == 0) {
+                plugin.loaded = false
+                plugin.enabled = false
+                Tray.update()
+            }
         }
     }
 
@@ -91,8 +104,9 @@ object PluginManager {
         if (MiraiNative.botOnline && !plugin.enabled) {
             MiraiNative.launch(NativeDispatcher) {
                 Bridge.enablePlugin(plugin)
+                plugin.enabled = true
+                Tray.update()
             }
-            Tray.update()
             return true
         }
         return false
@@ -102,11 +116,29 @@ object PluginManager {
         if (plugin.enabled) {
             MiraiNative.launch(NativeDispatcher) {
                 Bridge.disablePlugin(plugin)
+                plugin.enabled = false
+                Tray.update()
             }
-            Tray.update()
             return true
         }
         return false
+    }
+
+    fun enablePlugins() {
+        plugins.values.forEach {
+            if (it.autoEnable) {
+                enablePlugin(it)
+            }
+        }
+    }
+
+    fun disableAndExitPlugins() {
+        plugins.values.forEach {
+            if (it.enabled) {
+                Bridge.disablePlugin(it)
+            }
+            Bridge.exitPlugin(it)
+        }
     }
 
     fun registerCommands() {
