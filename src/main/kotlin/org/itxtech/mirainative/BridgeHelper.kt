@@ -32,12 +32,11 @@ import kotlinx.io.core.*
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.getGroupOrNull
-import net.mamoe.mirai.message.data.Message
-import net.mamoe.mirai.message.data.asMessageChain
 import net.mamoe.mirai.message.data.quote
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.message.MessageCache
+import org.itxtech.mirainative.message.MessageCache.isFromGroup
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
 import java.nio.charset.Charset
 import kotlin.io.use
@@ -51,27 +50,17 @@ object BridgeHelper {
         MiraiNative.launch {
             val src = MessageCache.getMessage(msgId)
             if (src != null) {
-                if (src.groupId == 0L) {
-                    if (src.senderId != MiraiNative.bot.id) {
-                        val f = MiraiNative.bot.getFriend(src.senderId)
-                        f.sendMessage(
-                            ((src.quote(f) + ChainCodeConverter.codeToChain(
-                                message,
-                                f
-                            )) as Iterable<Message>).asMessageChain()
-                        ).apply {
+                if (!src.isFromGroup()) {
+                    if (src.fromId != MiraiNative.bot.id) {
+                        val f = MiraiNative.bot.getFriend(src.fromId)
+                        f.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, f)).apply {
                             MessageCache.cacheMessage(source, internalId)
                         }
                     }
                 } else {
-                    val group = MiraiNative.bot.getGroup(src.groupId)
-                    if (src.senderId != MiraiNative.bot.id) {
-                        group.sendMessage(
-                            ((src.quote(group[src.senderId]) + ChainCodeConverter.codeToChain(
-                                message,
-                                group
-                            )) as Iterable<Message>).asMessageChain()
-                        ).apply {
+                    val group = MiraiNative.bot.getGroup(src.targetId)
+                    if (src.fromId != MiraiNative.bot.id) {
+                        group.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, group)).apply {
                             MessageCache.cacheMessage(source, internalId)
                         }
                     }

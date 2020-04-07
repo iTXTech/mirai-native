@@ -26,8 +26,11 @@ package org.itxtech.mirainative.message
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.LowLevelAPI
+import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.message.data.MessageSource
+import net.mamoe.mirai.message.data.OfflineMessageSource
+import net.mamoe.mirai.message.data.OnlineMessageSource
+import net.mamoe.mirai.message.data.recall
 import org.itxtech.mirainative.MiraiNative
 
 object MessageCache {
@@ -37,37 +40,30 @@ object MessageCache {
     fun nextId(): Int = internalId.getAndIncrement()
 
     fun cacheMessage(message: MessageSource, id: Int = nextId()): Int {
-        if (message.groupId == 0L) {
-            cache[id] = message
-        } else {
-            cache[id] = message
-        }
+        cache[id] = message
         return id
     }
 
-    @LowLevelAPI
     fun recall(id: Int): Boolean {
         val message = cache[id] ?: return false
         cache.remove(id)
         MiraiNative.launch {
-            message.ensureSequenceIdAvailable()
-            if (message.groupId == 0L) {
-                //MiraiNative.INSTANCE.bot._lowLevelRecallFriendMessage(message.id)
-            } else {
-                MiraiNative.bot._lowLevelRecallGroupMessage(
-                    groupId = message.groupId,
-                    messageId = message.id
-                )
-            }
+            message.recall()
         }
         return true
     }
 
-    suspend fun getMessage(id: Int): MessageSource? {
+    fun getMessage(id: Int): MessageSource? {
         if (cache[id] != null) {
-            cache[id]!!.ensureSequenceIdAvailable()
             return cache[id]
         }
         return null
+    }
+
+    fun MessageSource.isFromGroup(): Boolean {
+        return when(this){
+            is OnlineMessageSource -> subject is Group
+            is OfflineMessageSource -> kind == OfflineMessageSource.Kind.GROUP
+        }
     }
 }
