@@ -37,6 +37,9 @@ import java.util.HashMap;
  */
 public class Bridge {
     public static final int PRI_MSG_SUBTYPE_FRIEND = 11;
+    public static final int PRI_MSG_SUBTYPE_ONLINE_STATE = 1;
+    public static final int PRI_MSG_SUBTYPE_GROUP = 2;
+    public static final int PRI_MSG_SUBTYPE_DISCUSS = 3;
 
     public static final int PERM_SUBTYPE_CANCEL_ADMIN = 1;
     public static final int PERM_SUBTYPE_SET_ADMIN = 2;

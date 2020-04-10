@@ -26,10 +26,7 @@ package org.itxtech.mirainative.message
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.message.data.MessageSource
-import net.mamoe.mirai.message.data.OfflineMessageSource
-import net.mamoe.mirai.message.data.OnlineMessageSource
 import net.mamoe.mirai.message.data.recall
 import org.itxtech.mirainative.MiraiNative
 
@@ -58,12 +55,5 @@ object MessageCache {
             return cache[id]
         }
         return null
-    }
-
-    fun MessageSource.isFromGroup(): Boolean {
-        return when(this){
-            is OnlineMessageSource -> subject is Group
-            is OfflineMessageSource -> kind == OfflineMessageSource.Kind.GROUP
-        }
     }
 }

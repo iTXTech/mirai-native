@@ -36,6 +36,7 @@ import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.message.FriendMessage
 import net.mamoe.mirai.message.GroupMessage
+import net.mamoe.mirai.message.TempMessage
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.utils.currentTimeSeconds
 import org.itxtech.mirainative.message.ChainCodeConverter
@@ -176,6 +177,17 @@ object MiraiNative : PluginBase() {
                 )
             }
         }
+        subscribeAlways<TempMessage> {
+            launch(NativeDispatcher) {
+                Bridge.eventPrivateMessage(
+                    Bridge.PRI_MSG_SUBTYPE_GROUP,
+                    MessageCache.cacheMessage(message[MessageSource]),
+                    sender.id,
+                    ChainCodeConverter.chainToCode(message),
+                    0
+                )
+            }
+        }
 
         // 权限事件
         subscribeAlways<MemberPermissionChangeEvent> {
@@ -198,11 +210,16 @@ object MiraiNative : PluginBase() {
         }
 
         // 加群事件
-        subscribeAlways<MemberJoinEvent> {
+        subscribeAlways<MemberJoinEvent> { ev ->
             launch(NativeDispatcher) {
-                // TODO: 区分管理员批准/邀请，添加批准者
-                Bridge.eventGroupMemberJoin(Bridge.MEMBER_JOIN_PERMITTED, getTimestamp(), group.id, 0, member.id)
+                Bridge.eventGroupMemberJoin(
+                    if (ev is MemberJoinEvent.Invite) Bridge.MEMBER_JOIN_PERMITTED else Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
+                    getTimestamp(), group.id, 0, member.id
+                )
             }
+        }
+        subscribeAlways<MemberJoinRequestEvent> {
+            //TODO
         }
 
         // 退群事件
