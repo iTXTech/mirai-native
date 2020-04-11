@@ -53,8 +53,8 @@
 - [x] `CQ_sendPrivateMsg`
 - [x] `CQ_setDiscussLeave` `[Placeholder]`
 - [x] `CQ_setFatal`
-- [x] `CQ_setFriendAddRequest` `[Placeholder]`
-- [x] `CQ_setGroupAddRequestV2` `[Placeholder]`
+- [x] `CQ_setFriendAddRequest`
+- [x] `CQ_setGroupAddRequestV2`
 - [x] `CQ_setGroupAdmin` `[Placeholder]`
 - [x] `CQ_setGroupAnonymous` `[Placeholder]`
 - [x] `CQ_setGroupAnonymousBan` `[Placeholder]`
@@ -80,12 +80,12 @@
 - [x] `_eventStartup`
 - [x] `_eventExit`
 - [ ] `_eventDiscussMsg`
-- [ ] `_eventFriend_Add`
+- [x] `_eventFriend_Add`
 - [x] `_eventGroupMsg`
 - [ ] `_eventGroupUpload`
 - [x] `_eventPrivateMsg`
-- [ ] `_eventRequest_AddFriend`
-- [ ] `_eventRequest_AddGroup`
+- [x] `_eventRequest_AddFriend`
+- [x] `_eventRequest_AddGroup`
 - [x] `_eventSystem_GroupAdmin`
 - [x] `_eventSystem_GroupBan`
 - [x] `_eventSystem_GroupMemberDecrease`

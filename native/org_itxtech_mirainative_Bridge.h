@@ -9,6 +9,12 @@ extern "C" {
 #endif
 #undef org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_FRIEND
 #define org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_FRIEND 11L
+#undef org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_ONLINE_STATE
+#define org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_ONLINE_STATE 1L
+#undef org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_GROUP
+#define org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_GROUP 2L
+#undef org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_DISCUSS
+#define org_itxtech_mirainative_Bridge_PRI_MSG_SUBTYPE_DISCUSS 3L
 #undef org_itxtech_mirainative_Bridge_PERM_SUBTYPE_CANCEL_ADMIN
 #define org_itxtech_mirainative_Bridge_PERM_SUBTYPE_CANCEL_ADMIN 1L
 #undef org_itxtech_mirainative_Bridge_PERM_SUBTYPE_SET_ADMIN
@@ -17,6 +23,14 @@ extern "C" {
 #define org_itxtech_mirainative_Bridge_MEMBER_LEAVE_QUIT 1L
 #undef org_itxtech_mirainative_Bridge_MEMBER_LEAVE_KICK
 #define org_itxtech_mirainative_Bridge_MEMBER_LEAVE_KICK 2L
+#undef org_itxtech_mirainative_Bridge_MEMBER_JOIN_PERMITTED
+#define org_itxtech_mirainative_Bridge_MEMBER_JOIN_PERMITTED 1L
+#undef org_itxtech_mirainative_Bridge_MEMBER_JOIN_INVITED_BY_ADMIN
+#define org_itxtech_mirainative_Bridge_MEMBER_JOIN_INVITED_BY_ADMIN 2L
+#undef org_itxtech_mirainative_Bridge_REQUEST_GROUP_APPLY
+#define org_itxtech_mirainative_Bridge_REQUEST_GROUP_APPLY 1L
+#undef org_itxtech_mirainative_Bridge_REQUEST_GROUP_INVITED
+#define org_itxtech_mirainative_Bridge_REQUEST_GROUP_INVITED 2L
 #undef org_itxtech_mirainative_Bridge_GROUP_UNMUTE
 #define org_itxtech_mirainative_Bridge_GROUP_UNMUTE 1L
 #undef org_itxtech_mirainative_Bridge_GROUP_MUTE
@@ -27,7 +41,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin
-  (JNIEnv *, jobject, jstring, jint);
+  (JNIEnv *, jclass, jstring, jint);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -35,7 +49,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jclass, jint);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -43,7 +57,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin
  * Signature: (ILjava/lang/String;IIJLjava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage
-  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jstring, jint);
+  (JNIEnv *, jclass, jint, jstring, jint, jint, jlong, jstring, jint);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -51,7 +65,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage
  * Signature: (ILjava/lang/String;IIJJLjava/lang/String;Ljava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage
-  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong, jstring, jstring, jint);
+  (JNIEnv *, jclass, jint, jstring, jint, jint, jlong, jlong, jstring, jstring, jint);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -59,7 +73,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage
  * Signature: (ILjava/lang/String;IIJJ)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin
-  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong);
+  (JNIEnv *, jclass, jint, jstring, jint, jint, jlong, jlong);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -67,7 +81,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin
  * Signature: (ILjava/lang/String;IIJJJ)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMember
-  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong, jlong);
+  (JNIEnv *, jclass, jint, jstring, jint, jint, jlong, jlong, jlong);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -75,7 +89,31 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMember
  * Signature: (ILjava/lang/String;IIJJJJ)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan
-  (JNIEnv *, jobject, jint, jstring, jint, jint, jlong, jlong, jlong, jlong);
+  (JNIEnv *, jclass, jint, jstring, jint, jint, jlong, jlong, jlong, jlong);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    pEvRequestAddGroup
+ * Signature: (ILjava/lang/String;IIJJLjava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup
+  (JNIEnv *, jclass, jint, jstring, jint, jint, jlong, jlong, jstring, jstring);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    pEvRequestAddFriend
+ * Signature: (ILjava/lang/String;IIJLjava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddFriend
+  (JNIEnv *, jclass, jint, jstring, jint, jint, jlong, jstring, jstring);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
+ * Method:    pEvFriendAdd
+ * Signature: (ILjava/lang/String;IIJ)I
+ */
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvFriendAdd
+  (JNIEnv *, jclass, jint, jstring, jint, jint, jlong);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -83,7 +121,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan
  * Signature: (ILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod
-  (JNIEnv *, jobject, jint, jstring);
+  (JNIEnv *, jclass, jint, jstring);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -91,7 +129,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod
  * Signature: (ILjava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod
-  (JNIEnv *, jobject, jint, jstring);
+  (JNIEnv *, jclass, jint, jstring);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -99,7 +137,7 @@ JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage
-  (JNIEnv *, jobject);
+  (JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }

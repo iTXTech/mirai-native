@@ -39,8 +39,8 @@ import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.TempMessage
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.utils.currentTimeSeconds
+import org.itxtech.mirainative.message.CacheManager
 import org.itxtech.mirainative.message.ChainCodeConverter
-import org.itxtech.mirainative.message.MessageCache
 import org.itxtech.mirainative.ui.FloatingWindow
 import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.ConfigMan
@@ -157,7 +157,7 @@ object MiraiNative : PluginBase() {
             launch(NativeDispatcher) {
                 Bridge.eventPrivateMessage(
                     Bridge.PRI_MSG_SUBTYPE_FRIEND,
-                    MessageCache.cacheMessage(message[MessageSource]),
+                    CacheManager.cacheMessage(message[MessageSource]),
                     sender.id,
                     ChainCodeConverter.chainToCode(message),
                     0
@@ -168,7 +168,7 @@ object MiraiNative : PluginBase() {
             launch(NativeDispatcher) {
                 Bridge.eventGroupMessage(
                     1,
-                    MessageCache.cacheMessage(message[MessageSource]),
+                    CacheManager.cacheMessage(message[MessageSource]),
                     group.id,
                     sender.id,
                     "",
@@ -181,7 +181,7 @@ object MiraiNative : PluginBase() {
             launch(NativeDispatcher) {
                 Bridge.eventPrivateMessage(
                     Bridge.PRI_MSG_SUBTYPE_GROUP,
-                    MessageCache.cacheMessage(message[MessageSource]),
+                    CacheManager.cacheMessage(message[MessageSource]),
                     sender.id,
                     ChainCodeConverter.chainToCode(message),
                     0
@@ -218,8 +218,25 @@ object MiraiNative : PluginBase() {
                 )
             }
         }
-        subscribeAlways<MemberJoinRequestEvent> {
-            //TODO
+        subscribeAlways<MemberJoinRequestEvent> { ev ->
+            launch(NativeDispatcher) {
+                Bridge.eventRequestAddGroup(
+                    Bridge.REQUEST_GROUP_INVITED,
+                    getTimestamp(), groupId, fromId, message, CacheManager.cacheEvent(ev)
+                )
+            }
+        }
+
+        //加好友事件
+        subscribeAlways<NewFriendRequestEvent> { ev ->
+            launch(NativeDispatcher) {
+                Bridge.eventRequestAddFriend(1, getTimestamp(), fromId, message, CacheManager.cacheEvent(ev))
+            }
+        }
+        subscribeAlways<FriendAddEvent> {
+            launch(NativeDispatcher) {
+                Bridge.eventFriendAdd(1, getTimestamp(), friend.id)
+            }
         }
 
         // 退群事件

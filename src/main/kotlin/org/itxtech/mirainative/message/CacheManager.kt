@@ -26,24 +26,35 @@ package org.itxtech.mirainative.message
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
+import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.message.data.recall
 import org.itxtech.mirainative.MiraiNative
 
-object MessageCache {
-    private val cache: HashMap<Int, MessageSource> = HashMap()
+object CacheManager {
+    private val msgCache: HashMap<Int, MessageSource> = HashMap()
+    private val evCache: HashMap<Int, BotEvent> = HashMap()
     private val internalId = atomic(0)
 
     fun nextId(): Int = internalId.getAndIncrement()
 
+    fun cacheEvent(event: BotEvent, id: Int = nextId()): String {
+        evCache[id] = event
+        return id.toString()
+    }
+
+    fun getEvent(id: String): BotEvent? {
+        return evCache[id.toInt()]?.also { evCache.remove(id.toInt()) }
+    }
+
     fun cacheMessage(message: MessageSource, id: Int = nextId()): Int {
-        cache[id] = message
+        msgCache[id] = message
         return id
     }
 
     fun recall(id: Int): Boolean {
-        val message = cache[id] ?: return false
-        cache.remove(id)
+        val message = msgCache[id] ?: return false
+        msgCache.remove(id)
         MiraiNative.launch {
             message.recall()
         }
@@ -51,9 +62,6 @@ object MessageCache {
     }
 
     fun getMessage(id: Int): MessageSource? {
-        if (cache[id] != null) {
-            return cache[id]
-        }
-        return null
+        return msgCache[id]
     }
 }

@@ -31,12 +31,14 @@ import kotlinx.coroutines.launch
 import kotlinx.io.core.*
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
+import net.mamoe.mirai.event.events.MemberJoinRequestEvent
+import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.isAboutGroup
 import net.mamoe.mirai.message.data.quote
 import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import org.itxtech.mirainative.message.CacheManager
 import org.itxtech.mirainative.message.ChainCodeConverter
-import org.itxtech.mirainative.message.MessageCache
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
 import java.nio.charset.Charset
 import kotlin.io.use
@@ -46,22 +48,22 @@ import kotlin.text.toByteArray
 object BridgeHelper {
     @JvmStatic
     fun quoteMessage(msgId: Int, message: String): Int {
-        val internalId = MessageCache.nextId()
+        val internalId = CacheManager.nextId()
         MiraiNative.launch {
-            val src = MessageCache.getMessage(msgId)
+            val src = CacheManager.getMessage(msgId)
             if (src != null) {
                 if (!src.isAboutGroup()) {
                     if (src.fromId != MiraiNative.bot.id) {
                         val f = MiraiNative.bot.getFriend(src.fromId)
                         f.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, f)).apply {
-                            MessageCache.cacheMessage(source, internalId)
+                            CacheManager.cacheMessage(source, internalId)
                         }
                     }
                 } else {
                     val group = MiraiNative.bot.getGroup(src.targetId)
                     if (src.fromId != MiraiNative.bot.id) {
                         group.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, group)).apply {
-                            MessageCache.cacheMessage(source, internalId)
+                            CacheManager.cacheMessage(source, internalId)
                         }
                     }
                 }
@@ -72,11 +74,11 @@ object BridgeHelper {
 
     @JvmStatic
     fun sendFriendMessage(id: Long, message: String): Int {
-        val internalId = MessageCache.nextId()
+        val internalId = CacheManager.nextId()
         MiraiNative.launch {
             val contact = MiraiNative.bot.getFriend(id)
             contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
-                MessageCache.cacheMessage(source, internalId)
+                CacheManager.cacheMessage(source, internalId)
             }
         }
         return internalId
@@ -84,11 +86,11 @@ object BridgeHelper {
 
     @JvmStatic
     fun sendGroupMessage(id: Long, message: String): Int {
-        val internalId = MessageCache.nextId()
+        val internalId = CacheManager.nextId()
         MiraiNative.launch {
             val contact = MiraiNative.bot.getGroup(id)
             contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
-                MessageCache.cacheMessage(source, internalId)
+                CacheManager.cacheMessage(source, internalId)
             }
         }
         return internalId
@@ -230,6 +232,33 @@ object BridgeHelper {
                 }
             }
         }.readBytes().encodeBase64()
+    }
+
+    @JvmStatic
+    fun setGroupAddRequest(requestId: String, reqType: Int, type: Int, reason: String): Int {
+        MiraiNative.launch(NativeDispatcher) {
+            (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
+                when (type) {//1通过，2拒绝，3忽略
+                    1 -> accept()
+                    2 -> reject()
+                    3 -> ignore()
+                }
+            }
+        }
+        return 0
+    }
+
+    @JvmStatic
+    fun setFriendAddRequest(requestId: String, type: Int, remark: String): Int {
+        MiraiNative.launch(NativeDispatcher) {
+            (CacheManager.getEvent(requestId) as? NewFriendRequestEvent)?.apply {
+                when (type) {//1通过，2拒绝
+                    1 -> accept()
+                    2 -> reject()
+                }
+            }
+        }
+        return 0
     }
 
     private fun ByteReadPacket.readString(): String {

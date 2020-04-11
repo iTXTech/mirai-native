@@ -13,3 +13,6 @@ typedef int32_t (__stdcall* EvGroupMsg)(int32_t, int32_t, int64_t, int64_t, cons
 typedef int32_t (__stdcall* EvGroupAdmin)(int32_t, int32_t, int64_t, int64_t);
 typedef int32_t (__stdcall* EvGroupMember)(int32_t, int32_t, int64_t, int64_t, int64_t);
 typedef int32_t (__stdcall* EvGroupBan)(int32_t, int32_t, int64_t, int64_t, int64_t, int64_t);
+typedef int32_t (__stdcall* EvRequestAddGroup)(int32_t, int32_t, int64_t, int64_t, const char*, const char*);
+typedef int32_t (__stdcall* EvRequestAddFriend)(int32_t, int32_t, int64_t, const char*, const char*);
+typedef int32_t (__stdcall* EvFriendAdd)(int32_t, int32_t, int64_t);

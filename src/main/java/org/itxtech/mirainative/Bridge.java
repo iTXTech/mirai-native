@@ -2,7 +2,7 @@ package org.itxtech.mirainative;
 
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.utils.MiraiLogger;
-import org.itxtech.mirainative.message.MessageCache;
+import org.itxtech.mirainative.message.CacheManager;
 import org.itxtech.mirainative.plugin.Event;
 import org.itxtech.mirainative.plugin.NativePlugin;
 import org.itxtech.mirainative.plugin.PluginInfo;
@@ -49,6 +49,9 @@ public class Bridge {
 
     public static final int MEMBER_JOIN_PERMITTED = 1;
     public static final int MEMBER_JOIN_INVITED_BY_ADMIN = 2;
+
+    public static final int REQUEST_GROUP_APPLY = 1; //他人申请
+    public static final int REQUEST_GROUP_INVITED = 2; //受邀
 
     public static final int GROUP_UNMUTE = 1;
     public static final int GROUP_MUTE = 2;
@@ -167,6 +170,36 @@ public class Bridge {
         }
     }
 
+    public static void eventRequestAddGroup(int subType, int time, long fromGroup, long fromAccount, String msg, String flag) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_REQUEST_GROUP) && pEvRequestAddGroup(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_REQUEST_GROUP, "_eventRequest_AddGroup"),
+                    subType, time, fromGroup, fromAccount, msg, flag) == 1) {
+                break;
+            }
+        }
+    }
+
+    public static void eventRequestAddFriend(int subType, int time, long fromAccount, String msg, String flag) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_REQUEST_FRIEND) && pEvRequestAddFriend(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_REQUEST_FRIEND, "_eventRequest_AddFriend"),
+                    subType, time, fromAccount, msg, flag) == 1) {
+                break;
+            }
+        }
+    }
+
+    public static void eventFriendAdd(int subType, int time, long fromAccount) {
+        for (NativePlugin plugin : getPlugins().values()) {
+            if (plugin.shouldCallEvent(Event.EVENT_FRIEND_ADD) && pEvFriendAdd(plugin.getId(),
+                    plugin.getEventOrDefault(Event.EVENT_FRIEND_ADD, "_eventRequest_AddFriend"),
+                    subType, time, fromAccount) == 1) {
+                break;
+            }
+        }
+    }
+
     // Native
 
     public static native int loadNativePlugin(String file, int id);
@@ -182,6 +215,12 @@ public class Bridge {
     public static native int pEvGroupMember(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount);
 
     public static native int pEvGroupBan(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration);
+
+    public static native int pEvRequestAddGroup(int pluginId, String name, int subType, int time, long fromGroup, long fromAccount, String msg, String flag);
+
+    public static native int pEvRequestAddFriend(int pluginId, String name, int subType, int time, long fromAccount, String msg, String flag);
+
+    public static native int pEvFriendAdd(int pluginId, String name, int subType, int time, long fromAccount);
 
     public static native int callIntMethod(int pluginId, String name);
 
@@ -277,7 +316,7 @@ public class Bridge {
 
     @NativeBridgeMethod
     public static int recallMsg(int pluginId, long msgId) {
-        return MessageCache.INSTANCE.recall(Long.valueOf(msgId).intValue()) ? 0 : -1;
+        return CacheManager.INSTANCE.recall(Long.valueOf(msgId).intValue()) ? 0 : -1;
     }
 
     @NativeBridgeMethod
@@ -305,21 +344,21 @@ public class Bridge {
         return BridgeHelper.getGroupMemberList(group);
     }
 
+    @NativeBridgeMethod
+    public static int setGroupAddRequest(int pluginId, String requestId, int reqType, int fbType, String reason) {
+        return BridgeHelper.setGroupAddRequest(requestId, reqType, fbType, reason);
+    }
+
+    @NativeBridgeMethod
+    public static int setFriendAddRequest(int pluginId, String requestId, int type, String remark) {
+        return BridgeHelper.setFriendAddRequest(requestId, type, remark);
+    }
+
     // Placeholder methods which mirai hasn't supported yet
 
     @NativeBridgeMethod
     public static int setGroupAnonymous(int pluginId, long group, boolean enable) {
         return 0;
-    }
-
-    @NativeBridgeMethod
-    public static String getCookies(int pluginId, String domain) {
-        return "";
-    }
-
-    @NativeBridgeMethod
-    public static String getCsrfToken(int pluginId) {
-        return "";
     }
 
     @NativeBridgeMethod
@@ -348,16 +387,6 @@ public class Bridge {
     }
 
     @NativeBridgeMethod
-    public static int setFriendAddRequest(int pluginId, String requestId, int type, String remark) {
-        return 0;
-    }
-
-    @NativeBridgeMethod
-    public static int setGroupAddRequest(int pluginId, String requestId, int reqType, int fbType, String reason) {
-        return 0;
-    }
-
-    @NativeBridgeMethod
     public static int setGroupAdmin(int pluginId, long group, long account, boolean admin) {
         //true => set, false => revoke
         return 0;
@@ -375,9 +404,15 @@ public class Bridge {
         return 0;
     }
 
-    // Legacy Methods
+    @NativeBridgeMethod
+    public static String getCookies(int pluginId, String domain) {
+        return "";
+    }
 
-    // TODO
+    @NativeBridgeMethod
+    public static String getCsrfToken(int pluginId) {
+        return "";
+    }
 
     // Mirai Unique Methods
 

@@ -134,7 +134,7 @@ void detach_java()
 // Plugin
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
-	JNIEnv* env, jobject obj, jstring file, jint id)
+	JNIEnv* env, jclass clz, jstring file, jint id)
 {
 	native_plugin plugin = {id, const_cast<char*>(JstringToChars(env, file))};
 	const auto dll = LoadLibraryA(plugin.file);
@@ -156,7 +156,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin(
-	JNIEnv* env, jobject obj, jint id)
+	JNIEnv* env, jclass clz, jint id)
 {
 	auto r = FreeLibrary(plugins[id].dll);
 	delete[] plugins[id].file;
@@ -167,7 +167,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin(
 	return GetLastError();
 }
 
-JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage(JNIEnv* env, jobject obj)
+JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage(JNIEnv* env, jclass clz)
 {
 	MSG msg;
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) > 0)
@@ -178,7 +178,7 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage(JNIEnv
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(
-	JNIEnv* env, jobject obj, jint id, jstring method)
+	JNIEnv* env, jclass clz, jint id, jstring method)
 {
 	const auto m = IntMethod(GetMethod(env, id, method));
 	if (m)
@@ -189,7 +189,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(
 }
 
 JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
-	JNIEnv* env, jobject obj, jint id, jstring method)
+	JNIEnv* env, jclass clz, jint id, jstring method)
 {
 	const char* rtn = "";
 	const auto m = StringMethod(GetMethod(env, id, method));
@@ -203,7 +203,7 @@ JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
 // Event
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
-	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint msg_id, jlong acct, jstring msg, jint font)
+	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint msg_id, jlong acct, jstring msg, jint font)
 {
 	const auto m = EvPriMsg(GetMethod(env, id, method));
 	if (m)
@@ -214,7 +214,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
-	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint msg_id, jlong grp,
+	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint msg_id, jlong grp,
 	jlong acct, jstring anon, jstring msg, jint font)
 {
 	const auto m = EvGroupMsg(GetMethod(env, id, method));
@@ -226,7 +226,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin(
-	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint time, jlong grp, jlong acct)
+	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time, jlong grp, jlong acct)
 {
 	const auto m = EvGroupAdmin(GetMethod(env, id, method));
 	if (m)
@@ -237,7 +237,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMember(
-	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint time, jlong grp, jlong acct, jlong mbr)
+	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time, jlong grp, jlong acct, jlong mbr)
 {
 	const auto m = EvGroupMember(GetMethod(env, id, method));
 	if (m)
@@ -248,13 +248,48 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMember(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan(
-	JNIEnv* env, jobject obj, jint id, jstring method, jint type, jint time, jlong grp,
+	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time, jlong grp,
 	jlong acct, jlong mbr, jlong dur)
 {
 	const auto m = EvGroupBan(GetMethod(env, id, method));
 	if (m)
 	{
 		return m(type, time, grp, acct, mbr, dur);
+	}
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup(
+	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time,
+	jlong grp, jlong acct, jstring msg, jstring flag)
+{
+	const auto m = EvRequestAddGroup(GetMethod(env, id, method));
+	if (m)
+	{
+		return m(type, time, grp, acct, JstringToGb(env, msg), JstringToChars(env, flag));
+	}
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddFriend(
+	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time,
+	jlong acct, jstring msg, jstring flag)
+{
+	const auto m = EvRequestAddFriend(GetMethod(env, id, method));
+	if (m)
+	{
+		return m(type, time, acct, JstringToGb(env, msg), JstringToChars(env, flag));
+	}
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvFriendAdd(
+	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time, jlong acct)
+{
+	const auto m = EvFriendAdd(GetMethod(env, id, method));
+	if (m)
+	{
+		return m(type, time, acct);
 	}
 	return 0;
 }
