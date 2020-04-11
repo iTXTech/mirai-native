@@ -22,7 +22,7 @@
  *
  */
 
-package org.itxtech.mirainative
+package org.itxtech.mirainative.bridge
 
 import io.ktor.util.InternalAPI
 import io.ktor.util.decodeBase64Bytes
@@ -36,16 +36,22 @@ import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.isAboutGroup
 import net.mamoe.mirai.message.data.quote
-import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import net.mamoe.mirai.utils.MiraiLogger
+import org.itxtech.mirainative.Bridge
+import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.NativeDispatcher
+import org.itxtech.mirainative.PluginManager
 import org.itxtech.mirainative.message.CacheManager
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
+import org.itxtech.mirainative.plugin.NativePlugin
+import java.io.File
 import java.nio.charset.Charset
 import kotlin.io.use
 import kotlin.text.toByteArray
 
 @OptIn(InternalAPI::class)
-object BridgeHelper {
+object MiraiBridge {
     @JvmStatic
     fun quoteMessage(msgId: Int, message: String): Int {
         val internalId = CacheManager.nextId()
@@ -97,7 +103,7 @@ object BridgeHelper {
     }
 
     @JvmStatic
-    fun setGroupBan(groupId: Long, memberId: Long, duration: Int) {
+    fun setGroupBan(groupId: Long, memberId: Long, duration: Int): Int {
         MiraiNative.launch {
             if (duration == 0) {
                 MiraiNative.bot.getGroup(groupId)[memberId].unmute()
@@ -105,21 +111,41 @@ object BridgeHelper {
                 MiraiNative.bot.getGroup(groupId)[memberId].mute(duration)
             }
         }
+        return 0
     }
 
     @JvmStatic
-    fun setGroupKick(groupId: Long, memberId: Long) {
+    fun setGroupCard(groupId: Long, memberId: Long, card: String): Int {
+        MiraiNative.bot.getGroup(groupId)[memberId].nameCard = card
+        return 0
+    }
+
+    @JvmStatic
+    fun setGroupKick(groupId: Long, memberId: Long): Int {
         MiraiNative.launch {
             MiraiNative.bot.getGroup(groupId)[memberId].kick()
         }
+        return 0
     }
 
-    @MiraiExperimentalAPI
     @JvmStatic
-    fun setGroupLeave(groupId: Long) {
+    fun setGroupLeave(groupId: Long): Int {
         MiraiNative.launch {
             MiraiNative.bot.getGroup(groupId).quit()
         }
+        return 0
+    }
+
+    @JvmStatic
+    fun setGroupSpecialTitle(group: Long, member: Long, title: String, duration: Long): Int {
+        MiraiNative.bot.getGroup(group)[member].specialTitle = title
+        return 0
+    }
+
+    @JvmStatic
+    fun setGroupWholeBan(group: Long, enable: Boolean): Int {
+        MiraiNative.bot.getGroup(group).settings.isMuteAll = enable
+        return 0
     }
 
     private inline fun BytePacketBuilder.writeShortLVPacket(
@@ -261,6 +287,26 @@ object BridgeHelper {
         return 0
     }
 
+    @JvmStatic
+    fun addLog(pluginId: Int, priority: Int, type: String, content: String) {
+        NativeLoggerHelper.log(PluginManager.plugins[pluginId]!!, priority, type, content)
+    }
+
+    @JvmStatic
+    fun getPluginDataDir(pluginId: Int): String {
+        return PluginManager.plugins[pluginId]!!.appDir.absolutePath + File.separatorChar
+    }
+
+    @JvmStatic
+    fun getLoginQQ(): Long {
+        return MiraiNative.bot.id
+    }
+
+    @JvmStatic
+    fun getLoginNick(): String {
+        return MiraiNative.bot.nick
+    }
+
     private fun ByteReadPacket.readString(): String {
         return String(readBytes(readShort().toInt()))
     }
@@ -272,5 +318,37 @@ object BridgeHelper {
         fwe.data = pk.readString()
         fwe.unit = pk.readString()
         fwe.color = pk.readInt()
+    }
+}
+
+internal object NativeLoggerHelper {
+    const val LOG_DEBUG = 0
+    const val LOG_INFO = 10
+    const val LOG_INFO_SUCC = 11
+    const val LOG_INFO_RECV = 12
+    const val LOG_INFO_SEND = 13
+    const val LOG_WARNING = 20
+    const val LOG_ERROR = 21
+    const val LOG_FATAL = 22
+
+    private fun getLogger(): MiraiLogger {
+        return MiraiNative.logger
+    }
+
+    fun log(plugin: NativePlugin, priority: Int, type: String, content: String) {
+        var c = "[NP " + plugin.identifier
+        if ("" != type) {
+            c += " $type"
+        }
+        c += "] $content"
+        when (priority) {
+            LOG_DEBUG -> getLogger().debug(c)
+            LOG_INFO, LOG_INFO_RECV, LOG_INFO_SUCC, LOG_INFO_SEND -> getLogger().info(
+                c
+            )
+            LOG_WARNING -> getLogger().warning(c)
+            LOG_ERROR -> getLogger().error(c)
+            LOG_FATAL -> getLogger().error("[FATAL] $c")
+        }
     }
 }

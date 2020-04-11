@@ -39,6 +39,7 @@ import net.mamoe.mirai.message.GroupMessage
 import net.mamoe.mirai.message.TempMessage
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.utils.currentTimeSeconds
+import org.itxtech.mirainative.bridge.NativeBridge
 import org.itxtech.mirainative.message.CacheManager
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.ui.FloatingWindow
@@ -155,7 +156,7 @@ object MiraiNative : PluginBase() {
         // 消息事件
         subscribeAlways<FriendMessage> {
             launch(NativeDispatcher) {
-                Bridge.eventPrivateMessage(
+                NativeBridge.eventPrivateMessage(
                     Bridge.PRI_MSG_SUBTYPE_FRIEND,
                     CacheManager.cacheMessage(message[MessageSource]),
                     sender.id,
@@ -166,7 +167,7 @@ object MiraiNative : PluginBase() {
         }
         subscribeAlways<GroupMessage> {
             launch(NativeDispatcher) {
-                Bridge.eventGroupMessage(
+                NativeBridge.eventGroupMessage(
                     1,
                     CacheManager.cacheMessage(message[MessageSource]),
                     group.id,
@@ -179,7 +180,7 @@ object MiraiNative : PluginBase() {
         }
         subscribeAlways<TempMessage> {
             launch(NativeDispatcher) {
-                Bridge.eventPrivateMessage(
+                NativeBridge.eventPrivateMessage(
                     Bridge.PRI_MSG_SUBTYPE_GROUP,
                     CacheManager.cacheMessage(message[MessageSource]),
                     sender.id,
@@ -193,18 +194,18 @@ object MiraiNative : PluginBase() {
         subscribeAlways<MemberPermissionChangeEvent> {
             launch(NativeDispatcher) {
                 if (new == MemberPermission.MEMBER) {
-                    Bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, member.id)
+                    NativeBridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, member.id)
                 } else {
-                    Bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, member.id)
+                    NativeBridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, member.id)
                 }
             }
         }
         subscribeAlways<BotGroupPermissionChangeEvent> {
             launch(NativeDispatcher) {
                 if (new == MemberPermission.MEMBER) {
-                    Bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, bot.id)
+                    NativeBridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, bot.id)
                 } else {
-                    Bridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, bot.id)
+                    NativeBridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, bot.id)
                 }
             }
         }
@@ -212,7 +213,7 @@ object MiraiNative : PluginBase() {
         // 加群事件
         subscribeAlways<MemberJoinEvent> { ev ->
             launch(NativeDispatcher) {
-                Bridge.eventGroupMemberJoin(
+                NativeBridge.eventGroupMemberJoin(
                     if (ev is MemberJoinEvent.Invite) Bridge.MEMBER_JOIN_PERMITTED else Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
                     getTimestamp(), group.id, 0, member.id
                 )
@@ -220,7 +221,7 @@ object MiraiNative : PluginBase() {
         }
         subscribeAlways<MemberJoinRequestEvent> { ev ->
             launch(NativeDispatcher) {
-                Bridge.eventRequestAddGroup(
+                NativeBridge.eventRequestAddGroup(
                     Bridge.REQUEST_GROUP_INVITED,
                     getTimestamp(), groupId, fromId, message, CacheManager.cacheEvent(ev)
                 )
@@ -230,12 +231,12 @@ object MiraiNative : PluginBase() {
         //加好友事件
         subscribeAlways<NewFriendRequestEvent> { ev ->
             launch(NativeDispatcher) {
-                Bridge.eventRequestAddFriend(1, getTimestamp(), fromId, message, CacheManager.cacheEvent(ev))
+                NativeBridge.eventRequestAddFriend(1, getTimestamp(), fromId, message, CacheManager.cacheEvent(ev))
             }
         }
         subscribeAlways<FriendAddEvent> {
             launch(NativeDispatcher) {
-                Bridge.eventFriendAdd(1, getTimestamp(), friend.id)
+                NativeBridge.eventFriendAdd(1, getTimestamp(), friend.id)
             }
         }
 
@@ -243,12 +244,12 @@ object MiraiNative : PluginBase() {
         subscribeAlways<MemberLeaveEvent.Kick> {
             launch(NativeDispatcher) {
                 val op = operator?.id ?: bot.id
-                Bridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_KICK, getTimestamp(), group.id, op, member.id)
+                NativeBridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_KICK, getTimestamp(), group.id, op, member.id)
             }
         }
         subscribeAlways<MemberLeaveEvent.Quit> {
             launch(NativeDispatcher) {
-                Bridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_QUIT, getTimestamp(), group.id, 0, member.id)
+                NativeBridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_QUIT, getTimestamp(), group.id, 0, member.id)
             }
         }
 
@@ -256,7 +257,7 @@ object MiraiNative : PluginBase() {
         subscribeAlways<MemberMuteEvent> {
             launch(NativeDispatcher) {
                 val op = operator?.id ?: bot.id
-                Bridge.eventGroupBan(
+                NativeBridge.eventGroupBan(
                     Bridge.GROUP_MUTE,
                     getTimestamp(),
                     group.id,
@@ -269,12 +270,12 @@ object MiraiNative : PluginBase() {
         subscribeAlways<MemberUnmuteEvent> {
             launch(NativeDispatcher) {
                 val op = operator?.id ?: bot.id
-                Bridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, member.id, 0)
+                NativeBridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, member.id, 0)
             }
         }
         subscribeAlways<BotMuteEvent> {
             launch(NativeDispatcher) {
-                Bridge.eventGroupBan(
+                NativeBridge.eventGroupBan(
                     Bridge.GROUP_MUTE,
                     getTimestamp(),
                     group.id,
@@ -286,7 +287,7 @@ object MiraiNative : PluginBase() {
         }
         subscribeAlways<BotUnmuteEvent> {
             launch(NativeDispatcher) {
-                Bridge.eventGroupBan(
+                NativeBridge.eventGroupBan(
                     Bridge.GROUP_UNMUTE,
                     getTimestamp(),
                     group.id,
@@ -300,9 +301,9 @@ object MiraiNative : PluginBase() {
             launch(NativeDispatcher) {
                 val op = operator?.id ?: bot.id
                 if (new) {
-                    Bridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, 0, 0)
+                    NativeBridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, 0, 0)
                 } else {
-                    Bridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, 0, 0)
+                    NativeBridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, 0, 0)
                 }
             }
         }
@@ -314,7 +315,7 @@ object MiraiNative : PluginBase() {
 
     fun getVersion(): String {
         var version = getPluginDescription(MiraiNative).version
-        val mf = this.javaClass.classLoader.getResources("META-INF/MANIFEST.MF")
+        val mf = javaClass.classLoader.getResources("META-INF/MANIFEST.MF")
         while (mf.hasMoreElements()) {
             val manifest = Manifest(mf.nextElement().openStream())
             if ("iTXTech MiraiNative" == manifest.mainAttributes.getValue("Name")) {

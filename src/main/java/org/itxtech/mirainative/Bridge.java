@@ -1,16 +1,10 @@
 package org.itxtech.mirainative;
 
-import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.utils.MiraiLogger;
+import org.itxtech.mirainative.bridge.MiraiBridge;
 import org.itxtech.mirainative.message.CacheManager;
-import org.itxtech.mirainative.plugin.Event;
-import org.itxtech.mirainative.plugin.NativePlugin;
-import org.itxtech.mirainative.plugin.PluginInfo;
 
-import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.HashMap;
 
 /*
  *
@@ -56,150 +50,6 @@ public class Bridge {
     public static final int GROUP_UNMUTE = 1;
     public static final int GROUP_MUTE = 2;
 
-    // Plugin
-    public static int loadPlugin(NativePlugin plugin) {
-        int code = loadNativePlugin(plugin.getFile().getAbsolutePath().replace("\\", "\\\\"), plugin.getId());
-        if (plugin.getPluginInfo() != null) {
-            PluginInfo info = plugin.getPluginInfo();
-            getLogger().info("Native Plugin (w json) " + info.getName() + " has been loaded with code " + code);
-        } else {
-            getLogger().info("Native Plugin (w/o json) " + plugin.getFile().getName() + " has been loaded with code " + code);
-        }
-        return code;
-    }
-
-    public static int unloadPlugin(NativePlugin plugin) {
-        int code = freeNativePlugin(plugin.getId());
-        getLogger().info("Native Plugin " + plugin.getId() + " has been unloaded with code " + code);
-        return code;
-    }
-
-    public static void disablePlugin(NativePlugin plugin) {
-        if (plugin.getLoaded() && plugin.getEnabled()) {
-            if (plugin.shouldCallEvent(Event.EVENT_DISABLE, true)) {
-                callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable"));
-            }
-        }
-    }
-
-    public static void enablePlugin(NativePlugin plugin) {
-        if (plugin.getLoaded() && !plugin.getEnabled()) {
-            if (plugin.shouldCallEvent(Event.EVENT_ENABLE, true)) {
-                callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable"));
-            }
-        }
-    }
-
-    public static void startPlugin(NativePlugin plugin) {
-        if (plugin.shouldCallEvent(Event.EVENT_STARTUP, true)) {
-            callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup"));
-        }
-    }
-
-    public static void exitPlugin(NativePlugin plugin) {
-        if (plugin.shouldCallEvent(Event.EVENT_EXIT, true)) {
-            callIntMethod(plugin.getId(), plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit"));
-        }
-    }
-
-    public static void updateInfo(NativePlugin plugin) {
-        String info = callStringMethod(plugin.getId(), "AppInfo");
-        if (!"".equals(info)) {
-            plugin.setInfo(info);
-        }
-    }
-
-    // Events
-    public static void eventPrivateMessage(int subType, int msgId, long fromAccount, String msg, int font) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_PRI_MSG) && pEvPrivateMessage(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_PRI_MSG, "_eventPrivateMsg"),
-                    subType, msgId, fromAccount, plugin.processMessage(Event.EVENT_PRI_MSG, msg), font) == 1) {
-                break;
-            }
-        }
-    }
-
-    public static void eventGroupMessage(int subType, int msgId, long fromGroup, long fromAccount, String fromAnonymous, String msg, int font) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MSG) && pEvGroupMessage(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_GROUP_MSG, "_eventGroupMsg"),
-                    subType, msgId, fromGroup, fromAccount, fromAnonymous, plugin.processMessage(Event.EVENT_GROUP_MSG, msg), font) == 1) {
-                break;
-            }
-        }
-    }
-
-    public static void eventGroupAdmin(int subType, int time, long fromGroup, long beingOperateAccount) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_ADMIN) && pEvGroupAdmin(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_GROUP_ADMIN, "_eventSystem_GroupAdmin"),
-                    subType, time, fromGroup, beingOperateAccount) == 1) {
-                break;
-            }
-        }
-    }
-
-    public static void eventGroupMemberLeave(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_DEC) && pEvGroupMember(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_GROUP_MEMBER_DEC, "_eventSystem_GroupMemberDecrease"),
-                    subType, time, fromGroup, fromAccount, beingOperateAccount) == 1) {
-                break;
-            }
-        }
-    }
-
-    public static void eventGroupBan(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount, long duration) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_BAN) && pEvGroupBan(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_GROUP_BAN, "_eventSystem_GroupBan"),
-                    subType, time, fromGroup, fromAccount, beingOperateAccount, duration) == 1) {
-                break;
-            }
-        }
-    }
-
-    public static void eventGroupMemberJoin(int subType, int time, long fromGroup, long fromAccount, long beingOperateAccount) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_INC) && pEvGroupMember(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_GROUP_MEMBER_INC, "_eventSystem_GroupMemberIncrease"),
-                    subType, time, fromGroup, fromAccount, beingOperateAccount) == 1) {
-                break;
-            }
-        }
-    }
-
-    public static void eventRequestAddGroup(int subType, int time, long fromGroup, long fromAccount, String msg, String flag) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_REQUEST_GROUP) && pEvRequestAddGroup(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_REQUEST_GROUP, "_eventRequest_AddGroup"),
-                    subType, time, fromGroup, fromAccount, msg, flag) == 1) {
-                break;
-            }
-        }
-    }
-
-    public static void eventRequestAddFriend(int subType, int time, long fromAccount, String msg, String flag) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_REQUEST_FRIEND) && pEvRequestAddFriend(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_REQUEST_FRIEND, "_eventRequest_AddFriend"),
-                    subType, time, fromAccount, msg, flag) == 1) {
-                break;
-            }
-        }
-    }
-
-    public static void eventFriendAdd(int subType, int time, long fromAccount) {
-        for (NativePlugin plugin : getPlugins().values()) {
-            if (plugin.shouldCallEvent(Event.EVENT_FRIEND_ADD) && pEvFriendAdd(plugin.getId(),
-                    plugin.getEventOrDefault(Event.EVENT_FRIEND_ADD, "_eventRequest_AddFriend"),
-                    subType, time, fromAccount) == 1) {
-                break;
-            }
-        }
-    }
-
     // Native
 
     public static native int loadNativePlugin(String file, int id);
@@ -228,90 +78,66 @@ public class Bridge {
 
     public static native void processMessage();
 
-    // Helper
-
-    private static HashMap<Integer, NativePlugin> getPlugins() {
-        return PluginManager.INSTANCE.getPlugins();
-    }
-
-    private static NativePlugin getPlugin(int pluginId) {
-        return getPlugins().get(pluginId);
-    }
-
-    private static MiraiLogger getLogger() {
-        return MiraiNative.INSTANCE.getLogger();
-    }
-
-    private static Bot getBot() {
-        return MiraiNative.INSTANCE.getBot();
-    }
-
     // Bridge
 
     @NativeBridgeMethod
     public static int sendFriendMessage(int pluginId, long account, String msg) {
-        return BridgeHelper.sendFriendMessage(account, msg);
+        return MiraiBridge.sendFriendMessage(account, msg);
     }
 
     @NativeBridgeMethod
     public static int sendGroupMessage(int pluginId, long group, String msg) {
-        return BridgeHelper.sendGroupMessage(group, msg);
+        return MiraiBridge.sendGroupMessage(group, msg);
     }
 
     @NativeBridgeMethod
     public static void addLog(int pluginId, int priority, String type, String content) {
-        NativeLoggerHelper.log(getPlugin(pluginId), priority, type, content);
+        MiraiBridge.addLog(pluginId, priority, type, content);
     }
 
     @NativeBridgeMethod
     public static String getPluginDataDir(int pluginId) {
-        return getPlugin(pluginId).getAppDir().getAbsolutePath() + File.separatorChar;
+        return MiraiBridge.getPluginDataDir(pluginId);
     }
 
     @NativeBridgeMethod
     public static long getLoginQQ(int pluginId) {
-        return getBot().getUin();
+        return MiraiBridge.getLoginQQ();
     }
 
     @NativeBridgeMethod
     public static String getLoginNick(int pluginId) {
-        return getBot().getNick();
+        return MiraiBridge.getLoginNick();
     }
 
     @NativeBridgeMethod
     public static int setGroupBan(int pluginId, long group, long member, long duration) {
-        BridgeHelper.setGroupBan(group, member, (int) duration);
-        return 0;
+        return MiraiBridge.setGroupBan(group, member, (int) duration);
     }
 
     @NativeBridgeMethod
     public static int setGroupCard(int pluginId, long group, long member, String card) {
-        getBot().getGroup(pluginId).get(member).setNameCard(card);
-        return 0;
+        return MiraiBridge.setGroupCard(group, member, card);
     }
 
     @NativeBridgeMethod
     public static int setGroupKick(int pluginId, long group, long member, boolean reject) {
-        BridgeHelper.setGroupKick(group, member);
-        return 0;
+        return MiraiBridge.setGroupKick(group, member);
     }
 
     @NativeBridgeMethod
     public static int setGroupLeave(int pluginId, long group, boolean dismiss) {
-        BridgeHelper.setGroupLeave(group);
-        return 0;
+        return MiraiBridge.setGroupLeave(group);
     }
 
     @NativeBridgeMethod
     public static int setGroupSpecialTitle(int pluginId, long group, long member, String title, long duration) {
-        getBot().getGroup(pluginId).get(member).setSpecialTitle(title);
-        return 0;
+        return MiraiBridge.setGroupSpecialTitle(group, member, title, duration);
     }
 
     @NativeBridgeMethod
     public static int setGroupWholeBan(int pluginId, long group, boolean enable) {
-        getBot().getGroup(group).getSettings().setMuteAll(enable);
-        return 0;
+        return MiraiBridge.setGroupWholeBan(group, enable);
     }
 
     @NativeBridgeMethod
@@ -321,37 +147,37 @@ public class Bridge {
 
     @NativeBridgeMethod
     public static String getFriendList(int pluginId, boolean reserved) {
-        return BridgeHelper.getFriendList();
+        return MiraiBridge.getFriendList();
     }
 
     @NativeBridgeMethod
     public static String getGroupInfo(int pluginId, long groupId, boolean cache) {
-        return BridgeHelper.getGroupInfo(groupId);
+        return MiraiBridge.getGroupInfo(groupId);
     }
 
     @NativeBridgeMethod
     public static String getGroupList(int pluginId) {
-        return BridgeHelper.getGroupList();
+        return MiraiBridge.getGroupList();
     }
 
     @NativeBridgeMethod
     public static String getGroupMemberInfo(int pluginId, long group, long member, boolean cache) {
-        return BridgeHelper.getGroupMemberInfo(group, member);
+        return MiraiBridge.getGroupMemberInfo(group, member);
     }
 
     @NativeBridgeMethod
     public static String getGroupMemberList(int pluginId, long group) {
-        return BridgeHelper.getGroupMemberList(group);
+        return MiraiBridge.getGroupMemberList(group);
     }
 
     @NativeBridgeMethod
     public static int setGroupAddRequest(int pluginId, String requestId, int reqType, int fbType, String reason) {
-        return BridgeHelper.setGroupAddRequest(requestId, reqType, fbType, reason);
+        return MiraiBridge.setGroupAddRequest(requestId, reqType, fbType, reason);
     }
 
     @NativeBridgeMethod
     public static int setFriendAddRequest(int pluginId, String requestId, int type, String remark) {
-        return BridgeHelper.setFriendAddRequest(requestId, type, remark);
+        return MiraiBridge.setFriendAddRequest(requestId, type, remark);
     }
 
     // Placeholder methods which mirai hasn't supported yet
@@ -418,7 +244,7 @@ public class Bridge {
 
     @NativeBridgeMethod
     public static int quoteMessage(int pluginId, int msgId, String msg) {
-        return BridgeHelper.quoteMessage(msgId, msg);
+        return MiraiBridge.quoteMessage(msgId, msg);
     }
 
     // Annotation
@@ -428,46 +254,5 @@ public class Bridge {
      */
     @Retention(value = RetentionPolicy.SOURCE)
     @interface NativeBridgeMethod {
-    }
-
-    // Logger
-
-    static class NativeLoggerHelper {
-        public static final int LOG_DEBUG = 0;
-        public static final int LOG_INFO = 10;
-        public static final int LOG_INFO_SUCC = 11;
-        public static final int LOG_INFO_RECV = 12;
-        public static final int LOG_INFO_SEND = 13;
-        public static final int LOG_WARNING = 20;
-        public static final int LOG_ERROR = 21;
-        public static final int LOG_FATAL = 22;
-
-        static void log(NativePlugin plugin, int priority, String type, String content) {
-            String c = "[NP " + plugin.getIdentifier();
-            if (!"".equals(type)) {
-                c += " " + type;
-            }
-            c += "] " + content;
-            switch (priority) {
-                case LOG_DEBUG:
-                    getLogger().debug(c);
-                    break;
-                case LOG_INFO:
-                case LOG_INFO_RECV:
-                case LOG_INFO_SUCC:
-                case LOG_INFO_SEND:
-                    getLogger().info(c);
-                    break;
-                case LOG_WARNING:
-                    getLogger().warning(c);
-                    break;
-                case LOG_ERROR:
-                    getLogger().error(c);
-                    break;
-                case LOG_FATAL:
-                    getLogger().error("[FATAL]" + c);
-                    break;
-            }
-        }
     }
 }

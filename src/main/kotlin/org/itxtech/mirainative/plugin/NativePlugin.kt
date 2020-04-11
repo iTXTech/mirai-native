@@ -27,9 +27,9 @@ package org.itxtech.mirainative.plugin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.itxtech.mirainative.BridgeHelper
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.NativeDispatcher
+import org.itxtech.mirainative.bridge.MiraiBridge
 import org.itxtech.mirainative.ui.FloatingWindow
 import java.io.File
 
@@ -63,7 +63,7 @@ data class NativePlugin(val file: File, val id: Int) {
             MiraiNative.launch(NativeDispatcher) {
                 while (isActive) {
                     if (enabled && entry.visible && FloatingWindow.isVisible()) {
-                        BridgeHelper.updateFwe(id, entry)
+                        MiraiBridge.updateFwe(id, entry)
                     }
                     delay(it.period.toLong())
                 }

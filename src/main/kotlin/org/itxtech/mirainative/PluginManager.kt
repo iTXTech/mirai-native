@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.registerCommand
+import org.itxtech.mirainative.bridge.NativeBridge
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
 import org.itxtech.mirainative.ui.Tray
@@ -77,11 +78,11 @@ object PluginManager {
                     useArrayPolymorphism = true
                 }.parse(PluginInfo.serializer(), json.readText())
             }
-            if (Bridge.loadPlugin(plugin) == 0) {
+            if (NativeBridge.loadPlugin(plugin) == 0) {
                 plugin.loaded = true
                 plugins[pluginId.getAndIncrement()] = plugin
-                Bridge.updateInfo(plugin)
-                Bridge.startPlugin(plugin)
+                NativeBridge.updateInfo(plugin)
+                NativeBridge.startPlugin(plugin)
                 Tray.update()
             }
         }
@@ -90,9 +91,9 @@ object PluginManager {
     fun unloadPlugin(plugin: NativePlugin) {
         MiraiNative.launch(NativeDispatcher) {
             disablePlugin(plugin)
-            Bridge.exitPlugin(plugin)
+            NativeBridge.exitPlugin(plugin)
             delay(500)
-            if (Bridge.unloadPlugin(plugin) == 0) {
+            if (NativeBridge.unloadPlugin(plugin) == 0) {
                 plugin.loaded = false
                 plugin.enabled = false
                 Tray.update()
@@ -103,7 +104,7 @@ object PluginManager {
     fun enablePlugin(plugin: NativePlugin): Boolean {
         if (MiraiNative.botOnline && !plugin.enabled) {
             MiraiNative.launch(NativeDispatcher) {
-                Bridge.enablePlugin(plugin)
+                NativeBridge.enablePlugin(plugin)
                 plugin.enabled = true
                 Tray.update()
             }
@@ -115,7 +116,7 @@ object PluginManager {
     fun disablePlugin(plugin: NativePlugin): Boolean {
         if (plugin.enabled) {
             MiraiNative.launch(NativeDispatcher) {
-                Bridge.disablePlugin(plugin)
+                NativeBridge.disablePlugin(plugin)
                 plugin.enabled = false
                 Tray.update()
             }
@@ -135,9 +136,9 @@ object PluginManager {
     fun disableAndExitPlugins() {
         plugins.values.forEach {
             if (it.enabled) {
-                Bridge.disablePlugin(it)
+                NativeBridge.disablePlugin(it)
             }
-            Bridge.exitPlugin(it)
+            NativeBridge.exitPlugin(it)
         }
     }
 
