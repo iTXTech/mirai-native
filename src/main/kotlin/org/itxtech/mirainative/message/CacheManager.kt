@@ -26,14 +26,17 @@ package org.itxtech.mirainative.message
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
+import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.event.events.BotEvent
+import net.mamoe.mirai.message.TempMessage
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.message.data.recall
 import org.itxtech.mirainative.MiraiNative
 
 object CacheManager {
-    private val msgCache: HashMap<Int, MessageSource> = HashMap()
-    private val evCache: HashMap<Int, BotEvent> = HashMap()
+    private val msgCache = hashMapOf<Int, MessageSource>()
+    private val evCache = hashMapOf<Int, BotEvent>()
+    private val senders = hashMapOf<Long, Member>()
     private val internalId = atomic(0)
 
     fun nextId(): Int = internalId.getAndIncrement()
@@ -52,6 +55,11 @@ object CacheManager {
         return id
     }
 
+    fun cacheTempMessage(message: TempMessage, id: Int = nextId()): Int {
+        senders[message.sender.id] = message.sender
+        return cacheMessage(message.message[MessageSource], id)
+    }
+
     fun recall(id: Int): Boolean {
         val message = msgCache[id] ?: return false
         msgCache.remove(id)
@@ -63,5 +71,9 @@ object CacheManager {
 
     fun getMessage(id: Int): MessageSource? {
         return msgCache[id]
+    }
+
+    fun findMember(id: Long): Member? {
+        return senders[id]
     }
 }

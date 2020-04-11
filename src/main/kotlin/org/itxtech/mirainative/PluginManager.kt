@@ -40,7 +40,7 @@ import java.io.File
 @OptIn(UnstableDefault::class)
 object PluginManager {
     private var pluginId = atomic(0)
-    var plugins: HashMap<Int, NativePlugin> = HashMap()
+    var plugins = hashMapOf<Int, NativePlugin>()
 
     fun getPluginByIdentifier(id: String): NativePlugin? {
         plugins.values.forEach {
@@ -139,6 +139,7 @@ object PluginManager {
                 NativeBridge.disablePlugin(it)
             }
             NativeBridge.exitPlugin(it)
+            Bridge.freeNativePlugin(it.id)
         }
     }
 

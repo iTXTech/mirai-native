@@ -44,16 +44,15 @@ data class NativePlugin(val file: File, val id: Int) {
     }
     var pluginInfo: PluginInfo? = null
         set(v) {
-            events = HashMap()
             v!!.event.forEach {
-                events!![it.type] = it.function
+                events[it.type] = it.function
             }
             if (v.status.isNotEmpty()) {
                 registerFws(v.status)
             }
             field = v
         }
-    private var events: HashMap<Int, String>? = null
+    private val events = hashMapOf<Int, String>()
     val entries: ArrayList<FloatingWindowEntry> = ArrayList()
 
     private fun registerFws(fws: ArrayList<Status>) {
@@ -80,10 +79,7 @@ data class NativePlugin(val file: File, val id: Int) {
     }
 
     fun getEventOrDefault(key: Int, default: String): String {
-        if (events == null) {
-            return default
-        }
-        return events!!.getOrDefault(key, default)
+        return events.getOrDefault(key, default)
     }
 
     @JvmOverloads
@@ -91,10 +87,7 @@ data class NativePlugin(val file: File, val id: Int) {
         if (!enabled && !ignoreState) {
             return false
         }
-        if (events == null) {
-            return true
-        }
-        return events!!.containsKey(key)
+        return events.containsKey(key)
     }
 
     fun processMessage(key: Int, msg: String): String {

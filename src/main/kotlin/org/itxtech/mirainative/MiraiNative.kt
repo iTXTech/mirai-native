@@ -57,6 +57,18 @@ object MiraiNative : PluginBase() {
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries") }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
 
+    private fun checkNativeLibs() {
+        logger.info("正在加载 ${dll.absolutePath}")
+        System.load(dll.absolutePath)
+
+        lib.listFiles()?.forEach { file ->
+            if (file.absolutePath.endsWith(".dll")) {
+                logger.info("正在加载外部库 " + file.absolutePath)
+                System.load(file.absolutePath)
+            }
+        }
+    }
+
     override fun onLoad() {
         //暂时只支持 x86 平台运行，不兼容 amd64
         val mode = System.getProperty("sun.arch.data.model")
@@ -71,17 +83,9 @@ object MiraiNative : PluginBase() {
             getResources("CQP.dll")?.copyTo(cqp)
             cqp.close()
         }
-        logger.info("正在加载 ${dll.absolutePath}")
-        System.load(dll.absolutePath)
 
+        checkNativeLibs()
         initDataDir()
-
-        lib.listFiles()?.forEach { file ->
-            if (file.absolutePath.endsWith(".dll")) {
-                logger.info("正在加载外部库 " + file.absolutePath)
-                System.load(file.absolutePath)
-            }
-        }
 
         Tray.create()
         FloatingWindow.create()
@@ -178,11 +182,11 @@ object MiraiNative : PluginBase() {
                 )
             }
         }
-        subscribeAlways<TempMessage> {
+        subscribeAlways<TempMessage> { msg ->
             launch(NativeDispatcher) {
                 NativeBridge.eventPrivateMessage(
                     Bridge.PRI_MSG_SUBTYPE_GROUP,
-                    CacheManager.cacheMessage(message[MessageSource]),
+                    CacheManager.cacheTempMessage(msg),
                     sender.id,
                     ChainCodeConverter.chainToCode(message),
                     0
@@ -250,6 +254,14 @@ object MiraiNative : PluginBase() {
         subscribeAlways<MemberLeaveEvent.Quit> {
             launch(NativeDispatcher) {
                 NativeBridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_QUIT, getTimestamp(), group.id, 0, member.id)
+            }
+        }
+        subscribeAlways<BotLeaveEvent> { ev ->
+            launch(NativeDispatcher) {
+                NativeBridge.eventGroupMemberLeave(
+                    if (ev is BotLeaveEvent.Kick) Bridge.MEMBER_LEAVE_KICK else Bridge.MEMBER_LEAVE_QUIT,
+                    getTimestamp(), group.id, 0, bot.id
+                )
             }
         }
 

@@ -81,8 +81,8 @@ public class Bridge {
     // Bridge
 
     @NativeBridgeMethod
-    public static int sendFriendMessage(int pluginId, long account, String msg) {
-        return MiraiBridge.sendFriendMessage(account, msg);
+    public static int sendPrivateMessage(int pluginId, long account, String msg) {
+        return MiraiBridge.sendPrivateMessage(account, msg);
     }
 
     @NativeBridgeMethod
@@ -180,6 +180,11 @@ public class Bridge {
         return MiraiBridge.setFriendAddRequest(requestId, type, remark);
     }
 
+    @NativeBridgeMethod
+    public static String getStrangerInfo(int pluginId, long account, boolean cache) {
+        return MiraiBridge.getStrangerInfo(account);
+    }
+
     // Placeholder methods which mirai hasn't supported yet
 
     @NativeBridgeMethod
@@ -194,11 +199,6 @@ public class Bridge {
 
     @NativeBridgeMethod
     public static String getRecord(int pluginId, String file, String format) {
-        return "";
-    }
-
-    @NativeBridgeMethod
-    public static String getStrangerInfo(int pluginId, long account, boolean cache) {
         return "";
     }
 

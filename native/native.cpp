@@ -354,7 +354,7 @@ int32_t sendMsg(int32_t plugin_id, int64_t acc, const char* msg, const char* m)
 
 CQAPI(int32_t, CQ_sendPrivateMsg, 16)(int32_t plugin_id, int64_t account, const char* msg)
 {
-	return sendMsg(plugin_id, account, msg, "sendFriendMessage");
+	return sendMsg(plugin_id, account, msg, "sendPrivateMessage");
 }
 
 CQAPI(int32_t, CQ_sendGroupMsg, 16)(int32_t plugin_id, int64_t group, const char* msg)

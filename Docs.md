@@ -89,4 +89,4 @@
 - [x] `_eventSystem_GroupAdmin`
 - [x] `_eventSystem_GroupBan`
 - [x] `_eventSystem_GroupMemberDecrease`
-- [x] `_eventSystem_GroupMemberIncrease` `[Incomplete]`
+- [x] `_eventSystem_GroupMemberIncrease`

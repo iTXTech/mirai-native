@@ -33,6 +33,7 @@ import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
+import net.mamoe.mirai.getFriendOrNull
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.isAboutGroup
 import net.mamoe.mirai.message.data.quote
@@ -79,11 +80,11 @@ object MiraiBridge {
     }
 
     @JvmStatic
-    fun sendFriendMessage(id: Long, message: String): Int {
+    fun sendPrivateMessage(id: Long, message: String): Int {
         val internalId = CacheManager.nextId()
         MiraiNative.launch {
-            val contact = MiraiNative.bot.getFriend(id)
-            contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
+            val contact = MiraiNative.bot.getFriendOrNull(id) ?: CacheManager.findMember(id)
+            contact?.sendMessage(ChainCodeConverter.codeToChain(message, contact))?.apply {
                 CacheManager.cacheMessage(source, internalId)
             }
         }
@@ -146,6 +147,17 @@ object MiraiBridge {
     fun setGroupWholeBan(group: Long, enable: Boolean): Int {
         MiraiNative.bot.getGroup(group).settings.isMuteAll = enable
         return 0
+    }
+
+    @JvmStatic
+    fun getStrangerInfo(account: Long): String {
+        val m = CacheManager.findMember(account) ?: return ""
+        return buildPacket {
+            writeLong(m.id)
+            writeString(m.nick)
+            writeInt(0) // TODO: 性别
+            writeInt(0) // TODO: 年龄
+        }.readBytes().encodeBase64()
     }
 
     private inline fun BytePacketBuilder.writeShortLVPacket(
