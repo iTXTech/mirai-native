@@ -46,8 +46,7 @@ object NativeBridge {
             plugin.id
         )
         if (plugin.pluginInfo != null) {
-            val info = plugin.pluginInfo
-            getLogger().info("Native Plugin (w json) " + info!!.name + " has been loaded with code " + code)
+            getLogger().info("Native Plugin (w json) " + plugin.pluginInfo!!.name + " has been loaded with code " + code)
         } else {
             getLogger().info("Native Plugin (w/o json) " + plugin.file.name + " has been loaded with code " + code)
         }
@@ -112,7 +111,7 @@ object NativeBridge {
         subType: Int,
         msgId: Int,
         fromAccount: Long,
-        msg: String?,
+        msg: String,
         font: Int
     ) {
         for (plugin in getPlugins().values) {
@@ -122,7 +121,7 @@ object NativeBridge {
                     subType,
                     msgId,
                     fromAccount,
-                    plugin.processMessage(Event.EVENT_PRI_MSG, msg!!),
+                    plugin.processMessage(Event.EVENT_PRI_MSG, msg),
                     font
                 ) == 1
             ) {
@@ -136,8 +135,8 @@ object NativeBridge {
         msgId: Int,
         fromGroup: Long,
         fromAccount: Long,
-        fromAnonymous: String?,
-        msg: String?,
+        fromAnonymous: String,
+        msg: String,
         font: Int
     ) {
         for (plugin in getPlugins().values) {
@@ -149,7 +148,7 @@ object NativeBridge {
                     fromGroup,
                     fromAccount,
                     fromAnonymous,
-                    plugin.processMessage(Event.EVENT_GROUP_MSG, msg!!),
+                    plugin.processMessage(Event.EVENT_GROUP_MSG, msg),
                     font
                 ) == 1
             ) {
@@ -246,8 +245,8 @@ object NativeBridge {
         time: Int,
         fromGroup: Long,
         fromAccount: Long,
-        msg: String?,
-        flag: String?
+        msg: String,
+        flag: String
     ) {
         for (plugin in getPlugins().values) {
             if (plugin.shouldCallEvent(Event.EVENT_REQUEST_GROUP) && Bridge.pEvRequestAddGroup(
@@ -268,8 +267,8 @@ object NativeBridge {
         subType: Int,
         time: Int,
         fromAccount: Long,
-        msg: String?,
-        flag: String?
+        msg: String,
+        flag: String
     ) {
         for (plugin in getPlugins().values) {
             if (plugin.shouldCallEvent(Event.EVENT_REQUEST_FRIEND) && Bridge.pEvRequestAddFriend(
