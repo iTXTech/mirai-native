@@ -252,7 +252,7 @@ public class Bridge {
     /**
      * Indicates the method is called from native code
      */
-    @Retention(value = RetentionPolicy.SOURCE)
+    @Retention(RetentionPolicy.SOURCE)
     @interface NativeBridgeMethod {
     }
 }

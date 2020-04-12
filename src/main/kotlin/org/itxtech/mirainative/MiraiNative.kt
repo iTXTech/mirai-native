@@ -45,6 +45,7 @@ import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.ui.FloatingWindow
 import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.ConfigMan
+import org.itxtech.mirainative.util.LibraryManager
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.Executors
@@ -59,12 +60,12 @@ object MiraiNative : PluginBase() {
 
     private fun checkNativeLibs() {
         logger.info("正在加载 ${dll.absolutePath}")
-        System.load(dll.absolutePath)
+        LibraryManager.load(dll.absolutePath)
 
         lib.listFiles()?.forEach { file ->
             if (file.absolutePath.endsWith(".dll")) {
                 logger.info("正在加载外部库 " + file.absolutePath)
-                System.load(file.absolutePath)
+                LibraryManager.load(file.absolutePath)
             }
         }
     }
@@ -74,6 +75,7 @@ object MiraiNative : PluginBase() {
             PluginManager.unloadPlugins(true)
             delay(1000)
             logger.info("已卸载所有插件，正在重新加载。")
+            checkNativeLibs()
             PluginManager.loadPlugins()
         }
         return false
