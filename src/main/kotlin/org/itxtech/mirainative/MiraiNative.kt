@@ -69,6 +69,16 @@ object MiraiNative : PluginBase() {
         }
     }
 
+    override fun onReload(): Boolean {
+        launch(NativeDispatcher) {
+            PluginManager.unloadPlugins(true)
+            delay(1000)
+            logger.info("已卸载所有插件，正在重新加载。")
+            PluginManager.loadPlugins()
+        }
+        return false
+    }
+
     override fun onLoad() {
         //暂时只支持 x86 平台运行，不兼容 amd64
         val mode = System.getProperty("sun.arch.data.model")
@@ -90,15 +100,7 @@ object MiraiNative : PluginBase() {
         Tray.create()
         FloatingWindow.create()
 
-        if (!dataFolder.isDirectory) {
-            logger.error("数据文件夹不是一个文件夹！" + dataFolder.absolutePath)
-        } else {
-            dataFolder.listFiles()?.forEach { file ->
-                if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
-                    PluginManager.loadPlugin(file)
-                }
-            }
-        }
+        PluginManager.loadPlugins()
     }
 
     private fun initDataDir() {
@@ -139,11 +141,7 @@ object MiraiNative : PluginBase() {
 
     override fun onDisable() {
         ConfigMan.save()
-
-        launch(NativeDispatcher) {
-            logger.info("Mirai Native 正停用所有DLL插件并调用Exit事件。")
-            PluginManager.disableAndExitPlugins()
-        }
+        PluginManager.unloadPlugins()
     }
 
     private fun registerEvents() {

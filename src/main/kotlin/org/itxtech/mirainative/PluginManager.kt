@@ -42,6 +42,29 @@ object PluginManager {
     private var pluginId = atomic(0)
     var plugins = hashMapOf<Int, NativePlugin>()
 
+    fun loadPlugins() {
+        if (!MiraiNative.dataFolder.isDirectory) {
+            MiraiNative.logger.error("数据文件夹不是一个文件夹！" + MiraiNative.dataFolder.absolutePath)
+        } else {
+            MiraiNative.dataFolder.listFiles()?.forEach { file ->
+                if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
+                    loadPlugin(file)
+                }
+            }
+        }
+    }
+
+    fun unloadPlugins(blocking: Boolean = false) {
+        MiraiNative.logger.info("正停用所有插件并调用Exit事件。")
+        if (blocking) {
+            disableAndExitPlugins()
+        } else {
+            MiraiNative.launch(NativeDispatcher) {
+                disableAndExitPlugins()
+            }
+        }
+    }
+
     fun getPluginByIdentifier(id: String): NativePlugin? {
         plugins.values.forEach {
             if (it.identifier == id) {
@@ -141,6 +164,7 @@ object PluginManager {
             NativeBridge.exitPlugin(it)
             Bridge.freeNativePlugin(it.id)
         }
+        plugins.clear()
     }
 
     fun registerCommands() {
