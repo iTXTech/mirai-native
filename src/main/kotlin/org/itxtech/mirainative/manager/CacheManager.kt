@@ -79,4 +79,10 @@ object CacheManager {
     fun findMember(id: Long): Member? {
         return senders[id]
     }
+
+    fun clear() {
+        msgCache.clear()
+        evCache.clear()
+        senders.clear()
+    }
 }

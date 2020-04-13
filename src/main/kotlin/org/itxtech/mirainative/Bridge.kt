@@ -22,7 +22,7 @@
 *
 */
 
-@file:Suppress("unused")
+@file:Suppress("UNUSED_PARAMETER", "unused")
 
 package org.itxtech.mirainative
 
