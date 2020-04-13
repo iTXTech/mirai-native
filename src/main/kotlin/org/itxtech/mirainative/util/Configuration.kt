@@ -28,7 +28,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.itxtech.mirainative.MiraiNative
-import org.itxtech.mirainative.PluginManager
+import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.ui.FloatingWindow
 import java.io.File
 

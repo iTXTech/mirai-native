@@ -22,7 +22,7 @@
  *
  */
 
-package org.itxtech.mirainative.message
+package org.itxtech.mirainative.manager
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
@@ -57,7 +57,10 @@ object CacheManager {
 
     fun cacheTempMessage(message: TempMessage, id: Int = nextId()): Int {
         senders[message.sender.id] = message.sender
-        return cacheMessage(message.message[MessageSource], id)
+        return cacheMessage(
+            message.message[MessageSource],
+            id
+        )
     }
 
     fun recall(id: Int): Boolean {

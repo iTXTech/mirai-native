@@ -26,9 +26,7 @@ package org.itxtech.mirainative.plugin
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import org.itxtech.mirainative.MiraiNative
-import org.itxtech.mirainative.NativeDispatcher
 import org.itxtech.mirainative.bridge.MiraiBridge
 import org.itxtech.mirainative.ui.FloatingWindow
 import java.io.File
@@ -53,13 +51,13 @@ data class NativePlugin(val file: File, val id: Int) {
             field = v
         }
     private val events = hashMapOf<Int, String>()
-    val entries: ArrayList<FloatingWindowEntry> = ArrayList()
+    val entries = arrayListOf<FloatingWindowEntry>()
 
     private fun registerFws(fws: ArrayList<Status>) {
         fws.forEach {
             val entry = FloatingWindowEntry(it)
             entries.add(entry)
-            MiraiNative.launch(NativeDispatcher) {
+            MiraiNative.nativeLaunch {
                 while (isActive) {
                     if (enabled && entry.visible && FloatingWindow.isVisible()) {
                         MiraiBridge.updateFwe(id, entry)

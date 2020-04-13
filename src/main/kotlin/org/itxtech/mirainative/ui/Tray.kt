@@ -24,11 +24,9 @@
 
 package org.itxtech.mirainative.ui
 
-import kotlinx.coroutines.launch
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
-import org.itxtech.mirainative.NativeDispatcher
-import org.itxtech.mirainative.PluginManager
+import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.util.NpmHelper
 import java.awt.*
 import java.awt.event.MouseAdapter
@@ -162,7 +160,7 @@ object Tray {
                         plugin.pluginInfo!!.menu.forEach { m ->
                             val item = MenuItem(m.name)
                             item.addActionListener {
-                                MiraiNative.launch(NativeDispatcher) {
+                                MiraiNative.nativeLaunch {
                                     Bridge.callIntMethod(plugin.id, m.function)
                                 }
                             }

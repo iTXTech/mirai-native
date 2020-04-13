@@ -27,7 +27,7 @@ package org.itxtech.mirainative.bridge
 import net.mamoe.mirai.utils.MiraiLogger
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
-import org.itxtech.mirainative.PluginManager
+import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.plugin.Event
 import org.itxtech.mirainative.plugin.NativePlugin
 

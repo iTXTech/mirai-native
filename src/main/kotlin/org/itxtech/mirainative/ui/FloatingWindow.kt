@@ -28,7 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.itxtech.mirainative.MiraiNative
-import org.itxtech.mirainative.PluginManager
+import org.itxtech.mirainative.manager.PluginManager
 import java.awt.GraphicsEnvironment
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent

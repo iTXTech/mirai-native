@@ -1,7 +1,7 @@
 package org.itxtech.mirainative;
 
 import org.itxtech.mirainative.bridge.MiraiBridge;
-import org.itxtech.mirainative.message.CacheManager;
+import org.itxtech.mirainative.manager.CacheManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

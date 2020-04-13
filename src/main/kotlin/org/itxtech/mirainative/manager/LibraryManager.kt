@@ -22,7 +22,7 @@
  *
  */
 
-package org.itxtech.mirainative.util
+package org.itxtech.mirainative.manager
 
 object LibraryManager {
     private val libs = arrayListOf<String>()

@@ -24,28 +24,16 @@
 
 package org.itxtech.mirainative
 
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.console.plugins.PluginManager.getPluginDescription
-import net.mamoe.mirai.contact.MemberPermission
-import net.mamoe.mirai.event.events.*
-import net.mamoe.mirai.event.subscribeAlways
-import net.mamoe.mirai.message.FriendMessage
-import net.mamoe.mirai.message.GroupMessage
-import net.mamoe.mirai.message.TempMessage
-import net.mamoe.mirai.message.data.MessageSource
-import net.mamoe.mirai.utils.currentTimeSeconds
-import org.itxtech.mirainative.bridge.NativeBridge
-import org.itxtech.mirainative.message.CacheManager
-import org.itxtech.mirainative.message.ChainCodeConverter
+import org.itxtech.mirainative.manager.EventManager
+import org.itxtech.mirainative.manager.LibraryManager
+import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.ui.FloatingWindow
 import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.ConfigMan
-import org.itxtech.mirainative.util.LibraryManager
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.Executors
@@ -71,7 +59,7 @@ object MiraiNative : PluginBase() {
     }
 
     override fun onReload(): Boolean {
-        launch(NativeDispatcher) {
+        nativeLaunch {
             PluginManager.unloadPlugins(true)
             delay(1000)
             logger.info("已卸载所有插件，正在重新加载。")
@@ -131,9 +119,9 @@ object MiraiNative : PluginBase() {
 
     override fun onEnable() {
         PluginManager.registerCommands()
-        registerEvents()
+        EventManager.registerEvents()
 
-        launch(NativeDispatcher) {
+        nativeLaunch {
             while (isActive) {
                 Bridge.processMessage()
                 delay(10)
@@ -141,188 +129,13 @@ object MiraiNative : PluginBase() {
         }
     }
 
+    fun nativeLaunch(b: suspend CoroutineScope.() -> Unit) {
+        launch(context = NativeDispatcher, block = b)
+    }
+
     override fun onDisable() {
         ConfigMan.save()
         PluginManager.unloadPlugins()
-    }
-
-    private fun registerEvents() {
-        subscribeAlways<BotOnlineEvent> {
-            botOnline = true
-            launch(NativeDispatcher) {
-                ConfigMan.init()
-                logger.info("Mirai Native 正启用所有 DLL 插件。")
-                PluginManager.enablePlugins()
-                Tray.update()
-            }
-        }
-
-        // 消息事件
-        subscribeAlways<FriendMessage> {
-            launch(NativeDispatcher) {
-                NativeBridge.eventPrivateMessage(
-                    Bridge.PRI_MSG_SUBTYPE_FRIEND,
-                    CacheManager.cacheMessage(message[MessageSource]),
-                    sender.id,
-                    ChainCodeConverter.chainToCode(message),
-                    0
-                )
-            }
-        }
-        subscribeAlways<GroupMessage> {
-            launch(NativeDispatcher) {
-                NativeBridge.eventGroupMessage(
-                    1,
-                    CacheManager.cacheMessage(message[MessageSource]),
-                    group.id,
-                    sender.id,
-                    "",
-                    ChainCodeConverter.chainToCode(message),
-                    0
-                )
-            }
-        }
-        subscribeAlways<TempMessage> { msg ->
-            launch(NativeDispatcher) {
-                NativeBridge.eventPrivateMessage(
-                    Bridge.PRI_MSG_SUBTYPE_GROUP,
-                    CacheManager.cacheTempMessage(msg),
-                    sender.id,
-                    ChainCodeConverter.chainToCode(message),
-                    0
-                )
-            }
-        }
-
-        // 权限事件
-        subscribeAlways<MemberPermissionChangeEvent> {
-            launch(NativeDispatcher) {
-                if (new == MemberPermission.MEMBER) {
-                    NativeBridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, member.id)
-                } else {
-                    NativeBridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, member.id)
-                }
-            }
-        }
-        subscribeAlways<BotGroupPermissionChangeEvent> {
-            launch(NativeDispatcher) {
-                if (new == MemberPermission.MEMBER) {
-                    NativeBridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_CANCEL_ADMIN, getTimestamp(), group.id, bot.id)
-                } else {
-                    NativeBridge.eventGroupAdmin(Bridge.PERM_SUBTYPE_SET_ADMIN, getTimestamp(), group.id, bot.id)
-                }
-            }
-        }
-
-        // 加群事件
-        subscribeAlways<MemberJoinEvent> { ev ->
-            launch(NativeDispatcher) {
-                NativeBridge.eventGroupMemberJoin(
-                    if (ev is MemberJoinEvent.Invite) Bridge.MEMBER_JOIN_PERMITTED else Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
-                    getTimestamp(), group.id, 0, member.id
-                )
-            }
-        }
-        subscribeAlways<MemberJoinRequestEvent> { ev ->
-            launch(NativeDispatcher) {
-                NativeBridge.eventRequestAddGroup(
-                    Bridge.REQUEST_GROUP_INVITED,
-                    getTimestamp(), groupId, fromId, message, CacheManager.cacheEvent(ev)
-                )
-            }
-        }
-
-        //加好友事件
-        subscribeAlways<NewFriendRequestEvent> { ev ->
-            launch(NativeDispatcher) {
-                NativeBridge.eventRequestAddFriend(1, getTimestamp(), fromId, message, CacheManager.cacheEvent(ev))
-            }
-        }
-        subscribeAlways<FriendAddEvent> {
-            launch(NativeDispatcher) {
-                NativeBridge.eventFriendAdd(1, getTimestamp(), friend.id)
-            }
-        }
-
-        // 退群事件
-        subscribeAlways<MemberLeaveEvent.Kick> {
-            launch(NativeDispatcher) {
-                val op = operator?.id ?: bot.id
-                NativeBridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_KICK, getTimestamp(), group.id, op, member.id)
-            }
-        }
-        subscribeAlways<MemberLeaveEvent.Quit> {
-            launch(NativeDispatcher) {
-                NativeBridge.eventGroupMemberLeave(Bridge.MEMBER_LEAVE_QUIT, getTimestamp(), group.id, 0, member.id)
-            }
-        }
-        subscribeAlways<BotLeaveEvent> { ev ->
-            launch(NativeDispatcher) {
-                NativeBridge.eventGroupMemberLeave(
-                    if (ev is BotLeaveEvent.Kick) Bridge.MEMBER_LEAVE_KICK else Bridge.MEMBER_LEAVE_QUIT,
-                    getTimestamp(), group.id, 0, bot.id
-                )
-            }
-        }
-
-        // 禁言事件
-        subscribeAlways<MemberMuteEvent> {
-            launch(NativeDispatcher) {
-                val op = operator?.id ?: bot.id
-                NativeBridge.eventGroupBan(
-                    Bridge.GROUP_MUTE,
-                    getTimestamp(),
-                    group.id,
-                    op,
-                    member.id,
-                    durationSeconds.toLong()
-                )
-            }
-        }
-        subscribeAlways<MemberUnmuteEvent> {
-            launch(NativeDispatcher) {
-                val op = operator?.id ?: bot.id
-                NativeBridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, member.id, 0)
-            }
-        }
-        subscribeAlways<BotMuteEvent> {
-            launch(NativeDispatcher) {
-                NativeBridge.eventGroupBan(
-                    Bridge.GROUP_MUTE,
-                    getTimestamp(),
-                    group.id,
-                    operator.id,
-                    bot.id,
-                    durationSeconds.toLong()
-                )
-            }
-        }
-        subscribeAlways<BotUnmuteEvent> {
-            launch(NativeDispatcher) {
-                NativeBridge.eventGroupBan(
-                    Bridge.GROUP_UNMUTE,
-                    getTimestamp(),
-                    group.id,
-                    operator.id,
-                    bot.id,
-                    0
-                )
-            }
-        }
-        subscribeAlways<GroupMuteAllEvent> {
-            launch(NativeDispatcher) {
-                val op = operator?.id ?: bot.id
-                if (new) {
-                    NativeBridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, 0, 0)
-                } else {
-                    NativeBridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, 0, 0)
-                }
-            }
-        }
-    }
-
-    private fun getTimestamp(): Int {
-        return currentTimeSeconds.toInt()
     }
 
     fun getVersion(): String {

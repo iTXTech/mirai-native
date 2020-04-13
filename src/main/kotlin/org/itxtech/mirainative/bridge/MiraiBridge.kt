@@ -40,9 +40,8 @@ import net.mamoe.mirai.message.data.quote
 import net.mamoe.mirai.utils.MiraiLogger
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
-import org.itxtech.mirainative.NativeDispatcher
-import org.itxtech.mirainative.PluginManager
-import org.itxtech.mirainative.message.CacheManager
+import org.itxtech.mirainative.manager.CacheManager
+import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
 import org.itxtech.mirainative.plugin.NativePlugin
@@ -274,7 +273,7 @@ object MiraiBridge {
 
     @JvmStatic
     fun setGroupAddRequest(requestId: String, reqType: Int, type: Int, reason: String): Int {
-        MiraiNative.launch(NativeDispatcher) {
+        MiraiNative.nativeLaunch {
             (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
                 when (type) {//1通过，2拒绝，3忽略
                     1 -> accept()
@@ -288,7 +287,7 @@ object MiraiBridge {
 
     @JvmStatic
     fun setFriendAddRequest(requestId: String, type: Int, remark: String): Int {
-        MiraiNative.launch(NativeDispatcher) {
+        MiraiNative.nativeLaunch {
             (CacheManager.getEvent(requestId) as? NewFriendRequestEvent)?.apply {
                 when (type) {//1通过，2拒绝
                     1 -> accept()

@@ -22,14 +22,15 @@
  *
  */
 
-package org.itxtech.mirainative
+package org.itxtech.mirainative.manager
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.registerCommand
+import org.itxtech.mirainative.Bridge
+import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.bridge.NativeBridge
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
@@ -59,7 +60,7 @@ object PluginManager {
         if (blocking) {
             disableAndExitPlugins()
         } else {
-            MiraiNative.launch(NativeDispatcher) {
+            MiraiNative.nativeLaunch {
                 disableAndExitPlugins()
             }
         }
@@ -90,7 +91,7 @@ object PluginManager {
                 return
             }
         }
-        MiraiNative.launch(NativeDispatcher) {
+        MiraiNative.nativeLaunch {
             val plugin = NativePlugin(file, pluginId.value)
             val json = File(file.parent + File.separatorChar + file.name.replace(".dll", ".json"))
             if (json.exists()) {
@@ -112,7 +113,7 @@ object PluginManager {
     }
 
     fun unloadPlugin(plugin: NativePlugin) {
-        MiraiNative.launch(NativeDispatcher) {
+        MiraiNative.nativeLaunch {
             disablePlugin(plugin)
             NativeBridge.exitPlugin(plugin)
             delay(500)
@@ -126,7 +127,7 @@ object PluginManager {
 
     fun enablePlugin(plugin: NativePlugin): Boolean {
         if (MiraiNative.botOnline && !plugin.enabled) {
-            MiraiNative.launch(NativeDispatcher) {
+            MiraiNative.nativeLaunch {
                 NativeBridge.enablePlugin(plugin)
                 plugin.enabled = true
                 Tray.update()
@@ -138,7 +139,7 @@ object PluginManager {
 
     fun disablePlugin(plugin: NativePlugin): Boolean {
         if (plugin.enabled) {
-            MiraiNative.launch(NativeDispatcher) {
+            MiraiNative.nativeLaunch {
                 NativeBridge.disablePlugin(plugin)
                 plugin.enabled = false
                 Tray.update()
@@ -221,7 +222,7 @@ object PluginManager {
                             return@onCommand false
                         }
                         if (plugins.containsKey(it[1].toInt()) && plugins[it[1].toInt()]!!.verifyMenuFunc(it[2])) {
-                            MiraiNative.launch(NativeDispatcher) {
+                            MiraiNative.nativeLaunch {
                                 Bridge.callIntMethod(it[1].toInt(), it[2])
                             }
                             appendMessage("已调用 Id " + it[1] + " 的 " + it[2] + " 方法。")
@@ -243,7 +244,9 @@ object PluginManager {
                     }
                     "unload" -> {
                         if (plugins.containsKey(it[1].toInt())) {
-                            unloadPlugin(plugins[it[1].toInt()]!!)
+                            unloadPlugin(
+                                plugins[it[1].toInt()]!!
+                            )
                         } else {
                             appendMessage("Id " + it[1] + " 不存在。")
                         }
