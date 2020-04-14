@@ -47,22 +47,20 @@ object PluginManager {
         if (!MiraiNative.dataFolder.isDirectory) {
             MiraiNative.logger.error("数据文件夹不是一个文件夹！" + MiraiNative.dataFolder.absolutePath)
         } else {
-            MiraiNative.dataFolder.listFiles()?.forEach { file ->
-                if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
-                    loadPlugin(file)
+            MiraiNative.nativeLaunch {
+                MiraiNative.dataFolder.listFiles()?.forEach { file ->
+                    if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
+                        loadPlugin(file)
+                    }
                 }
             }
         }
     }
 
-    fun unloadPlugins(blocking: Boolean = false) {
+    fun unloadPlugins() {
         MiraiNative.logger.info("正停用所有插件并调用Exit事件。")
-        if (blocking) {
+        MiraiNative.nativeLaunch {
             disableAndExitPlugins()
-        } else {
-            MiraiNative.nativeLaunch {
-                disableAndExitPlugins()
-            }
         }
     }
 

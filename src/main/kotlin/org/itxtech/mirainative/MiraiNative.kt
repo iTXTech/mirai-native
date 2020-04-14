@@ -59,18 +59,6 @@ object MiraiNative : PluginBase() {
         }
     }
 
-    override fun onReload(): Boolean {
-        CacheManager.clear()
-        nativeLaunch {
-            PluginManager.unloadPlugins(true)
-            delay(1000)
-            logger.info("已卸载所有插件，正在重新加载。")
-            checkNativeLibs()
-            PluginManager.loadPlugins()
-        }
-        return false
-    }
-
     override fun onLoad() {
         //暂时只支持 x86 平台运行，不兼容 amd64
         val mode = System.getProperty("sun.arch.data.model")
@@ -86,13 +74,13 @@ object MiraiNative : PluginBase() {
             cqp.close()
         }
 
-        checkNativeLibs()
         initDataDir()
 
         Tray.create()
         FloatingWindow.create()
 
-        PluginManager.loadPlugins()
+        PluginManager.registerCommands()
+        EventManager.registerEvents()
     }
 
     private fun initDataDir() {
@@ -120,8 +108,8 @@ object MiraiNative : PluginBase() {
     }
 
     override fun onEnable() {
-        PluginManager.registerCommands()
-        EventManager.registerEvents()
+        checkNativeLibs()
+        PluginManager.loadPlugins()
 
         nativeLaunch {
             while (isActive) {
@@ -131,13 +119,14 @@ object MiraiNative : PluginBase() {
         }
     }
 
-    fun nativeLaunch(b: suspend CoroutineScope.() -> Unit) {
-        launch(context = NativeDispatcher, block = b)
-    }
-
     override fun onDisable() {
         ConfigMan.save()
         PluginManager.unloadPlugins()
+        CacheManager.clear()
+    }
+
+    fun nativeLaunch(b: suspend CoroutineScope.() -> Unit) {
+        launch(context = NativeDispatcher, block = b)
     }
 
     fun getVersion(): String {
