@@ -8,8 +8,8 @@
 
 - [x] 应用 `JSON`
 - [x] `CQ码` `[Incomplete]`
-- [x] 悬浮窗 `[Incomplete]`
-- [x] 菜单 `[Incomplete]`
+- [x] 悬浮窗
+- [x] 菜单
 - [ ] 权限验证
 - [ ] **直接加载 酷Q CPK 文件**
 
@@ -43,10 +43,10 @@
 - [x] `CQ_getGroupMemberInfoV2` `[Incomplete]`
 - [x] `CQ_getGroupMemberList` `[Incomplete]`
 - [x] `CQ_getImage` `[Placeholder]`
-- [x] `CQ_getLoginNick` `[Incomplete]`
+- [x] `CQ_getLoginNick`
 - [x] `CQ_getLoginQQ`
 - [x] `CQ_getRecordV2` `[Placeholder]`
-- [x] `CQ_getStrangerInfo` `[Placeholder]`
+- [x] `CQ_getStrangerInfo` `[Incomplete]`
 - [x] `CQ_sendDiscussMsg` `[Placeholder]`
 - [x] `CQ_sendGroupMsg`
 - [x] `CQ_sendLikeV2` `[Placeholder]` `[Won't Implement]`

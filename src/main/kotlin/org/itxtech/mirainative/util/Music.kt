@@ -40,6 +40,22 @@ abstract class MusicProvider {
     abstract suspend fun send(id: String): Message
 }
 
+object Music {
+    fun custom(url: String, audio: String, title: String, content: String?, image: String?): Message {
+        return XmlMessage(
+            "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>" +
+                    "<msg serviceID=\"2\" templateID=\"1\" action=\"web\" brief=\"[分享] $title\" sourceMsgId=\"0\" " +
+                    "url=\"$url\" " +
+                    "flag=\"0\" adverSign=\"0\" multiMsgFlag=\"0\"><item layout=\"2\">" +
+                    "<audio cover=\"$image\" " +
+                    "src=\"$audio\" /><title>$title</title><summary>$content</summary></item><source name=\"Mirai\" " +
+                    "icon=\"https://i.gtimg.cn/open/app_icon/01/07/98/56/1101079856_100_m.png\" " +
+                    "url=\"http://web.p.qq.com/qqmpmobile/aio/app.html?id=1101079856\" action=\"app\" " +
+                    "a_actionData=\"com.tencent.qqmusic\" i_actionData=\"tencent1101079856://\" appid=\"1101079856\" /></msg>"
+        )
+    }
+}
+
 @OptIn(UnstableDefault::class)
 object QQMusic : MusicProvider() {
     suspend fun search(name: String, page: Int, cnt: Int): JsonElement {
@@ -98,7 +114,6 @@ object QQMusic : MusicProvider() {
     }
 }
 
-@KtorExperimentalAPI
 object NeteaseMusic : MusicProvider() {
     override suspend fun send(id: String): XmlMessage {
         TODO("Not yet implemented")

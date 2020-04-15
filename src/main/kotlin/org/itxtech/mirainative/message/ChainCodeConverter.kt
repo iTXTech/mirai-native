@@ -31,6 +31,8 @@ import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.uploadImage
 import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.util.Music
+import org.itxtech.mirainative.util.NeteaseMusic
 import org.itxtech.mirainative.util.QQMusic
 import java.net.URL
 
@@ -123,8 +125,16 @@ object ChainCodeConverter {
                     }
                 }
                 "music" -> {
-                    if (args["type"] == "qq") {
-                        return QQMusic.send(args["id"]!!)
+                    when (args["type"]) {
+                        "qq" -> return QQMusic.send(args["id"]!!)
+                        "163" -> return NeteaseMusic.send(args["id"]!!)
+                        "custom" -> return Music.custom(
+                            args["url"]!!,
+                            args["audio"]!!,
+                            args["title"]!!,
+                            args["content"],
+                            args["image"]
+                        )
                     }
                 }
                 "shake" -> {

@@ -25,7 +25,6 @@
 package org.itxtech.mirainative.manager
 
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.delay
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.registerCommand
@@ -114,7 +113,6 @@ object PluginManager {
         MiraiNative.nativeLaunch {
             disablePlugin(plugin)
             NativeBridge.exitPlugin(plugin)
-            delay(500)
             if (NativeBridge.unloadPlugin(plugin) == 0) {
                 plugin.loaded = false
                 plugin.enabled = false

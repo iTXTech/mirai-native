@@ -283,6 +283,7 @@ object Bridge {
     }
 
     // Placeholder methods which mirai hasn't supported yet
+
     @JvmStatic
     fun setGroupAnonymous(pluginId: Int, group: Long, enable: Boolean): Int {
         return 0
@@ -320,6 +321,7 @@ object Bridge {
     }
 
     // Wont' Implement
+
     @JvmStatic
     fun sendLike(pluginId: Int, account: Long, times: Int): Int {
         return 0
@@ -336,6 +338,7 @@ object Bridge {
     }
 
     // Mirai Unique Methods
+
     @JvmStatic
     fun quoteMessage(pluginId: Int, msgId: Int, msg: String): Int {
         return quoteMessage(msgId, msg)
