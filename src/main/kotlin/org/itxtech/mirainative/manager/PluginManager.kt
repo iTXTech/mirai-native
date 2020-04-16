@@ -59,7 +59,14 @@ object PluginManager {
     fun unloadPlugins() {
         MiraiNative.logger.info("正停用所有插件并调用Exit事件。")
         MiraiNative.nativeLaunch {
-            disableAndExitPlugins()
+            plugins.values.forEach {
+                if (it.enabled) {
+                    NativeBridge.disablePlugin(it)
+                }
+                NativeBridge.exitPlugin(it)
+                NativeBridge.unloadPlugin(it)
+            }
+            plugins.clear()
         }
     }
 
@@ -151,17 +158,6 @@ object PluginManager {
                 enablePlugin(it)
             }
         }
-    }
-
-    fun disableAndExitPlugins() {
-        plugins.values.forEach {
-            if (it.enabled) {
-                NativeBridge.disablePlugin(it)
-            }
-            NativeBridge.exitPlugin(it)
-            Bridge.freeNativePlugin(it.id)
-        }
-        plugins.clear()
     }
 
     fun registerCommands() {

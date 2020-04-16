@@ -1,19 +1,24 @@
 # Mirai Native
 
-Mirai Native 致力于通过实现 酷Q 的兼容API使 酷Q 的应用（插件）能在 [Mirai](https://github.com/mamoe/mirai) 环境下运行。
 
-## 贡献
+Mirai Native 支持所有`stdcall`方式导出方法的 DLL 使用 [Mirai](https://github.com/mamoe/mirai) 提供的 API。
+
+与**大部分**`酷Q`插件兼容，**不支持**CPK和解包的DLL，需获取DLL和JSON原文件，JSON文件**不支持**注释。
+
+## 写在前面
 
 本项目欢迎一切形式的贡献，详见 [Docs](Docs.md)
 
+关于兼容的 酷Q 插件（比如`CQHTTP`）和安装方法，见 [Wiki](https://github.com/iTXTech/mirai-native/wiki)
+
 ## 运行环境 - ！非常重要！
 
-* **JRE 8 32位** - ~~酷Q的插件都是32位哒~~
+* **JRE 32位** - ~~酷Q的插件都是32位哒~~
 * 可能需要管理员权限，因为需要在Java目录下创建数据文件夹，如果不想授权管理员权限，请将JRE移动到不需要管理员权限的目录下
 
 ## 开发环境
 
-* [Java Development Kit 8](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html)
+* [JDK 11](https://adoptopenjdk.net/releases.html?variant=openjdk11&jvmVariant=hotspot)
 * [Visual Studio](https://visualstudio.microsoft.com/zh-hans/)
 * [IntelliJ IDEA](https://www.jetbrains.com/idea/)
 
@@ -46,8 +51,13 @@ Mirai Native 致力于通过实现 酷Q 的兼容API使 酷Q 的应用（插件�
 1. 提供 `Mirai` 独有API，见 `Mirai Native Advance SDK`（建设中，见 `epl-test`文件夹）
 1. `DLL` 字符串编码采用 `GB18030`
 1. 待 `Bot` 上线后才会调用插件的 `Enable` 事件，托班菜单内才可以禁用插件
+1. `Mirai Native` 内部使用了非阻塞，协程实现具体功能，调用所有API都立即返回，但是也有劣势，比如无法得知消息是否发送成功
 
 ## 如何获取酷Q插件
+
+### 联系作者提供`DLL`和`JSON`文件
+
+### 以下方法已无效！！！
 
 1. 启动酷Q
 1. 查找路径 `data\tmp\capp\` 的二级目录下的 `cpk` 文件，将后缀修改为 `dll` 即可
