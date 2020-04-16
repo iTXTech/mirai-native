@@ -27,26 +27,7 @@
 package org.itxtech.mirainative
 
 import org.itxtech.mirainative.bridge.MiraiBridge
-import org.itxtech.mirainative.bridge.MiraiBridge.getFriendList
-import org.itxtech.mirainative.bridge.MiraiBridge.getGroupInfo
-import org.itxtech.mirainative.bridge.MiraiBridge.getGroupList
-import org.itxtech.mirainative.bridge.MiraiBridge.getGroupMemberInfo
-import org.itxtech.mirainative.bridge.MiraiBridge.getGroupMemberList
-import org.itxtech.mirainative.bridge.MiraiBridge.getLoginNick
-import org.itxtech.mirainative.bridge.MiraiBridge.getLoginQQ
-import org.itxtech.mirainative.bridge.MiraiBridge.getStrangerInfo
-import org.itxtech.mirainative.bridge.MiraiBridge.quoteMessage
-import org.itxtech.mirainative.bridge.MiraiBridge.sendGroupMessage
-import org.itxtech.mirainative.bridge.MiraiBridge.sendPrivateMessage
-import org.itxtech.mirainative.bridge.MiraiBridge.setFriendAddRequest
-import org.itxtech.mirainative.bridge.MiraiBridge.setGroupAddRequest
-import org.itxtech.mirainative.bridge.MiraiBridge.setGroupBan
-import org.itxtech.mirainative.bridge.MiraiBridge.setGroupCard
-import org.itxtech.mirainative.bridge.MiraiBridge.setGroupKick
-import org.itxtech.mirainative.bridge.MiraiBridge.setGroupLeave
-import org.itxtech.mirainative.bridge.MiraiBridge.setGroupSpecialTitle
-import org.itxtech.mirainative.bridge.MiraiBridge.setGroupWholeBan
-import org.itxtech.mirainative.manager.CacheManager.recall
+import org.itxtech.mirainative.manager.CacheManager
 
 object Bridge {
     const val PRI_MSG_SUBTYPE_FRIEND = 11
@@ -173,12 +154,12 @@ object Bridge {
 
     @JvmStatic
     fun sendPrivateMessage(pluginId: Int, account: Long, msg: String): Int {
-        return sendPrivateMessage(account, msg)
+        return MiraiBridge.sendPrivateMessage(pluginId, account, msg)
     }
 
     @JvmStatic
     fun sendGroupMessage(pluginId: Int, group: Long, msg: String): Int {
-        return sendGroupMessage(group, msg)
+        return MiraiBridge.sendGroupMessage(pluginId, group, msg)
     }
 
     @JvmStatic
@@ -193,72 +174,72 @@ object Bridge {
 
     @JvmStatic
     fun getLoginQQ(pluginId: Int): Long {
-        return getLoginQQ()
+        return MiraiBridge.getLoginQQ(pluginId)
     }
 
     @JvmStatic
     fun getLoginNick(pluginId: Int): String {
-        return getLoginNick()
+        return MiraiBridge.getLoginNick(pluginId)
     }
 
     @JvmStatic
     fun setGroupBan(pluginId: Int, group: Long, member: Long, duration: Long): Int {
-        return setGroupBan(group, member, duration.toInt())
+        return MiraiBridge.setGroupBan(pluginId, group, member, duration.toInt())
     }
 
     @JvmStatic
     fun setGroupCard(pluginId: Int, group: Long, member: Long, card: String): Int {
-        return setGroupCard(group, member, card)
+        return MiraiBridge.setGroupCard(pluginId, group, member, card)
     }
 
     @JvmStatic
     fun setGroupKick(pluginId: Int, group: Long, member: Long, reject: Boolean): Int {
-        return setGroupKick(group, member)
+        return MiraiBridge.setGroupKick(pluginId, group, member)
     }
 
     @JvmStatic
     fun setGroupLeave(pluginId: Int, group: Long, dismiss: Boolean): Int {
-        return setGroupLeave(group)
+        return MiraiBridge.setGroupLeave(pluginId, group)
     }
 
     @JvmStatic
     fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: String, duration: Long): Int {
-        return setGroupSpecialTitle(group, member, title, duration)
+        return MiraiBridge.setGroupSpecialTitle(pluginId, group, member, title, duration)
     }
 
     @JvmStatic
     fun setGroupWholeBan(pluginId: Int, group: Long, enable: Boolean): Int {
-        return setGroupWholeBan(group, enable)
+        return MiraiBridge.setGroupWholeBan(pluginId, group, enable)
     }
 
     @JvmStatic
     fun recallMsg(pluginId: Int, msgId: Long): Int {
-        return if (recall(java.lang.Long.valueOf(msgId).toInt())) 0 else -1
+        return if (CacheManager.recall(msgId.toInt())) 0 else -1
     }
 
     @JvmStatic
     fun getFriendList(pluginId: Int, reserved: Boolean): String {
-        return getFriendList()
+        return MiraiBridge.getFriendList(pluginId)
     }
 
     @JvmStatic
     fun getGroupInfo(pluginId: Int, groupId: Long, cache: Boolean): String {
-        return getGroupInfo(groupId)
+        return MiraiBridge.getGroupInfo(pluginId, groupId)
     }
 
     @JvmStatic
     fun getGroupList(pluginId: Int): String {
-        return getGroupList()
+        return MiraiBridge.getGroupList(pluginId)
     }
 
     @JvmStatic
     fun getGroupMemberInfo(pluginId: Int, group: Long, member: Long, cache: Boolean): String {
-        return getGroupMemberInfo(group, member)
+        return MiraiBridge.getGroupMemberInfo(pluginId, group, member)
     }
 
     @JvmStatic
     fun getGroupMemberList(pluginId: Int, group: Long): String {
-        return getGroupMemberList(group)
+        return MiraiBridge.getGroupMemberList(pluginId, group)
     }
 
     @JvmStatic
@@ -269,17 +250,17 @@ object Bridge {
         fbType: Int,
         reason: String
     ): Int {
-        return setGroupAddRequest(requestId, reqType, fbType, reason)
+        return MiraiBridge.setGroupAddRequest(pluginId, requestId, reqType, fbType, reason)
     }
 
     @JvmStatic
     fun setFriendAddRequest(pluginId: Int, requestId: String, type: Int, remark: String): Int {
-        return setFriendAddRequest(requestId, type, remark)
+        return MiraiBridge.setFriendAddRequest(pluginId, requestId, type, remark)
     }
 
     @JvmStatic
     fun getStrangerInfo(pluginId: Int, account: Long, cache: Boolean): String {
-        return getStrangerInfo(account)
+        return MiraiBridge.getStrangerInfo(pluginId, account)
     }
 
     // Placeholder methods which mirai hasn't supported yet
@@ -341,6 +322,6 @@ object Bridge {
 
     @JvmStatic
     fun quoteMessage(pluginId: Int, msgId: Int, msg: String): Int {
-        return quoteMessage(msgId, msg)
+        return MiraiBridge.quoteMessage(pluginId, msgId, msg)
     }
 }
