@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,4
- PRODUCTVERSION 1,2,0,4
+ FILEVERSION 1,3,0,5
+ PRODUCTVERSION 1,3,0,5
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "iTX Technologies"
             VALUE "FileDescription", "Mirai Native Bridge"
-            VALUE "FileVersion", "1.2.0.4"
+            VALUE "FileVersion", "1.3.0.5"
             VALUE "InternalName", "CQP.dll"
             VALUE "LegalCopyright", "Copyright (C) 2020 iTX Technologies"
             VALUE "OriginalFilename", "CQP.dll"
             VALUE "ProductName", "Mirai Native Bridge"
-            VALUE "ProductVersion", "1.2.0.4"
+            VALUE "ProductVersion", "1.3.0.5"
         END
     END
     BLOCK "VarFileInfo"
