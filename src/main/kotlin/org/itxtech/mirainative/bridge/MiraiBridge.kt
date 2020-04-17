@@ -67,7 +67,6 @@ object MiraiBridge {
         return false
     }
 
-    @JvmStatic
     fun quoteMessage(pluginId: Int, msgId: Int, message: String): Int {
         if (isLegalCall(pluginId)) {
             val internalId = CacheManager.nextId()
@@ -96,7 +95,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun sendPrivateMessage(pluginId: Int, id: Long, message: String): Int {
         if (isLegalCall(pluginId)) {
             val internalId = CacheManager.nextId()
@@ -111,7 +109,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun sendGroupMessage(pluginId: Int, id: Long, message: String): Int {
         if (isLegalCall(pluginId)) {
             val internalId = CacheManager.nextId()
@@ -126,7 +123,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun setGroupBan(pluginId: Int, groupId: Long, memberId: Long, duration: Int): Int {
         if (isLegalCall(pluginId)) {
             MiraiNative.launch {
@@ -140,7 +136,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun setGroupCard(pluginId: Int, groupId: Long, memberId: Long, card: String): Int {
         if (isLegalCall(pluginId)) {
             MiraiNative.bot.getGroup(groupId)[memberId].nameCard = card
@@ -148,7 +143,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun setGroupKick(pluginId: Int, groupId: Long, memberId: Long): Int {
         if (isLegalCall(pluginId)) {
             MiraiNative.launch {
@@ -158,7 +152,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun setGroupLeave(pluginId: Int, groupId: Long): Int {
         if (isLegalCall(pluginId)) {
             MiraiNative.launch {
@@ -168,7 +161,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: String, duration: Long): Int {
         if (isLegalCall(pluginId)) {
             MiraiNative.bot.getGroup(group)[member].specialTitle = title
@@ -176,7 +168,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun setGroupWholeBan(pluginId: Int, group: Long, enable: Boolean): Int {
         if (isLegalCall(pluginId)) {
             MiraiNative.bot.getGroup(group).settings.isMuteAll = enable
@@ -184,7 +175,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun getStrangerInfo(pluginId: Int, account: Long): String {
         if (isLegalCall(pluginId)) {
             val m = CacheManager.findMember(account) ?: return ""
@@ -198,7 +188,6 @@ object MiraiBridge {
         return ""
     }
 
-    @JvmStatic
     fun getFriendList(pluginId: Int): String {
         if (isLegalCall(pluginId)) {
             val list = MiraiNative.bot.friends
@@ -217,7 +206,6 @@ object MiraiBridge {
         return ""
     }
 
-    @JvmStatic
     fun getGroupInfo(pluginId: Int, id: Long): String {
         if (isLegalCall(pluginId)) {
             val info = MiraiNative.bot.getGroupOrNull(id)
@@ -234,7 +222,6 @@ object MiraiBridge {
         return ""
     }
 
-    @JvmStatic
     fun getGroupList(pluginId: Int): String {
         if (isLegalCall(pluginId)) {
             val list = MiraiNative.bot.groups
@@ -251,7 +238,6 @@ object MiraiBridge {
         return ""
     }
 
-    @JvmStatic
     fun getGroupMemberInfo(pluginId: Int, groupId: Long, memberId: Long): String {
         if (isLegalCall(pluginId)) {
             val member = MiraiNative.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
@@ -262,7 +248,6 @@ object MiraiBridge {
         return ""
     }
 
-    @JvmStatic
     fun getGroupMemberList(pluginId: Int, groupId: Long): String {
         if (isLegalCall(pluginId)) {
             val group = MiraiNative.bot.getGroupOrNull(groupId) ?: return ""
@@ -278,7 +263,6 @@ object MiraiBridge {
         return ""
     }
 
-    @JvmStatic
     fun setGroupAddRequest(pluginId: Int, requestId: String, reqType: Int, type: Int, reason: String): Int {
         if (isLegalCall(pluginId)) {
             MiraiNative.nativeLaunch {
@@ -294,7 +278,6 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun setFriendAddRequest(pluginId: Int, requestId: String, type: Int, remark: String): Int {
         if (isLegalCall(pluginId)) {
             MiraiNative.nativeLaunch {
@@ -309,22 +292,18 @@ object MiraiBridge {
         return 0
     }
 
-    @JvmStatic
     fun addLog(pluginId: Int, priority: Int, type: String, content: String) {
         NativeLoggerHelper.log(PluginManager.plugins[pluginId]!!, priority, type, content)
     }
 
-    @JvmStatic
     fun getPluginDataDir(pluginId: Int): String {
         return PluginManager.plugins[pluginId]!!.appDir.absolutePath + File.separatorChar
     }
 
-    @JvmStatic
     fun getLoginQQ(pluginId: Int): Long {
         return if (isLegalCall(pluginId)) MiraiNative.bot.id else 0
     }
 
-    @JvmStatic
     fun getLoginNick(pluginId: Int): String {
         return if (isLegalCall(pluginId)) MiraiNative.bot.nick else ""
     }

@@ -27,8 +27,8 @@ package org.itxtech.mirainative.util
 import org.itxtech.mirainative.plugin.NativePlugin
 
 object NpmHelper {
-    fun state(p: NativePlugin): String {
-        return "状态：" + (if (p.enabled) "已启用 " else "已禁用 ") + (if (p.loaded) "已加载" else "已卸载")
+    fun state(p: NativePlugin, h: Boolean = true): String {
+        return (if (h) " 状态：" else "") + (if (p.enabled) "已启用 " else "已禁用 ") + (if (p.loaded) "已加载" else "已卸载")
     }
 
     fun name(p: NativePlugin): String {
@@ -39,7 +39,7 @@ object NpmHelper {
         val d = StringBuilder()
         val i = p.pluginInfo
         d.appendln("标识符：" + p.identifier)
-        d.appendln("状态：" + state(p))
+        d.appendln("状态：" + state(p, false))
         if (i == null) {
             d.appendln("Id：" + p.id + " （JSON文件缺失）")
             d.appendln("CQ API：" + p.api)

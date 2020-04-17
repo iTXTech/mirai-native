@@ -41,13 +41,14 @@ import java.io.File
 object PluginManager {
     private var pluginId = atomic(0)
     var plugins = hashMapOf<Int, NativePlugin>()
+    private val pl: File by lazy { File(MiraiNative.dataFolder.absolutePath + File.separatorChar + "plugins").also { it.mkdirs() } }
 
     fun loadPlugins() {
         if (!MiraiNative.dataFolder.isDirectory) {
             MiraiNative.logger.error("数据文件夹不是一个文件夹！" + MiraiNative.dataFolder.absolutePath)
         } else {
             MiraiNative.nativeLaunch {
-                MiraiNative.dataFolder.listFiles()?.forEach { file ->
+                pl.listFiles()?.forEach { file ->
                     if (file.isFile && file.absolutePath.endsWith("dll") && !file.absolutePath.endsWith("CQP.dll")) {
                         loadPlugin(file)
                     }
