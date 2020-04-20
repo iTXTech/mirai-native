@@ -383,7 +383,7 @@ internal object NativeLoggerHelper {
     }
 
     fun log(plugin: NativePlugin, priority: Int, type: String, content: String) {
-        var c = "[NP " + plugin.identifier
+        var c = "[" + plugin.identifier
         if ("" != type) {
             c += " $type"
         }

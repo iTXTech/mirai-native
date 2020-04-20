@@ -29,7 +29,7 @@ import net.mamoe.mirai.message.data.buildXmlMessage
 import org.itxtech.mirainative.MiraiNative
 
 object XmlMessageHelper {
-    fun share(u: String, title: String?, content: String?, image: String?) = buildXmlMessage {
+    fun share(u: String, title: String?, content: String?, image: String?) = buildXmlMessage(60) {
         templateId = 12345
         serviceId = 1
         action = "web"
@@ -52,7 +52,7 @@ object XmlMessageHelper {
     fun contactQQ(id: Long): XmlMessage {
         val nick = MiraiNative.bot.getFriend(id).nick
         return XmlMessage(
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+            60, "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                     "<msg templateID=\"12345\" action=\"plugin\" p_actionData=\"AppCmd://OpenContactInfo/?uin=$id\" " +
                     "brief=\"推荐了$nick\" serviceID=\"14\" " +
                     "i_actionData=\"mqqapi://card/show_pslcard?src_type=internal&amp;source=sharecard&amp;version=1&amp;uin=$id\" " +
@@ -70,7 +70,7 @@ object XmlMessageHelper {
         val founder = "未知创建人"
         val url = "https://github.com/mamoe/mirai"
         return XmlMessage(
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+            60, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                     "<msg templateID=\"-1\" action=\"web\" brief=\"推荐了${group.name}群\" serviceID=\"15\"" +
                     " i_actionData=\"group:$id\" url=\"$url\"><item layout=\"0\" mode=\"1\"><summary>推荐群</summary><hr/></item>" +
                     "<item layout=\"2\" mode=\"1\"><picture cover=\"http://p.qlogo.cn/gh/$id/$id/100\"/>" +
