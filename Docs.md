@@ -42,7 +42,7 @@
 - [x] `CQ_getGroupList`
 - [x] `CQ_getGroupMemberInfoV2` `[Incomplete]`
 - [x] `CQ_getGroupMemberList` `[Incomplete]`
-- [x] `CQ_getImage` `[Placeholder]`
+- [x] `CQ_getImage`
 - [x] `CQ_getLoginNick`
 - [x] `CQ_getLoginQQ`
 - [x] `CQ_getRecordV2` `[Placeholder]`

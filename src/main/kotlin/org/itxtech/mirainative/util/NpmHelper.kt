@@ -28,7 +28,7 @@ import org.itxtech.mirainative.plugin.NativePlugin
 
 object NpmHelper {
     fun state(p: NativePlugin, h: Boolean = true): String {
-        return (if (h) " 状态：" else "") + (if (p.enabled) "已启用 " else "已禁用 ") + (if (p.loaded) "已加载" else "已卸载")
+        return (if (h) "状态：" else "") + (if (p.enabled) "已启用 " else "已禁用 ") + (if (p.loaded) "已加载" else "已卸载")
     }
 
     fun name(p: NativePlugin): String {

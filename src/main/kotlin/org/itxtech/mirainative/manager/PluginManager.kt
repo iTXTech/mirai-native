@@ -177,7 +177,7 @@ object PluginManager {
                             if (p.pluginInfo != null) {
                                 appendMessage(
                                     "Id：" + p.id + " 标识符：" + p.identifier + " 名称：" + p.pluginInfo!!.name +
-                                            " 版本：" + p.pluginInfo!!.version + NpmHelper.state(p)
+                                            " 版本：" + p.pluginInfo!!.version + " " + NpmHelper.state(p)
 
                                 )
                             } else {

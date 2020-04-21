@@ -24,10 +24,17 @@
 
 package org.itxtech.mirainative.bridge
 
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.isSuccess
 import io.ktor.util.InternalAPI
+import io.ktor.util.cio.writeChannel
 import io.ktor.util.decodeBase64Bytes
 import io.ktor.util.encodeBase64
+import io.ktor.utils.io.copyAndClose
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.io.core.*
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
@@ -35,8 +42,7 @@ import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.getFriendOrNull
 import net.mamoe.mirai.getGroupOrNull
-import net.mamoe.mirai.message.data.isAboutGroup
-import net.mamoe.mirai.message.data.quote
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiLogger
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
@@ -46,29 +52,38 @@ import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
 import org.itxtech.mirainative.plugin.NativePlugin
 import java.io.File
+import java.math.BigInteger
 import java.nio.charset.Charset
+import java.security.MessageDigest
 import kotlin.io.use
 import kotlin.text.toByteArray
 
 @OptIn(InternalAPI::class)
 object MiraiBridge {
+    private fun logError(id: Int, e: String, err: Exception? = null) {
+        val plugin = PluginManager.plugins[id]
+        val info = if (plugin == null) {
+            e.replace("%0", "$id (Not Found)")
+        } else {
+            e.replace("%0", "\"${plugin.identifier}\" (${plugin.file.name}) (ID: ${plugin.id})")
+        }
+        if (err == null) {
+            MiraiNative.logger.error(Exception(info))
+        } else {
+            MiraiNative.logger.error(info, err)
+        }
+    }
 
-    class BotNotLoginException(id: Int, plugin: NativePlugin?) :
-        Exception(
-            if (plugin == null) "Plugin $id not found!" else
-                "Plugin \"${plugin.identifier}\" (${plugin.file.name}) (ID: ${plugin.id}) calls native API before the bot logs in."
-        )
-
-    private fun isLegalCall(pluginId: Int): Boolean {
+    private fun verifyCall(pluginId: Int): Boolean {
         if (MiraiNative.botOnline) {
             return true
         }
-        MiraiNative.logger.error(BotNotLoginException(pluginId, PluginManager.plugins[pluginId]))
+        logError(pluginId, "Plugin %0 calls native API before the bot logs in.")
         return false
     }
 
     fun quoteMessage(pluginId: Int, msgId: Int, message: String): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val internalId = CacheManager.nextId()
             MiraiNative.launch {
                 val src = CacheManager.getMessage(msgId)
@@ -96,7 +111,7 @@ object MiraiBridge {
     }
 
     fun sendPrivateMessage(pluginId: Int, id: Long, message: String): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val internalId = CacheManager.nextId()
             MiraiNative.launch {
                 val contact = MiraiNative.bot.getFriendOrNull(id) ?: CacheManager.findMember(id)
@@ -110,7 +125,7 @@ object MiraiBridge {
     }
 
     fun sendGroupMessage(pluginId: Int, id: Long, message: String): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val internalId = CacheManager.nextId()
             MiraiNative.launch {
                 val contact = MiraiNative.bot.getGroup(id)
@@ -124,7 +139,7 @@ object MiraiBridge {
     }
 
     fun setGroupBan(pluginId: Int, groupId: Long, memberId: Long, duration: Int): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             MiraiNative.launch {
                 if (duration == 0) {
                     MiraiNative.bot.getGroup(groupId)[memberId].unmute()
@@ -137,14 +152,14 @@ object MiraiBridge {
     }
 
     fun setGroupCard(pluginId: Int, groupId: Long, memberId: Long, card: String): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             MiraiNative.bot.getGroup(groupId)[memberId].nameCard = card
         }
         return 0
     }
 
     fun setGroupKick(pluginId: Int, groupId: Long, memberId: Long): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             MiraiNative.launch {
                 MiraiNative.bot.getGroup(groupId)[memberId].kick()
             }
@@ -153,7 +168,7 @@ object MiraiBridge {
     }
 
     fun setGroupLeave(pluginId: Int, groupId: Long): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             MiraiNative.launch {
                 MiraiNative.bot.getGroup(groupId).quit()
             }
@@ -162,21 +177,21 @@ object MiraiBridge {
     }
 
     fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: String, duration: Long): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             MiraiNative.bot.getGroup(group)[member].specialTitle = title
         }
         return 0
     }
 
     fun setGroupWholeBan(pluginId: Int, group: Long, enable: Boolean): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             MiraiNative.bot.getGroup(group).settings.isMuteAll = enable
         }
         return 0
     }
 
     fun getStrangerInfo(pluginId: Int, account: Long): String {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val m = CacheManager.findMember(account) ?: return ""
             return buildPacket {
                 writeLong(m.id)
@@ -189,7 +204,7 @@ object MiraiBridge {
     }
 
     fun getFriendList(pluginId: Int): String {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val list = MiraiNative.bot.friends
             return buildPacket {
                 writeInt(list.size)
@@ -207,7 +222,7 @@ object MiraiBridge {
     }
 
     fun getGroupInfo(pluginId: Int, id: Long): String {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val info = MiraiNative.bot.getGroupOrNull(id)
             if (info != null) {
                 return buildPacket {
@@ -223,7 +238,7 @@ object MiraiBridge {
     }
 
     fun getGroupList(pluginId: Int): String {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val list = MiraiNative.bot.groups
             return buildPacket {
                 writeInt(list.size)
@@ -239,7 +254,7 @@ object MiraiBridge {
     }
 
     fun getGroupMemberInfo(pluginId: Int, groupId: Long, memberId: Long): String {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val member = MiraiNative.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
             return buildPacket {
                 writeMember(member)
@@ -249,7 +264,7 @@ object MiraiBridge {
     }
 
     fun getGroupMemberList(pluginId: Int, groupId: Long): String {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             val group = MiraiNative.bot.getGroupOrNull(groupId) ?: return ""
             return buildPacket {
                 writeInt(group.members.size)
@@ -264,7 +279,7 @@ object MiraiBridge {
     }
 
     fun setGroupAddRequest(pluginId: Int, requestId: String, reqType: Int, type: Int, reason: String): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             MiraiNative.nativeLaunch {
                 (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
                     when (type) {//1通过，2拒绝，3忽略
@@ -279,7 +294,7 @@ object MiraiBridge {
     }
 
     fun setFriendAddRequest(pluginId: Int, requestId: String, type: Int, remark: String): Int {
-        if (isLegalCall(pluginId)) {
+        if (verifyCall(pluginId)) {
             MiraiNative.nativeLaunch {
                 (CacheManager.getEvent(requestId) as? NewFriendRequestEvent)?.apply {
                     when (type) {//1通过，2拒绝
@@ -292,6 +307,32 @@ object MiraiBridge {
         return 0
     }
 
+    fun getImage(pluginId: Int, image: String): String = runBlocking {
+        if (verifyCall(pluginId)) {
+            try {
+                val img = image.replace(".mnimg", "")
+                val u = getImageUrl(img)
+                val md = MessageDigest.getInstance("MD5")
+                val file = File(
+                    MiraiNative.imageDataPath.absolutePath + File.separatorChar +
+                            BigInteger(1, md.digest(img.toByteArray())).toString(16)
+                                .padStart(32, '0') + "." + img.substringAfterLast(".")
+                )
+                if (u != "") {
+                    val client = HttpClient()
+                    val response = client.get<HttpResponse>(u)
+                    if (response.status.isSuccess()) {
+                        response.content.copyAndClose(file.writeChannel())
+                        return@runBlocking file.absolutePath
+                    }
+                }
+            } catch (e: Exception) {
+                logError(pluginId, "Error occurred when plugin %0 downloading image $image", e)
+            }
+        }
+        return@runBlocking ""
+    }
+
     fun addLog(pluginId: Int, priority: Int, type: String, content: String) {
         NativeLoggerHelper.log(PluginManager.plugins[pluginId]!!, priority, type, content)
     }
@@ -301,11 +342,11 @@ object MiraiBridge {
     }
 
     fun getLoginQQ(pluginId: Int): Long {
-        return if (isLegalCall(pluginId)) MiraiNative.bot.id else 0
+        return if (verifyCall(pluginId)) MiraiNative.bot.id else 0
     }
 
     fun getLoginNick(pluginId: Int): String {
-        return if (isLegalCall(pluginId)) MiraiNative.bot.nick else ""
+        return if (verifyCall(pluginId)) MiraiNative.bot.nick else ""
     }
 
     fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {
@@ -315,6 +356,13 @@ object MiraiBridge {
         fwe.data = pk.readString()
         fwe.unit = pk.readString()
         fwe.color = pk.readInt()
+    }
+
+    private fun getImageUrl(id: String) = when (val image = Image(id)) {
+        is FriendImage -> "http://c2cpicdw.qpic.cn/offpic_new/0/${image.imageId}/0"
+        is GroupImage -> "http://gchat.qpic.cn/gchatpic_new/0/0-0-${image.imageId.substringAfter('{')
+            .substringBefore('}').replace("-", "").toUpperCase()}/0"
+        else -> ""
     }
 
     private fun ByteReadPacket.readString(): String {
@@ -331,7 +379,6 @@ object MiraiBridge {
             writePacket(it)
             return length.toInt()
         }
-
 
     private fun BytePacketBuilder.writeString(string: String) {
         val b = string.toByteArray(Charset.forName("GB18030"))
@@ -383,7 +430,7 @@ internal object NativeLoggerHelper {
     }
 
     fun log(plugin: NativePlugin, priority: Int, type: String, content: String) {
-        var c = "[" + plugin.identifier
+        var c = "[" + plugin.getName()
         if ("" != type) {
             c += " $type"
         }

@@ -46,6 +46,7 @@ object MiraiNative : PluginBase() {
     val bot: Bot by lazy { Bot.instances.first().get()!! }
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
+    val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
 
     private fun checkNativeLibs() {
         logger.info("正在加载 ${dll.absolutePath}")
@@ -84,7 +85,6 @@ object MiraiNative : PluginBase() {
     }
 
     private fun initDataDir() {
-        File("data" + File.separatorChar + "image").mkdirs()
         File(
             System.getProperty("java.library.path")
                 .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + "image"

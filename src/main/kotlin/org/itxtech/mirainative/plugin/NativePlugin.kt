@@ -68,6 +68,10 @@ data class NativePlugin(val file: File, val id: Int) {
         }
     }
 
+    fun getName(): String {
+        return pluginInfo?.name ?: identifier
+    }
+
     fun setInfo(i: String) {
         val parts = i.split(",")
         if (parts.size == 2) {
