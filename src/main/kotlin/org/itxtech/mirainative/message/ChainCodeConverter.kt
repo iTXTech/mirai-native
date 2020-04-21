@@ -97,16 +97,23 @@ object ChainCodeConverter {
                     return PlainText(String(Character.toChars(args["id"]!!.toInt())))
                 }
                 "image" -> {
+                    var image: Image? = null
                     if (args.containsKey("file")) {
                         if (args["file"]!!.endsWith(".mnimg")) {
-                            return Image(args["file"]!!.replace(".mnimg", ""))
+                            image = Image(args["file"]!!.replace(".mnimg", ""))
                         }
                         val file = MiraiNative.getDataFile("image", args["file"]!!)
                         if (file != null) {
-                            return contact!!.uploadImage(file)
+                            image = contact!!.uploadImage(file)
                         }
                     } else if (args.containsKey("url")) {
-                        return withContext(Dispatchers.IO) { contact!!.uploadImage(URL(args["url"]!!)) }
+                        image = withContext(Dispatchers.IO) { contact!!.uploadImage(URL(args["url"]!!)) }
+                    }
+                    if (image != null) {
+                        if (args["type"] == "flash") {
+                            return image.flash()
+                        }
+                        return image
                     }
                 }
                 "share" -> {
@@ -152,12 +159,12 @@ object ChainCodeConverter {
     fun chainToCode(chain: MessageChain): String {
         return chain.joinToString(separator = "") {
             when (it) {
-                is MessageMetadata -> ""
                 is At -> "[CQ:at,qq=${it.target}]"
                 is AtAll -> "[CQ:at,qq=all]"
                 is PlainText -> it.stringValue.escape(false)
                 is Face -> "[CQ:face,id=${it.id}]"
                 is Image -> "[CQ:image,file=${it.imageId}.mnimg]" // Real file not supported
+                is RichMessage -> "[CQ:rich,data=${it.content}]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
             }
         }

@@ -47,11 +47,11 @@
 - [x] `CQ_getLoginQQ`
 - [x] `CQ_getRecordV2` `[Placeholder]`
 - [x] `CQ_getStrangerInfo` `[Incomplete]`
-- [x] `CQ_sendDiscussMsg` `[Placeholder]`
+- [x] `CQ_sendDiscussMsg` `[Placeholder]` `[Won't Implement]`
 - [x] `CQ_sendGroupMsg`
 - [x] `CQ_sendLikeV2` `[Placeholder]` `[Won't Implement]`
 - [x] `CQ_sendPrivateMsg`
-- [x] `CQ_setDiscussLeave` `[Placeholder]`
+- [x] `CQ_setDiscussLeave` `[Placeholder]` `[Won't Implement]`
 - [x] `CQ_setFatal`
 - [x] `CQ_setFriendAddRequest`
 - [x] `CQ_setGroupAddRequestV2`
@@ -79,7 +79,7 @@
 - [x] `_eventDisable`
 - [x] `_eventStartup`
 - [x] `_eventExit`
-- [ ] `_eventDiscussMsg`
+- [ ] `_eventDiscussMsg` `[Won't Implement]`
 - [x] `_eventFriend_Add`
 - [x] `_eventGroupMsg`
 - [ ] `_eventGroupUpload`

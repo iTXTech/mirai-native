@@ -281,16 +281,6 @@ object Bridge {
     }
 
     @JvmStatic
-    fun sendDiscussMessage(pluginId: Int, group: Long, msg: String): Int {
-        return 0
-    }
-
-    @JvmStatic
-    fun setDiscussLeave(pluginId: Int, group: Long): Int {
-        return 0
-    }
-
-    @JvmStatic
     fun setGroupAdmin(pluginId: Int, group: Long, account: Long, admin: Boolean): Int {
         //true => set, false => revoke
         return 0
@@ -316,6 +306,16 @@ object Bridge {
     @JvmStatic
     fun getCsrfToken(pluginId: Int): String {
         return ""
+    }
+
+    @JvmStatic
+    fun sendDiscussMessage(pluginId: Int, group: Long, msg: String): Int {
+        return 0
+    }
+
+    @JvmStatic
+    fun setDiscussLeave(pluginId: Int, group: Long): Int {
+        return 0
     }
 
     // Mirai Unique Methods
