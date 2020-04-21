@@ -82,204 +82,177 @@ object MiraiBridge {
         return false
     }
 
-    fun quoteMessage(pluginId: Int, msgId: Int, message: String): Int {
+    private inline fun <reified T> call(pluginId: Int, defaultValue: T, errMsg: String = "", block: () -> T): T {
         if (verifyCall(pluginId)) {
-            val internalId = CacheManager.nextId()
-            MiraiNative.launch {
-                val src = CacheManager.getMessage(msgId)
-                if (src != null) {
-                    if (!src.isAboutGroup()) {
-                        if (src.fromId != MiraiNative.bot.id) {
-                            val f = MiraiNative.bot.getFriend(src.fromId)
-                            f.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, f)).apply {
-                                CacheManager.cacheMessage(source, internalId)
-                            }
-                        }
-                    } else {
-                        val group = MiraiNative.bot.getGroup(src.targetId)
-                        if (src.fromId != MiraiNative.bot.id) {
-                            group.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, group)).apply {
-                                CacheManager.cacheMessage(source, internalId)
-                            }
+            try {
+                return block()
+            } catch (e: Exception) {
+                logError(pluginId, errMsg, e)
+            }
+        }
+        return defaultValue
+    }
+
+    fun quoteMessage(pluginId: Int, msgId: Int, message: String) = call(pluginId, 0) {
+        val internalId = CacheManager.nextId()
+        MiraiNative.launch {
+            val src = CacheManager.getMessage(msgId)
+            if (src != null) {
+                if (!src.isAboutGroup()) {
+                    if (src.fromId != MiraiNative.bot.id) {
+                        val f = MiraiNative.bot.getFriend(src.fromId)
+                        f.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, f)).apply {
+                            CacheManager.cacheMessage(source, internalId)
                         }
                     }
-                }
-            }
-            return internalId
-        }
-        return 0
-    }
-
-    fun sendPrivateMessage(pluginId: Int, id: Long, message: String): Int {
-        if (verifyCall(pluginId)) {
-            val internalId = CacheManager.nextId()
-            MiraiNative.launch {
-                val contact = MiraiNative.bot.getFriendOrNull(id) ?: CacheManager.findMember(id)
-                contact?.sendMessage(ChainCodeConverter.codeToChain(message, contact))?.apply {
-                    CacheManager.cacheMessage(source, internalId)
-                }
-            }
-            return internalId
-        }
-        return 0
-    }
-
-    fun sendGroupMessage(pluginId: Int, id: Long, message: String): Int {
-        if (verifyCall(pluginId)) {
-            val internalId = CacheManager.nextId()
-            MiraiNative.launch {
-                val contact = MiraiNative.bot.getGroup(id)
-                contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
-                    CacheManager.cacheMessage(source, internalId)
-                }
-            }
-            return internalId
-        }
-        return 0
-    }
-
-    fun setGroupBan(pluginId: Int, groupId: Long, memberId: Long, duration: Int): Int {
-        if (verifyCall(pluginId)) {
-            MiraiNative.launch {
-                if (duration == 0) {
-                    MiraiNative.bot.getGroup(groupId)[memberId].unmute()
                 } else {
-                    MiraiNative.bot.getGroup(groupId)[memberId].mute(duration)
+                    val group = MiraiNative.bot.getGroup(src.targetId)
+                    if (src.fromId != MiraiNative.bot.id) {
+                        group.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, group)).apply {
+                            CacheManager.cacheMessage(source, internalId)
+                        }
+                    }
                 }
             }
         }
-        return 0
+        return internalId
     }
 
-    fun setGroupCard(pluginId: Int, groupId: Long, memberId: Long, card: String): Int {
-        if (verifyCall(pluginId)) {
-            MiraiNative.bot.getGroup(groupId)[memberId].nameCard = card
+    fun sendPrivateMessage(pluginId: Int, id: Long, message: String) = call(pluginId, 0) {
+        val internalId = CacheManager.nextId()
+        MiraiNative.launch {
+            val contact = MiraiNative.bot.getFriendOrNull(id) ?: CacheManager.findMember(id)
+            contact?.sendMessage(ChainCodeConverter.codeToChain(message, contact))?.apply {
+                CacheManager.cacheMessage(source, internalId)
+            }
         }
-        return 0
+        return internalId
     }
 
-    fun setGroupKick(pluginId: Int, groupId: Long, memberId: Long): Int {
-        if (verifyCall(pluginId)) {
-            MiraiNative.launch {
-                MiraiNative.bot.getGroup(groupId)[memberId].kick()
+    fun sendGroupMessage(pluginId: Int, id: Long, message: String) = call(pluginId, 0) {
+        val internalId = CacheManager.nextId()
+        MiraiNative.launch {
+            val contact = MiraiNative.bot.getGroup(id)
+            contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
+                CacheManager.cacheMessage(source, internalId)
+            }
+        }
+        return internalId
+    }
+
+    fun setGroupBan(pluginId: Int, groupId: Long, memberId: Long, duration: Int) = call(pluginId, 0) {
+        MiraiNative.launch {
+            if (duration == 0) {
+                MiraiNative.bot.getGroup(groupId)[memberId].unmute()
+            } else {
+                MiraiNative.bot.getGroup(groupId)[memberId].mute(duration)
             }
         }
         return 0
     }
 
-    fun setGroupLeave(pluginId: Int, groupId: Long): Int {
-        if (verifyCall(pluginId)) {
-            MiraiNative.launch {
-                MiraiNative.bot.getGroup(groupId).quit()
-            }
+    fun setGroupCard(pluginId: Int, groupId: Long, memberId: Long, card: String) = call(pluginId, 0) {
+        MiraiNative.bot.getGroup(groupId)[memberId].nameCard = card
+        return 0
+    }
+
+    fun setGroupKick(pluginId: Int, groupId: Long, memberId: Long) = call(pluginId, 0) {
+        MiraiNative.launch {
+            MiraiNative.bot.getGroup(groupId)[memberId].kick()
         }
         return 0
     }
 
-    fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: String, duration: Long): Int {
-        if (verifyCall(pluginId)) {
+    fun setGroupLeave(pluginId: Int, groupId: Long) = call(pluginId, 0) {
+        MiraiNative.launch {
+            MiraiNative.bot.getGroup(groupId).quit()
+        }
+        return 0
+    }
+
+    fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: String, duration: Long) =
+        call(pluginId, 0) {
             MiraiNative.bot.getGroup(group)[member].specialTitle = title
+            return 0
         }
+
+    fun setGroupWholeBan(pluginId: Int, group: Long, enable: Boolean) = call(pluginId, 0) {
+        MiraiNative.bot.getGroup(group).settings.isMuteAll = enable
         return 0
     }
 
-    fun setGroupWholeBan(pluginId: Int, group: Long, enable: Boolean): Int {
-        if (verifyCall(pluginId)) {
-            MiraiNative.bot.getGroup(group).settings.isMuteAll = enable
-        }
-        return 0
+    fun getStrangerInfo(pluginId: Int, account: Long) = call(pluginId, "") {
+        val m = CacheManager.findMember(account) ?: return ""
+        return buildPacket {
+            writeLong(m.id)
+            writeString(m.nick)
+            writeInt(0) // TODO: 性别
+            writeInt(0) // TODO: 年龄
+        }.readBytes().encodeBase64()
     }
 
-    fun getStrangerInfo(pluginId: Int, account: Long): String {
-        if (verifyCall(pluginId)) {
-            val m = CacheManager.findMember(account) ?: return ""
-            return buildPacket {
-                writeLong(m.id)
-                writeString(m.nick)
-                writeInt(0) // TODO: 性别
-                writeInt(0) // TODO: 年龄
-            }.readBytes().encodeBase64()
-        }
-        return ""
-    }
-
-    fun getFriendList(pluginId: Int): String {
-        if (verifyCall(pluginId)) {
-            val list = MiraiNative.bot.friends
-            return buildPacket {
-                writeInt(list.size)
-                list.forEach { qq ->
-                    writeShortLVPacket {
-                        writeLong(qq.id)
-                        writeString(qq.nick)
-                        //TODO: 备注
-                        writeString("")
-                    }
+    fun getFriendList(pluginId: Int) = call(pluginId, "") {
+        val list = MiraiNative.bot.friends
+        return buildPacket {
+            writeInt(list.size)
+            list.forEach { qq ->
+                writeShortLVPacket {
+                    writeLong(qq.id)
+                    writeString(qq.nick)
+                    //TODO: 备注
+                    writeString("")
                 }
-            }.readBytes().encodeBase64()
-        }
-        return ""
-    }
-
-    fun getGroupInfo(pluginId: Int, id: Long): String {
-        if (verifyCall(pluginId)) {
-            val info = MiraiNative.bot.getGroupOrNull(id)
-            if (info != null) {
-                return buildPacket {
-                    writeLong(id)
-                    writeString(info.name)
-                    writeInt(info.members.size + 1)
-                    //TODO: 上限
-                    writeInt(1000)
-                }.readBytes().encodeBase64()
             }
-        }
-        return ""
+        }.readBytes().encodeBase64()
     }
 
-    fun getGroupList(pluginId: Int): String {
-        if (verifyCall(pluginId)) {
-            val list = MiraiNative.bot.groups
-            return buildPacket {
-                writeInt(list.size)
-                list.forEach {
-                    writeShortLVPacket {
-                        writeLong(it.id)
-                        writeString(it.name)
-                    }
+    fun getGroupInfo(pluginId: Int, id: Long) = call(pluginId, "") {
+        val info = MiraiNative.bot.getGroupOrNull(id)
+        return if (info != null) {
+            buildPacket {
+                writeLong(id)
+                writeString(info.name)
+                writeInt(info.members.size + 1)
+                //TODO: 上限
+                writeInt(1000)
+            }.readBytes().encodeBase64()
+        } else ""
+    }
+
+    fun getGroupList(pluginId: Int) = call(pluginId, "") {
+        val list = MiraiNative.bot.groups
+        return buildPacket {
+            writeInt(list.size)
+            list.forEach {
+                writeShortLVPacket {
+                    writeLong(it.id)
+                    writeString(it.name)
                 }
-            }.readBytes().encodeBase64()
-        }
-        return ""
+            }
+        }.readBytes().encodeBase64()
     }
 
-    fun getGroupMemberInfo(pluginId: Int, groupId: Long, memberId: Long): String {
-        if (verifyCall(pluginId)) {
-            val member = MiraiNative.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
-            return buildPacket {
-                writeMember(member)
-            }.readBytes().encodeBase64()
-        }
-        return ""
+    fun getGroupMemberInfo(pluginId: Int, groupId: Long, memberId: Long) = call(pluginId, "") {
+        val member = MiraiNative.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
+        return buildPacket {
+            writeMember(member)
+        }.readBytes().encodeBase64()
     }
 
-    fun getGroupMemberList(pluginId: Int, groupId: Long): String {
-        if (verifyCall(pluginId)) {
-            val group = MiraiNative.bot.getGroupOrNull(groupId) ?: return ""
-            return buildPacket {
-                writeInt(group.members.size)
-                group.members.forEach {
-                    writeShortLVPacket {
-                        writeMember(it)
-                    }
+    fun getGroupMemberList(pluginId: Int, groupId: Long) = call(pluginId, "") {
+        val group = MiraiNative.bot.getGroupOrNull(groupId) ?: return ""
+        return buildPacket {
+            writeInt(group.members.size)
+            group.members.forEach {
+                writeShortLVPacket {
+                    writeMember(it)
                 }
-            }.readBytes().encodeBase64()
-        }
-        return ""
+            }
+        }.readBytes().encodeBase64()
     }
 
-    fun setGroupAddRequest(pluginId: Int, requestId: String, reqType: Int, type: Int, reason: String): Int {
-        if (verifyCall(pluginId)) {
+    fun setGroupAddRequest(pluginId: Int, requestId: String, reqType: Int, type: Int, reason: String) =
+        call(pluginId, 0) {
             MiraiNative.nativeLaunch {
                 (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
                     when (type) {//1通过，2拒绝，3忽略
@@ -289,27 +262,24 @@ object MiraiBridge {
                     }
                 }
             }
+            return 0
         }
-        return 0
-    }
 
-    fun setFriendAddRequest(pluginId: Int, requestId: String, type: Int, remark: String): Int {
-        if (verifyCall(pluginId)) {
-            MiraiNative.nativeLaunch {
-                (CacheManager.getEvent(requestId) as? NewFriendRequestEvent)?.apply {
-                    when (type) {//1通过，2拒绝
-                        1 -> accept()
-                        2 -> reject()
-                    }
+    fun setFriendAddRequest(pluginId: Int, requestId: String, type: Int, remark: String) = call(pluginId, 0) {
+        MiraiNative.nativeLaunch {
+            (CacheManager.getEvent(requestId) as? NewFriendRequestEvent)?.apply {
+                when (type) {//1通过，2拒绝
+                    1 -> accept()
+                    2 -> reject()
                 }
             }
         }
         return 0
     }
 
-    fun getImage(pluginId: Int, image: String): String = runBlocking {
-        if (verifyCall(pluginId)) {
-            try {
+    fun getImage(pluginId: Int, image: String): String =
+        call(pluginId, "", "Error occurred when plugin %0 downloading image $image") {
+            return runBlocking {
                 val img = image.replace(".mnimg", "")
                 val u = getImageUrl(img)
                 val md = MessageDigest.getInstance("MD5")
@@ -326,12 +296,9 @@ object MiraiBridge {
                         return@runBlocking file.absolutePath
                     }
                 }
-            } catch (e: Exception) {
-                logError(pluginId, "Error occurred when plugin %0 downloading image $image", e)
+                return@runBlocking ""
             }
         }
-        return@runBlocking ""
-    }
 
     fun addLog(pluginId: Int, priority: Int, type: String, content: String) {
         NativeLoggerHelper.log(PluginManager.plugins[pluginId]!!, priority, type, content)
@@ -341,12 +308,12 @@ object MiraiBridge {
         return PluginManager.plugins[pluginId]!!.appDir.absolutePath + File.separatorChar
     }
 
-    fun getLoginQQ(pluginId: Int): Long {
-        return if (verifyCall(pluginId)) MiraiNative.bot.id else 0
+    fun getLoginQQ(pluginId: Int) = call(pluginId, 0L) {
+        return MiraiNative.bot.id
     }
 
-    fun getLoginNick(pluginId: Int): String {
-        return if (verifyCall(pluginId)) MiraiNative.bot.nick else ""
+    fun getLoginNick(pluginId: Int) = call(pluginId, "") {
+        return MiraiNative.bot.nick
     }
 
     fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {
