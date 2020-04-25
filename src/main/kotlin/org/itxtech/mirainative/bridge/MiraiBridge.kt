@@ -388,14 +388,14 @@ object MiraiBridge {
 }
 
 internal object NativeLoggerHelper {
-    const val LOG_DEBUG = 0
-    const val LOG_INFO = 10
-    const val LOG_INFO_SUCC = 11
-    const val LOG_INFO_RECV = 12
-    const val LOG_INFO_SEND = 13
-    const val LOG_WARNING = 20
-    const val LOG_ERROR = 21
-    const val LOG_FATAL = 22
+    private const val LOG_DEBUG = 0
+    private const val LOG_INFO = 10
+    private const val LOG_INFO_SUCC = 11
+    private const val LOG_INFO_RECV = 12
+    private const val LOG_INFO_SEND = 13
+    private const val LOG_WARNING = 20
+    private const val LOG_ERROR = 21
+    private const val LOG_FATAL = 22
 
     private fun getLogger(): MiraiLogger {
         return MiraiNative.logger
