@@ -43,7 +43,7 @@ import kotlin.coroutines.ContinuationInterceptor
 
 object MiraiNative : PluginBase() {
     var botOnline = false
-    val bot: Bot by lazy { Bot.instances.first().get()!! }
+    val bot: Bot by lazy { Bot.botInstances.first() }
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }

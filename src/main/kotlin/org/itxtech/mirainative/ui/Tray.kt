@@ -52,6 +52,8 @@ object Tray {
                                     "\n版权所有 (C) 2020 iTX Technologies",
                             "关于 Mirai Native", JOptionPane.INFORMATION_MESSAGE
                         )
+                    } else if (e?.clickCount == 1 && !FloatingWindow.isVisible()) {
+                        FloatingWindow.toggle()
                     }
                 }
             })
@@ -83,7 +85,7 @@ object Tray {
 
             val load = MenuItem("加载 DLL")
             load.addActionListener {
-                val file = JOptionPane.showInputDialog("请输入位于 MiraiNative 目录下的 DLL文件名")
+                val file = JOptionPane.showInputDialog("请输入位于 MiraiNative 目录下的 DLL文件名。")
                 if (file != null) {
                     if (!PluginManager.loadPluginFromFile(file)) {
                         JOptionPane.showMessageDialog(null, "加载 DLL 文件出错 “$file”。", "错误", JOptionPane.ERROR_MESSAGE)

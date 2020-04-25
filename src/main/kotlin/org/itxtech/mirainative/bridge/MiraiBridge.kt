@@ -42,7 +42,10 @@ import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.getFriendOrNull
 import net.mamoe.mirai.getGroupOrNull
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.isAboutGroup
+import net.mamoe.mirai.message.data.queryUrl
+import net.mamoe.mirai.message.data.quote
 import net.mamoe.mirai.utils.MiraiLogger
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
@@ -281,12 +284,12 @@ object MiraiBridge {
         call(pluginId, "", "Error occurred when plugin %0 downloading image $image") {
             return runBlocking {
                 val img = image.replace(".mnimg", "")
-                val u = getImageUrl(img)
+                val u = Image(img).queryUrl()
                 val md = MessageDigest.getInstance("MD5")
                 val file = File(
                     MiraiNative.imageDataPath.absolutePath + File.separatorChar +
                             BigInteger(1, md.digest(img.toByteArray())).toString(16)
-                                .padStart(32, '0') + "." + img.substringAfterLast(".")
+                                .padStart(32, '0') + ".jpg"
                 )
                 if (u != "") {
                     val client = HttpClient()
@@ -323,13 +326,6 @@ object MiraiBridge {
         fwe.data = pk.readString()
         fwe.unit = pk.readString()
         fwe.color = pk.readInt()
-    }
-
-    private fun getImageUrl(id: String) = when (val image = Image(id)) {
-        is FriendImage -> "http://c2cpicdw.qpic.cn/offpic_new/0/${image.imageId}/0"
-        is GroupImage -> "http://gchat.qpic.cn/gchatpic_new/0/0-0-${image.imageId.substringAfter('{')
-            .substringBefore('}').replace("-", "").toUpperCase()}/0"
-        else -> ""
     }
 
     private fun ByteReadPacket.readString(): String {
