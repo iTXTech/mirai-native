@@ -319,6 +319,15 @@ object MiraiBridge {
         return MiraiNative.bot.nick
     }
 
+    fun forwardMessage(pluginId: Int, type: Int, id: Long, strategy: String, msg: String) = call(pluginId, 0) {
+        val contact = if (type == 0) MiraiNative.bot.getFriend(id) else MiraiNative.bot.getGroup(id)
+        val internalId = CacheManager.nextId()
+        MiraiNative.launch {
+            contact.sendMessage(ForwardMessageDecoder.decode(contact, strategy, msg))
+        }
+        return internalId
+    }
+
     fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {
         val pk = ByteReadPacket(
             Bridge.callStringMethod(pluginId, fwe.status.function).decodeBase64Bytes()
@@ -328,7 +337,7 @@ object MiraiBridge {
         fwe.color = pk.readInt()
     }
 
-    private fun ByteReadPacket.readString(): String {
+    fun ByteReadPacket.readString(): String {
         return String(readBytes(readShort().toInt()))
     }
 

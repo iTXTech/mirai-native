@@ -324,4 +324,9 @@ object Bridge {
     fun quoteMessage(pluginId: Int, msgId: Int, msg: String): Int {
         return MiraiBridge.quoteMessage(pluginId, msgId, msg)
     }
+
+    @JvmStatic
+    fun forwardMessage(pluginId: Int, type: Int, id: Long, strategy: String, msg: String): Int {
+        return MiraiBridge.forwardMessage(pluginId, type, id, strategy, msg)
+    }
 }

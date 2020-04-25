@@ -312,9 +312,18 @@ CQAPI(int32_t, mQuoteMessage, 12)(int32_t plugin_id, int32_t msg_id, const char*
 	return result;
 }
 
-/*CQAPI(int32_t, mGroupAnnouncement, 12)(int32_t plugin_id, int64_t group, const char* content)
+CQAPI(int32_t, mForwardMessage, 24)(int32_t plugin_id, int32_t type, int64_t id, const char* strategy, const char* msg)
 {
-}*/
+	auto env = attach_java();
+	auto s = env->NewStringUTF(strategy);
+	auto m = env->NewStringUTF(msg);
+	auto method = env->GetStaticMethodID(bclz, "forwardMessage", "(IIJLjava/lang/String;Ljava/lang/String;)I");
+	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, type, id, s, m);
+	env->DeleteLocalRef(s);
+	env->DeleteLocalRef(m);
+	detach_java();
+	return result;
+}
 
 // CQ APIs
 
