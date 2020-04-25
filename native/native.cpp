@@ -44,6 +44,15 @@ const char* JstringToGb(JNIEnv* env, jstring jstr)
 	return rtn;
 }
 
+jstring UtfToJString(JNIEnv* env, const char* str)
+{
+	if (str == nullptr)
+	{
+		str = "";
+	}
+	return env->NewStringUTF(str);
+}
+
 jstring GbToJstring(JNIEnv* env, const char* str)
 {
 	if (str == nullptr)
@@ -197,7 +206,7 @@ JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
 	{
 		rtn = m();
 	}
-	return env->NewStringUTF(rtn);
+	return UtfToJString(env, rtn);
 }
 
 // Event
@@ -315,8 +324,8 @@ CQAPI(int32_t, mQuoteMessage, 12)(int32_t plugin_id, int32_t msg_id, const char*
 CQAPI(int32_t, mForwardMessage, 24)(int32_t plugin_id, int32_t type, int64_t id, const char* strategy, const char* msg)
 {
 	auto env = attach_java();
-	auto s = env->NewStringUTF(strategy);
-	auto m = env->NewStringUTF(msg);
+	auto s = UtfToJString(env, strategy);
+	auto m = UtfToJString(env, msg);
 	auto method = env->GetStaticMethodID(bclz, "forwardMessage", "(IIJLjava/lang/String;Ljava/lang/String;)I");
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, type, id, s, m);
 	env->DeleteLocalRef(s);
@@ -611,7 +620,7 @@ CQAPI(int32_t, CQ_setFriendAddRequest, 16)(int32_t plugin_id, const char* id, in
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "setFriendAddRequest", "(ILjava/lang/String;ILjava/lang/String;)I");
-	auto i = env->NewStringUTF(id);
+	auto i = UtfToJString(env, id);
 	auto r = GbToJstring(env, remark);
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, i, type, r);
 	env->DeleteLocalRef(i);
@@ -625,7 +634,7 @@ CQAPI(int32_t, CQ_setGroupAddRequestV2, 20)(int32_t plugin_id, const char* id, i
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "setGroupAddRequest", "(ILjava/lang/String;IILjava/lang/String;)I");
-	auto i = env->NewStringUTF(id);
+	auto i = UtfToJString(env, id);
 	auto r = GbToJstring(env, reason);
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, i, req_type, fb_type, r);
 	env->DeleteLocalRef(i);
@@ -647,7 +656,7 @@ CQAPI(int32_t, CQ_setGroupAnonymousBan, 24)(int32_t plugin_id, int64_t group, co
 {
 	auto env = attach_java();
 	auto method = env->GetStaticMethodID(bclz, "setGroupAnonymousBan", "(IJLjava/lang/String;J)I");
-	auto i = env->NewStringUTF(id);
+	auto i = UtfToJString(env, id);
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, i, duration);
 	env->DeleteLocalRef(i);
 	detach_java();

@@ -46,7 +46,7 @@ object ForwardMessageDecoder {
      * Short => 消息条数
      * Entry => MessageEntry
      */
-    fun decode(contact: Contact, strategy: String?, data: String): ForwardMessage {
+    fun decode(contact: Contact, strategy: String, data: String): ForwardMessage {
         val pk = ByteReadPacket(data.decodeBase64Bytes())
         return runBlocking {
             return@runBlocking buildForwardMessage(contact, decodeStrategy(strategy)) {
@@ -62,8 +62,8 @@ object ForwardMessageDecoder {
      * Title, Brief, Source, Summary
      * Preview数目，Strings
      */
-    private fun decodeStrategy(strategy: String?): ForwardMessage.DisplayStrategy {
-        if (strategy == null || strategy == "") {
+    private fun decodeStrategy(strategy: String): ForwardMessage.DisplayStrategy {
+        if (strategy == "") {
             return ForwardMessage.DisplayStrategy
         }
         val pk = ByteReadPacket(strategy.decodeBase64Bytes())
