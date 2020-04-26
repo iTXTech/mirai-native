@@ -71,7 +71,7 @@ object ForwardMessageDecoder {
         val brief = pk.readString()
         val source = pk.readString()
         val summary = pk.readString()
-        val pre = pk.readByte()
+        val pre = pk.readShort()
         val seq = arrayListOf<String>()
         for (i in 1..pre) {
             seq.add(pk.readString())
@@ -90,7 +90,7 @@ object ForwardMessageDecoder {
                 if (summary == "") ForwardMessage.DisplayStrategy.generateSummary(it) else summary
             },
             generatePreview = {
-                if (pre == 0.toByte()) ForwardMessage.DisplayStrategy.generatePreview(it) else seq.asSequence()
+                if (pre == 0.toShort()) ForwardMessage.DisplayStrategy.generatePreview(it) else seq.asSequence()
             }
         )
     }
