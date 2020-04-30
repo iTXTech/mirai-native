@@ -27,6 +27,7 @@ Mirai Native 支持所有`stdcall`方式导出方法的 DLL 使用 [Mirai](https
 1. 搭建 `mirai-console` 运行环境
 1. 将 `mirai-native.jar` 放入 `plugins` 文件夹
 1. 将 `CQP.dll` 和 要加载的 Native 插件 **dll** (不是 **cpk**) 一起放入 `plugins\MiraiNative` 下（如果有插件对应的**json**文件，请使用和`dll`相同的文件名）
+**注意，这里的`CQP.dll`为该项目的文件，请到miraiQQ群内下载**
 1. 如果 Native 插件有依赖的 DLL，请放入 `plugins\MiraiNative\libraries` 下
 1. 启动 `mirai-console`
 
