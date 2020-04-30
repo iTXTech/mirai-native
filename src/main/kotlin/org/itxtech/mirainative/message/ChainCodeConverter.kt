@@ -117,7 +117,7 @@ object ChainCodeConverter {
                     }
                 }
                 "share" -> {
-                    return XmlMessageHelper.share(
+                    return RichMessageHelper.share(
                         args["url"]!!,
                         args["title"],
                         args["content"],
@@ -126,9 +126,9 @@ object ChainCodeConverter {
                 }
                 "contact" -> {
                     return if (args["type"] == "qq") {
-                        XmlMessageHelper.contactQQ(args["id"]!!.toLong())
+                        RichMessageHelper.contactQQ(args["id"]!!.toLong())
                     } else {
-                        XmlMessageHelper.contactGroup(args["id"]!!.toLong())
+                        RichMessageHelper.contactGroup(args["id"]!!.toLong())
                     }
                 }
                 "music" -> {
