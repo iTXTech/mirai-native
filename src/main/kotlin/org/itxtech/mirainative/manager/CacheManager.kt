@@ -28,9 +28,10 @@ import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.event.events.BotEvent
-import net.mamoe.mirai.message.TempMessage
+import net.mamoe.mirai.message.TempMessageEvent
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.message.data.recall
+import net.mamoe.mirai.message.data.source
 import org.itxtech.mirainative.MiraiNative
 
 object CacheManager {
@@ -55,10 +56,10 @@ object CacheManager {
         return id
     }
 
-    fun cacheTempMessage(message: TempMessage, id: Int = nextId()): Int {
+    fun cacheTempMessage(message: TempMessageEvent, id: Int = nextId()): Int {
         senders[message.sender.id] = message.sender
         return cacheMessage(
-            message.message[MessageSource],
+            message.message.source,
             id
         )
     }

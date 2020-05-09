@@ -27,10 +27,10 @@ package org.itxtech.mirainative.manager
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.event.subscribeAlways
-import net.mamoe.mirai.message.FriendMessage
-import net.mamoe.mirai.message.GroupMessage
-import net.mamoe.mirai.message.TempMessage
-import net.mamoe.mirai.message.data.MessageSource
+import net.mamoe.mirai.message.FriendMessageEvent
+import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.message.TempMessageEvent
+import net.mamoe.mirai.message.data.source
 import net.mamoe.mirai.utils.currentTimeSeconds
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
@@ -52,22 +52,22 @@ object EventManager {
         }
 
         // 消息事件
-        MiraiNative.subscribeAlways<FriendMessage> {
+        MiraiNative.subscribeAlways<FriendMessageEvent> {
             MiraiNative.nativeLaunch {
                 NativeBridge.eventPrivateMessage(
                     Bridge.PRI_MSG_SUBTYPE_FRIEND,
-                    CacheManager.cacheMessage(message[MessageSource]),
+                    CacheManager.cacheMessage(message.source),
                     sender.id,
                     ChainCodeConverter.chainToCode(message),
                     0
                 )
             }
         }
-        MiraiNative.subscribeAlways<GroupMessage> {
+        MiraiNative.subscribeAlways<GroupMessageEvent> {
             MiraiNative.nativeLaunch {
                 NativeBridge.eventGroupMessage(
                     1,
-                    CacheManager.cacheMessage(message[MessageSource]),
+                    CacheManager.cacheMessage(message.source),
                     group.id,
                     sender.id,
                     "",
@@ -76,7 +76,7 @@ object EventManager {
                 )
             }
         }
-        MiraiNative.subscribeAlways<TempMessage> { msg ->
+        MiraiNative.subscribeAlways<TempMessageEvent> { msg ->
             MiraiNative.nativeLaunch {
                 NativeBridge.eventPrivateMessage(
                     Bridge.PRI_MSG_SUBTYPE_GROUP,
