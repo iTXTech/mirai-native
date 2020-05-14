@@ -37,16 +37,18 @@ import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.ConfigMan
 import java.io.File
 import java.io.FileOutputStream
-import java.util.concurrent.Executors
 import java.util.jar.Manifest
-import kotlin.coroutines.ContinuationInterceptor
 
 object MiraiNative : PluginBase() {
-    var botOnline = false
-    val bot: Bot by lazy { Bot.botInstances.first() }
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
+
+    @OptIn(ObsoleteCoroutinesApi::class)
+    private val dispatcher = newSingleThreadContext("MiraiNative")
+
+    var botOnline = false
+    val bot: Bot by lazy { Bot.botInstances.first() }
 
     private fun checkNativeLibs() {
         logger.info("正在加载 ${dll.absolutePath}")
@@ -124,8 +126,8 @@ object MiraiNative : PluginBase() {
         CacheManager.clear()
     }
 
-    fun nativeLaunch(b: suspend CoroutineScope.() -> Unit) {
-        launch(context = NativeDispatcher, block = b)
+    fun nativeLaunch(b: suspend CoroutineScope.() -> Unit): Job {
+        return launch(context = dispatcher, block = b)
     }
 
     fun getVersion(): String {
@@ -140,5 +142,3 @@ object MiraiNative : PluginBase() {
         return version
     }
 }
-
-object NativeDispatcher : ContinuationInterceptor by Executors.newFixedThreadPool(1).asCoroutineDispatcher()

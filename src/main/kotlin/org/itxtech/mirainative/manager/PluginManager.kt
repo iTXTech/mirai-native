@@ -39,8 +39,8 @@ import java.io.File
 
 @OptIn(UnstableDefault::class)
 object PluginManager {
-    private var pluginId = atomic(0)
-    var plugins = hashMapOf<Int, NativePlugin>()
+    private val pluginId = atomic(0)
+    val plugins = hashMapOf<Int, NativePlugin>()
     private val pl: File by lazy { File(MiraiNative.dataFolder.absolutePath + File.separatorChar + "plugins").also { it.mkdirs() } }
 
     fun loadPlugins() {

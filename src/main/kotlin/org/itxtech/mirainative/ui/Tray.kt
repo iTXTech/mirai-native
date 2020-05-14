@@ -42,17 +42,7 @@ object Tray {
             icon = TrayIcon(ImageIO.read(MiraiNative.getResources("icon.jpg")), "Mirai Native 插件菜单")
             icon!!.addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
-                    if (e?.clickCount == 2) {
-                        JOptionPane.showMessageDialog(
-                            null, "Mirai Native " + MiraiNative.getVersion() +
-                                    "\nhttps://github.com/iTXTech/mirai-native" +
-                                    "\n遵循 AGPL-3.0 协议开源" +
-                                    "\n作者 PeratX@iTXTech.org" +
-                                    "\n“流泪猫猫头”图标版权所有" +
-                                    "\n版权所有 (C) 2020 iTX Technologies",
-                            "关于 Mirai Native", JOptionPane.INFORMATION_MESSAGE
-                        )
-                    } else if (e?.clickCount == 1 && !FloatingWindow.isVisible()) {
+                    if (e?.button == 1 && !FloatingWindow.isVisible()) {
                         FloatingWindow.toggle()
                     }
                 }
@@ -171,6 +161,23 @@ object Tray {
                     }
                 }
             }
+
+            popupMenu.addSeparator()
+
+            val about = MenuItem("关于")
+            popupMenu.add(about)
+            about.addActionListener {
+                JOptionPane.showMessageDialog(
+                    null, "Mirai Native " + MiraiNative.getVersion() +
+                            "\nhttps://github.com/iTXTech/mirai-native" +
+                            "\n遵循 AGPL-3.0 协议开源" +
+                            "\n作者 PeratX@iTXTech.org" +
+                            "\n“流泪猫猫头”图标版权所有" +
+                            "\n版权所有 (C) 2020 iTX Technologies",
+                    "关于 Mirai Native", JOptionPane.INFORMATION_MESSAGE
+                )
+            }
+
         }
     }
 }
