@@ -126,9 +126,7 @@ object MiraiNative : PluginBase() {
         CacheManager.clear()
     }
 
-    fun nativeLaunch(b: suspend CoroutineScope.() -> Unit): Job {
-        return launch(context = dispatcher, block = b)
-    }
+    fun nativeLaunch(b: suspend CoroutineScope.() -> Unit) = launch(context = dispatcher, block = b)
 
     fun getVersion(): String {
         var version = getPluginDescription(MiraiNative).version

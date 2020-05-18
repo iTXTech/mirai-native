@@ -129,9 +129,7 @@ object EventManager {
                 )
             }
         }
-		
-		
-		MiraiNative.subscribeAlways<MemberJoinRequestEvent> { ev ->
+        MiraiNative.subscribeAlways<MemberJoinRequestEvent> { ev ->
             MiraiNative.nativeLaunch {
                 NativeBridge.eventRequestAddGroup(
                     Bridge.REQUEST_GROUP_APPLY,
@@ -139,7 +137,6 @@ object EventManager {
                 )
             }
         }
-		
         MiraiNative.subscribeAlways<BotInvitedJoinGroupRequestEvent> { ev ->
             MiraiNative.nativeLaunch {
                 NativeBridge.eventRequestAddGroup(

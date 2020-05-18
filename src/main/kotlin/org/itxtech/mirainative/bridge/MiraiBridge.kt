@@ -38,8 +38,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.io.core.*
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
-import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
+import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.getFriendOrNull
 import net.mamoe.mirai.getGroupOrNull
@@ -258,22 +258,22 @@ object MiraiBridge {
     fun setGroupAddRequest(pluginId: Int, requestId: String, reqType: Int, type: Int, reason: String) =
         call(pluginId, 0) {
             MiraiNative.nativeLaunch {
-				if(reqType == Bridge.REQUEST_GROUP_APPLY) {
-					(CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
-						when (type) {//1通过，2拒绝，3忽略
-							1 -> accept()
-							2 -> reject()
-							3 -> ignore()
-						}
-					}
-				} else {
-					(CacheManager.getEvent(requestId) as? BotInvitedJoinGroupRequestEvent)?.apply {
-						when (type) {//1通过，2忽略
-							1 -> accept()
-							2 -> ignore()
-						}
-					}
-				}
+                if (reqType == Bridge.REQUEST_GROUP_APPLY) {
+                    (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
+                        when (type) {//1通过，2拒绝，3忽略
+                            1 -> accept()
+                            2 -> reject()
+                            3 -> ignore()
+                        }
+                    }
+                } else {
+                    (CacheManager.getEvent(requestId) as? BotInvitedJoinGroupRequestEvent)?.apply {
+                        when (type) {//1通过，2忽略
+                            1 -> accept()
+                            2 -> ignore()
+                        }
+                    }
+                }
             }
             return 0
         }
