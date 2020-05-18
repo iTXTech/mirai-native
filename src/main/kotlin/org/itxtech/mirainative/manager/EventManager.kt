@@ -129,11 +129,22 @@ object EventManager {
                 )
             }
         }
-        MiraiNative.subscribeAlways<MemberJoinRequestEvent> { ev ->
+		
+		
+		MiraiNative.subscribeAlways<MemberJoinRequestEvent> { ev ->
+            MiraiNative.nativeLaunch {
+                NativeBridge.eventRequestAddGroup(
+                    Bridge.REQUEST_GROUP_APPLY,
+                    getTimestamp(), groupId, fromId, message, CacheManager.cacheEvent(ev)
+                )
+            }
+        }
+		
+        MiraiNative.subscribeAlways<BotInvitedJoinGroupRequestEvent> { ev ->
             MiraiNative.nativeLaunch {
                 NativeBridge.eventRequestAddGroup(
                     Bridge.REQUEST_GROUP_INVITED,
-                    getTimestamp(), groupId, fromId, message, CacheManager.cacheEvent(ev)
+                    getTimestamp(), groupId, invitorId, "", CacheManager.cacheEvent(ev)
                 )
             }
         }
