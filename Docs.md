@@ -21,12 +21,13 @@
 - [x] 图片
 - [x] 名片 `[Incomplete]`
 
-## 图片CQ码详解
+## 扩展CQ码详解
 
  - 发送网络图片以 `.mnimg` 结尾，该文件不落地，例：`[CQ:image,file={247E6A8B-ED3A-1B98-15E8-07E2277C787A}.jpg.mnimg]`
  - 发送本地图片支持绝对和相对路径，相对路径支持java.exe目录下`data\image`和运行目录下`data\image`，例：`[CQ:image,file=2.png]`
  - 发送URL图片使用扩展CQ码，例：`[CQ:image,url=https://xxxx/xxxx.jpg]`
  - 支持闪照，额外参数 `type=flash`
+ - 支持接收语音 `[CQ:voice,url=语音链接,md5=文件MD5,file=文件名]`
 
 ## 酷Q API
 

@@ -161,10 +161,11 @@ object ChainCodeConverter {
             when (it) {
                 is At -> "[CQ:at,qq=${it.target}]"
                 is AtAll -> "[CQ:at,qq=all]"
-                is PlainText -> it.stringValue.escape(false)
+                is PlainText -> it.content.escape(false)
                 is Face -> "[CQ:face,id=${it.id}]"
                 is Image -> "[CQ:image,file=${it.imageId}.mnimg]" // Real file not supported
                 is RichMessage -> "[CQ:rich,data=${it.content}]"
+                is Voice -> "[CQ:voice,url=${it.url},md5=${it.md5},file=${it.fileName}]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
             }
         }
