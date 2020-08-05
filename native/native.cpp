@@ -145,7 +145,7 @@ void detach_java()
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 	JNIEnv* env, jclass clz, jstring file, jint id)
 {
-	native_plugin plugin = {id, const_cast<char*>(JstringToChars(env, file))};
+	native_plugin plugin = {id, const_cast<char*>(JstringToGb(env, file))};
 	const auto dll = LoadLibraryA(plugin.file);
 
 	if (dll != nullptr)

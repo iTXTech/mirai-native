@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.itxtech"
-version = "1.7.0"
+version = "1.8.1"
 
 kotlin {
     sourceSets {
@@ -23,9 +23,9 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
 
-    implementation("net.mamoe:mirai-core:1.0.2")
+    implementation("net.mamoe:mirai-core:1.1.3")
     implementation("net.mamoe:mirai-console:0.5.2")
 }
 

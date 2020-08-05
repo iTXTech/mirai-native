@@ -262,7 +262,7 @@ object MiraiBridge {
                     (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
                         when (type) {//1通过，2拒绝，3忽略
                             1 -> accept()
-                            2 -> reject()
+                            2 -> reject(message = reason)
                             3 -> ignore()
                         }
                     }

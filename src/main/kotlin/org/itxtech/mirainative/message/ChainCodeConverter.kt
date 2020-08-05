@@ -147,6 +147,20 @@ object ChainCodeConverter {
                 "shake" -> {
                     return PokeMessage.Poke
                 }
+                "poke" -> {
+                    PokeMessage.values.forEach {
+                        if (it.type == args["type"]!!.toInt() && it.id == args["id"]!!.toInt()) {
+                            return it
+                        }
+                    }
+                    return MSG_EMPTY
+                }
+                "xml" -> {
+                    return XmlMessage(args["data"]!!)
+                }
+                "json" -> {
+                    return JsonMessage(args["data"]!!)
+                }
                 else -> {
                     MiraiNative.logger.debug("不支持的 CQ码：${parts[0]}")
                 }
@@ -163,9 +177,12 @@ object ChainCodeConverter {
                 is AtAll -> "[CQ:at,qq=all]"
                 is PlainText -> it.content.escape(false)
                 is Face -> "[CQ:face,id=${it.id}]"
+                is VipFace -> "[CQ:vipface,id=${it.kind.id},name=${it.kind.name},count=${it.count}]"
                 is Image -> "[CQ:image,file=${it.imageId}.mnimg]" // Real file not supported
                 is RichMessage -> "[CQ:rich,data=${it.content}]"
                 is Voice -> "[CQ:voice,url=${it.url},md5=${it.md5},file=${it.fileName}]"
+                is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.type},name=${it.name}]"
+                is FlashImage -> "[CQ:image,file=${it.image.imageId}.mning,type=flash]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
             }
         }
