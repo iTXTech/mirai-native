@@ -52,7 +52,7 @@ object MiraiNative : PluginBase() {
     var botOnline = false
     val bot: Bot by lazy { Bot.botInstances.first() }
 
-    fun ByteArray.checksum() = BigInteger(1, MessageDigest.getInstance("MD5").digest(this))
+    private fun ByteArray.checksum() = BigInteger(1, MessageDigest.getInstance("MD5").digest(this))
 
     private fun checkNativeLibs() {
         logger.info("正在加载 ${dll.absolutePath}")
@@ -79,11 +79,9 @@ object MiraiNative : PluginBase() {
             val cqp = FileOutputStream(dll)
             getResources("CQP.dll")?.copyTo(cqp)
             cqp.close()
-        } else {
-            if (getResources("CQP.dll")!!.readBytes().checksum() != dll.readBytes().checksum()) {
-                logger.warning("${dll.absolutePath} 与 Mirai Native 内置的 CQP.dll 的校验和不同。")
-                logger.warning("如运行时出现问题，请尝试删除 ${dll.absolutePath} 并重启 Mirai。")
-            }
+        } else if (getResources("CQP.dll")!!.readBytes().checksum() != dll.readBytes().checksum()) {
+            logger.warning("${dll.absolutePath} 与 Mirai Native 内置的 CQP.dll 的校验和不同。")
+            logger.warning("如运行时出现问题，请尝试删除 ${dll.absolutePath} 并重启 Mirai。")
         }
 
         initDataDir()

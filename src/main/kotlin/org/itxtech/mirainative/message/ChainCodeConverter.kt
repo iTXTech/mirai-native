@@ -155,6 +155,12 @@ object ChainCodeConverter {
                     }
                     return MSG_EMPTY
                 }
+                "xml" -> {
+                    return XmlMessage(args["data"]!!)
+                }
+                "json" -> {
+                    return JsonMessage(args["data"]!!)
+                }
                 else -> {
                     MiraiNative.logger.debug("不支持的 CQ码：${parts[0]}")
                 }
