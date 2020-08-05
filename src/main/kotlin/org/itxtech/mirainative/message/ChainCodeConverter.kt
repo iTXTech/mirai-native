@@ -39,27 +39,25 @@ import java.net.URL
 object ChainCodeConverter {
     private val MSG_EMPTY = PlainText("")
 
-    private fun String.escape(c: Boolean = false): String {
-        var s = replace("&", "&amp;")
+    private fun String.escape(): String {
+        return replace("&", "&amp;")
             .replace("[", "&#91;")
             .replace("]", "&#93;")
-        if (c) {
-            s = s.replace(",", "&#44;")
-        }
-        return s
+            .replace(",", "&#44;")
     }
 
     private fun String.unescape(): String {
         return replace("&amp;", "&")
             .replace("&#91;", "[")
             .replace("&#93;", "]")
+            .replace("&#44;", ",")
     }
 
     private fun String.toMap(): HashMap<String, String> {
         val map = HashMap<String, String>()
         split(",").forEach {
             val parts = it.split(delimiters = *arrayOf("="), limit = 2)
-            map[parts[0]] = parts[1].escape(true)
+            map[parts[0]] = parts[1].escape()
         }
         return map
     }
@@ -71,6 +69,9 @@ object ChainCodeConverter {
                 parts[1].toMap()
             } else {
                 HashMap()
+            }
+            args.forEach {
+                args[it.key] = it.value.unescape()
             }
             when (parts[0]) {
                 "at" -> {
@@ -175,7 +176,7 @@ object ChainCodeConverter {
             when (it) {
                 is At -> "[CQ:at,qq=${it.target}]"
                 is AtAll -> "[CQ:at,qq=all]"
-                is PlainText -> it.content.escape(false)
+                is PlainText -> it.content.escape()
                 is Face -> "[CQ:face,id=${it.id}]"
                 is VipFace -> "[CQ:vipface,id=${it.kind.id},name=${it.kind.name},count=${it.count}]"
                 is Image -> "[CQ:image,file=${it.imageId}.mnimg]" // Real file not supported
