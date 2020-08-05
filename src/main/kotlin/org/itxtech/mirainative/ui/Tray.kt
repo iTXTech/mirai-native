@@ -38,17 +38,21 @@ object Tray {
     private var icon: TrayIcon? = null
 
     fun create() {
-        if (SystemTray.isSupported()) {
-            icon = TrayIcon(ImageIO.read(MiraiNative.getResources("icon.jpg")), "Mirai Native 插件菜单")
-            icon!!.addMouseListener(object : MouseAdapter() {
-                override fun mouseClicked(e: MouseEvent?) {
-                    if (e?.button == 1 && !FloatingWindow.isVisible()) {
-                        FloatingWindow.toggle()
+        try {
+            if (SystemTray.isSupported()) {
+                icon = TrayIcon(ImageIO.read(MiraiNative.getResources("icon.jpg")), "Mirai Native 插件菜单")
+                icon!!.addMouseListener(object : MouseAdapter() {
+                    override fun mouseClicked(e: MouseEvent?) {
+                        if (e?.button == 1 && !FloatingWindow.isVisible()) {
+                            FloatingWindow.toggle()
+                        }
                     }
-                }
-            })
-            icon!!.popupMenu = PopupMenu()
-            SystemTray.getSystemTray().add(icon)
+                })
+                icon!!.popupMenu = PopupMenu()
+                SystemTray.getSystemTray().add(icon)
+            }
+        } catch (e: Throwable) {
+            MiraiNative.logger.error(e)
         }
     }
 
