@@ -241,7 +241,5 @@ object EventManager {
         }
     }
 
-    private fun getTimestamp(): Int {
-        return currentTimeSeconds.toInt()
-    }
+    private fun getTimestamp() = currentTimeSeconds.toInt()
 }

@@ -39,27 +39,23 @@ import java.net.URL
 object ChainCodeConverter {
     private val MSG_EMPTY = PlainText("")
 
-    private fun String.escape(): String {
-        return replace("&", "&amp;")
+    private fun String.escape() =
+        replace("&", "&amp;")
             .replace("[", "&#91;")
             .replace("]", "&#93;")
             .replace(",", "&#44;")
-    }
 
-    private fun String.unescape(): String {
-        return replace("&amp;", "&")
+    private fun String.unescape() =
+        replace("&amp;", "&")
             .replace("&#91;", "[")
             .replace("&#93;", "]")
             .replace("&#44;", ",")
-    }
 
-    private fun String.toMap(): HashMap<String, String> {
-        val map = HashMap<String, String>()
-        split(",").forEach {
+    private fun String.toMap() = HashMap<String, String>().apply {
+        this@toMap.split(",").forEach {
             val parts = it.split(delimiters = *arrayOf("="), limit = 2)
-            map[parts[0]] = parts[1].escape()
+            this[parts[0]] = parts[1].escape()
         }
-        return map
     }
 
     private suspend fun String.toMessageInternal(contact: Contact?): Message {

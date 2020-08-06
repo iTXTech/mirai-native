@@ -40,28 +40,17 @@ object CacheManager {
     private val senders = hashMapOf<Long, Member>()
     private val internalId = atomic(0)
 
-    fun nextId(): Int = internalId.getAndIncrement()
+    fun nextId() = internalId.getAndIncrement()
 
-    fun cacheEvent(event: BotEvent, id: Int = nextId()): String {
-        evCache[id] = event
-        return id.toString()
-    }
+    fun cacheEvent(event: BotEvent, id: Int = nextId()) = id.apply { evCache[this] = event }.toString()
 
-    fun getEvent(id: String): BotEvent? {
-        return evCache[id.toInt()]?.also { evCache.remove(id.toInt()) }
-    }
+    fun getEvent(id: String) = evCache[id.toInt()]?.also { evCache.remove(id.toInt()) }
 
-    fun cacheMessage(message: MessageSource, id: Int = nextId()): Int {
-        msgCache[id] = message
-        return id
-    }
+    fun cacheMessage(message: MessageSource, id: Int = nextId()) = id.apply { msgCache[this] = message }
 
     fun cacheTempMessage(message: TempMessageEvent, id: Int = nextId()): Int {
         senders[message.sender.id] = message.sender
-        return cacheMessage(
-            message.message.source,
-            id
-        )
+        return cacheMessage(message.message.source, id)
     }
 
     fun recall(id: Int): Boolean {
@@ -73,13 +62,9 @@ object CacheManager {
         return true
     }
 
-    fun getMessage(id: Int): MessageSource? {
-        return msgCache[id]
-    }
+    fun getMessage(id: Int) = msgCache[id]
 
-    fun findMember(id: Long): Member? {
-        return senders[id]
-    }
+    fun findMember(id: Long) = senders[id]
 
     fun clear() {
         msgCache.clear()

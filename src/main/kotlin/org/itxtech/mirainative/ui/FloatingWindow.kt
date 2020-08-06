@@ -41,34 +41,43 @@ object FloatingWindow {
     private val text = JTextArea()
 
     fun create() {
-        window.setSize(250, 150)
-        window.isResizable = false
-        window.isAlwaysOnTop = true
+        try {
+            val panel = JPanel()
 
-        val rect = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.bounds
-        window.setLocation(
-            (rect.maxX / 20 * 19.5 - window.width).toInt(),
-            (rect.maxY / 20 * 19 - window.height).toInt()
-        )
+            window.apply {
+                setSize(250, 150)
+                isResizable = false
+                isAlwaysOnTop = true
 
-        val panel = JPanel()
-        window.add(panel)
-        text.setLocation(0, 0)
-        text.setSize(250, 150)
-        text.isEditable = false
-        panel.add(text)
+                val rect =
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.bounds
+                setLocation(
+                    (rect.maxX / 20 * 19.5 - width).toInt(),
+                    (rect.maxY / 20 * 19 - height).toInt()
+                )
 
-        window.addComponentListener(object : ComponentAdapter() {
-            override fun componentHidden(e: ComponentEvent) {
-                Tray.update()
+                add(panel)
+
+                addComponentListener(object : ComponentAdapter() {
+                    override fun componentHidden(e: ComponentEvent) {
+                        Tray.update()
+                    }
+                })
             }
-        })
 
-        MiraiNative.launch {
-            while (isActive) {
-                update()
-                delay(100)
+            text.setLocation(0, 0)
+            text.setSize(250, 150)
+            text.isEditable = false
+            panel.add(text)
+
+            MiraiNative.launch {
+                while (isActive) {
+                    update()
+                    delay(100)
+                }
             }
+        } catch (e: Throwable) {
+            MiraiNative.logger.error(e)
         }
     }
 
@@ -90,7 +99,5 @@ object FloatingWindow {
         window.isVisible = !window.isVisible
     }
 
-    fun isVisible(): Boolean {
-        return window.isVisible
-    }
+    fun isVisible() = window.isVisible
 }
