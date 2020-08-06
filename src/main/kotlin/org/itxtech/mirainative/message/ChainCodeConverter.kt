@@ -54,7 +54,7 @@ object ChainCodeConverter {
     private fun String.toMap() = HashMap<String, String>().apply {
         this@toMap.split(",").forEach {
             val parts = it.split(delimiters = *arrayOf("="), limit = 2)
-            this[parts[0]] = parts[1].escape()
+            this[parts[0]] = parts[1].unescape()
         }
     }
 
@@ -65,9 +65,6 @@ object ChainCodeConverter {
                 parts[1].toMap()
             } else {
                 HashMap()
-            }
-            args.forEach {
-                args[it.key] = it.value.unescape()
             }
             when (parts[0]) {
                 "at" -> {
