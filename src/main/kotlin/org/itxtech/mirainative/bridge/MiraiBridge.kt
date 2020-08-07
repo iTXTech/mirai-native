@@ -24,15 +24,13 @@
 
 package org.itxtech.mirainative.bridge
 
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.isSuccess
-import io.ktor.util.InternalAPI
-import io.ktor.util.cio.writeChannel
-import io.ktor.util.decodeBase64Bytes
-import io.ktor.util.encodeBase64
-import io.ktor.utils.io.copyAndClose
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.util.*
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.core.*
@@ -51,6 +49,7 @@ import net.mamoe.mirai.utils.MiraiLogger
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.manager.CacheManager
+import org.itxtech.mirainative.manager.EventManager
 import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
@@ -261,7 +260,13 @@ object MiraiBridge {
                 if (reqType == Bridge.REQUEST_GROUP_APPLY) {
                     (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
                         when (type) {//1通过，2拒绝，3忽略
-                            1 -> accept()
+                            1 -> {
+                                accept()
+                                NativeBridge.eventGroupMemberJoin(
+                                    Bridge.MEMBER_JOIN_PERMITTED,
+                                    EventManager.getTimestamp(), group.id, 0, fromId
+                                )
+                            }
                             2 -> reject(message = reason)
                             3 -> ignore()
                         }
@@ -269,7 +274,13 @@ object MiraiBridge {
                 } else {
                     (CacheManager.getEvent(requestId) as? BotInvitedJoinGroupRequestEvent)?.apply {
                         when (type) {//1通过，2忽略
-                            1 -> accept()
+                            1 -> {
+                                accept()
+                                NativeBridge.eventGroupMemberJoin(
+                                    Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
+                                    EventManager.getTimestamp(), groupId, invitorId, bot.id
+                                )
+                            }
                             2 -> ignore()
                         }
                     }
