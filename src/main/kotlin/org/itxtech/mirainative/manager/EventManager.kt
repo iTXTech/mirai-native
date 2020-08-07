@@ -45,7 +45,7 @@ object EventManager {
             MiraiNative.botOnline = true
             MiraiNative.nativeLaunch {
                 ConfigMan.init()
-                MiraiNative.logger.info("Mirai Native 正启用所有 DLL 插件。")
+                MiraiNative.logger.info("Mirai Native 正启用所有插件。")
                 PluginManager.enablePlugins()
                 Tray.update()
             }
@@ -91,32 +91,18 @@ object EventManager {
         // 权限事件
         MiraiNative.subscribeAlways<MemberPermissionChangeEvent> {
             MiraiNative.nativeLaunch {
-                if (new == MemberPermission.MEMBER) {
-                    NativeBridge.eventGroupAdmin(
-                        Bridge.PERM_SUBTYPE_CANCEL_ADMIN,
-                        getTimestamp(), group.id, member.id
-                    )
-                } else {
-                    NativeBridge.eventGroupAdmin(
-                        Bridge.PERM_SUBTYPE_SET_ADMIN,
-                        getTimestamp(), group.id, member.id
-                    )
-                }
+                NativeBridge.eventGroupAdmin(
+                    if (new == MemberPermission.MEMBER) Bridge.PERM_SUBTYPE_CANCEL_ADMIN else Bridge.PERM_SUBTYPE_SET_ADMIN,
+                    getTimestamp(), group.id, member.id
+                )
             }
         }
         MiraiNative.subscribeAlways<BotGroupPermissionChangeEvent> {
             MiraiNative.nativeLaunch {
-                if (new == MemberPermission.MEMBER) {
-                    NativeBridge.eventGroupAdmin(
-                        Bridge.PERM_SUBTYPE_CANCEL_ADMIN,
-                        getTimestamp(), group.id, bot.id
-                    )
-                } else {
-                    NativeBridge.eventGroupAdmin(
-                        Bridge.PERM_SUBTYPE_SET_ADMIN,
-                        getTimestamp(), group.id, bot.id
-                    )
-                }
+                NativeBridge.eventGroupAdmin(
+                    if (new == MemberPermission.MEMBER) Bridge.PERM_SUBTYPE_CANCEL_ADMIN else Bridge.PERM_SUBTYPE_SET_ADMIN,
+                    getTimestamp(), group.id, bot.id
+                )
             }
         }
 
@@ -161,10 +147,9 @@ object EventManager {
         // 退群事件
         MiraiNative.subscribeAlways<MemberLeaveEvent.Kick> {
             MiraiNative.nativeLaunch {
-                val op = operator?.id ?: bot.id
                 NativeBridge.eventGroupMemberLeave(
                     Bridge.MEMBER_LEAVE_KICK,
-                    getTimestamp(), group.id, op, member.id
+                    getTimestamp(), group.id, operator?.id ?: bot.id, member.id
                 )
             }
         }
@@ -176,11 +161,19 @@ object EventManager {
                 )
             }
         }
-        MiraiNative.subscribeAlways<BotLeaveEvent> { ev ->
+        MiraiNative.subscribeAlways<BotLeaveEvent.Active> {
             MiraiNative.nativeLaunch {
                 NativeBridge.eventGroupMemberLeave(
-                    if (ev is BotLeaveEvent.Kick) Bridge.MEMBER_LEAVE_KICK else Bridge.MEMBER_LEAVE_QUIT,
+                    Bridge.MEMBER_LEAVE_QUIT,
                     getTimestamp(), group.id, 0, bot.id
+                )
+            }
+        }
+        MiraiNative.subscribeAlways<BotLeaveEvent.Kick> { ev ->
+            MiraiNative.nativeLaunch {
+                NativeBridge.eventGroupMemberLeave(
+                    Bridge.MEMBER_LEAVE_KICK,
+                    getTimestamp(), group.id, ev.operator.id, bot.id
                 )
             }
         }
@@ -188,12 +181,11 @@ object EventManager {
         // 禁言事件
         MiraiNative.subscribeAlways<MemberMuteEvent> {
             MiraiNative.nativeLaunch {
-                val op = operator?.id ?: bot.id
                 NativeBridge.eventGroupBan(
                     Bridge.GROUP_MUTE,
                     getTimestamp(),
                     group.id,
-                    op,
+                    operator?.id ?: bot.id,
                     member.id,
                     durationSeconds.toLong()
                 )
@@ -201,8 +193,14 @@ object EventManager {
         }
         MiraiNative.subscribeAlways<MemberUnmuteEvent> {
             MiraiNative.nativeLaunch {
-                val op = operator?.id ?: bot.id
-                NativeBridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, member.id, 0)
+                NativeBridge.eventGroupBan(
+                    Bridge.GROUP_UNMUTE,
+                    getTimestamp(),
+                    group.id,
+                    operator?.id ?: bot.id,
+                    member.id,
+                    0
+                )
             }
         }
         MiraiNative.subscribeAlways<BotMuteEvent> {
@@ -231,12 +229,14 @@ object EventManager {
         }
         MiraiNative.subscribeAlways<GroupMuteAllEvent> {
             MiraiNative.nativeLaunch {
-                val op = operator?.id ?: bot.id
-                if (new) {
-                    NativeBridge.eventGroupBan(Bridge.GROUP_MUTE, getTimestamp(), group.id, op, 0, 0)
-                } else {
-                    NativeBridge.eventGroupBan(Bridge.GROUP_UNMUTE, getTimestamp(), group.id, op, 0, 0)
-                }
+                NativeBridge.eventGroupBan(
+                    if (new) Bridge.GROUP_MUTE else Bridge.GROUP_UNMUTE,
+                    getTimestamp(),
+                    group.id,
+                    operator?.id ?: bot.id,
+                    0,
+                    0
+                )
             }
         }
     }

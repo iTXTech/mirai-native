@@ -45,7 +45,6 @@ import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.isAboutGroup
 import net.mamoe.mirai.message.data.queryUrl
 import net.mamoe.mirai.message.data.quote
-import net.mamoe.mirai.utils.MiraiLogger
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.manager.CacheManager
@@ -418,9 +417,7 @@ internal object NativeLoggerHelper {
     private const val LOG_ERROR = 21
     private const val LOG_FATAL = 22
 
-    private fun getLogger(): MiraiLogger {
-        return MiraiNative.logger
-    }
+    private fun getLogger() = MiraiNative.logger
 
     fun log(plugin: NativePlugin, priority: Int, type: String, content: String) {
         var c = "[" + plugin.getName()

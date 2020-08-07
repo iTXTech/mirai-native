@@ -24,7 +24,6 @@
 
 package org.itxtech.mirainative.bridge
 
-import net.mamoe.mirai.utils.MiraiLogger
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.manager.PluginManager
@@ -32,13 +31,9 @@ import org.itxtech.mirainative.plugin.Event
 import org.itxtech.mirainative.plugin.NativePlugin
 
 object NativeBridge {
-    private fun getPlugins(): HashMap<Int, NativePlugin> {
-        return PluginManager.plugins
-    }
+    private fun getPlugins() = PluginManager.plugins
 
-    private fun getLogger(): MiraiLogger {
-        return MiraiNative.logger
-    }
+    private fun getLogger() = MiraiNative.logger
 
     fun loadPlugin(plugin: NativePlugin): Int {
         val code = Bridge.loadNativePlugin(
@@ -46,17 +41,15 @@ object NativeBridge {
             plugin.id
         )
         if (plugin.pluginInfo != null) {
-            getLogger().info("Native Plugin (w json) " + plugin.pluginInfo!!.name + " has been loaded with code " + code)
+            getLogger().info("Native Plugin (w json) ${plugin.pluginInfo!!.name} has been loaded with code $code")
         } else {
-            getLogger().info("Native Plugin (w/o json) " + plugin.file.name + " has been loaded with code " + code)
+            getLogger().info("Native Plugin (w/o json) ${plugin.file.name} has been loaded with code $code")
         }
         return code
     }
 
-    fun unloadPlugin(plugin: NativePlugin): Int {
-        val code = Bridge.freeNativePlugin(plugin.id)
-        getLogger().info("Native Plugin " + plugin.id + " has been unloaded with code " + code)
-        return code
+    fun unloadPlugin(plugin: NativePlugin) = Bridge.freeNativePlugin(plugin.id).apply {
+        getLogger().info("Native Plugin ${plugin.id} has been unloaded with code $this")
     }
 
     fun disablePlugin(plugin: NativePlugin) {
