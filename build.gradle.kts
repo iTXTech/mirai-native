@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.itxtech"
-version = "1.8.1"
+version = "1.8.2"
 
 kotlin {
     sourceSets {

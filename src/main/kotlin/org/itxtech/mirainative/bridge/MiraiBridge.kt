@@ -264,7 +264,7 @@ object MiraiBridge {
                                 accept()
                                 NativeBridge.eventGroupMemberJoin(
                                     Bridge.MEMBER_JOIN_PERMITTED,
-                                    EventManager.getTimestamp(), group.id, 0, fromId
+                                    EventManager.getTimestamp(), groupId, 0, fromId
                                 )
                             }
                             2 -> reject(message = reason)
