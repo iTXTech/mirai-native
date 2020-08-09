@@ -37,14 +37,14 @@ import javax.swing.JPanel
 import javax.swing.JTextArea
 
 object FloatingWindow {
-    private val window = JFrame("悬浮窗")
-    private val text = JTextArea()
+    private var window: JFrame? = null
+    private var text: JTextArea? = null
 
     fun create() {
         try {
             val panel = JPanel()
 
-            window.apply {
+            window = JFrame("悬浮窗").apply {
                 setSize(250, 150)
                 isResizable = false
                 isAlwaysOnTop = true
@@ -65,10 +65,12 @@ object FloatingWindow {
                 })
             }
 
-            text.setLocation(0, 0)
-            text.setSize(250, 150)
-            text.isEditable = false
-            panel.add(text)
+            text = JTextArea().apply {
+                setLocation(0, 0)
+                setSize(250, 150)
+                isEditable = false
+                panel.add(this)
+            }
 
             MiraiNative.launch {
                 while (isActive) {
@@ -82,22 +84,26 @@ object FloatingWindow {
     }
 
     private fun update() {
-        val t = StringBuilder()
-        PluginManager.plugins.values.forEach { p ->
-            if (p.entries.isNotEmpty()) {
-                p.entries.forEach { e ->
-                    if (p.enabled && e.visible) {
-                        t.append(e.status.name).append(": ").append(e.data).append(" ").appendln(e.unit)
+        if (text != null) {
+            val t = StringBuilder()
+            PluginManager.plugins.values.forEach { p ->
+                if (p.entries.isNotEmpty()) {
+                    p.entries.forEach { e ->
+                        if (p.enabled && e.visible) {
+                            t.append(e.status.name).append(": ").append(e.data).append(" ").appendln(e.unit)
+                        }
                     }
                 }
             }
+            text!!.text = t.toString()
         }
-        text.text = t.toString()
     }
 
     fun toggle() {
-        window.isVisible = !window.isVisible
+        if (window != null) {
+            window!!.isVisible = !window!!.isVisible
+        }
     }
 
-    fun isVisible() = window.isVisible
+    fun isVisible() = window?.isVisible ?: false
 }
