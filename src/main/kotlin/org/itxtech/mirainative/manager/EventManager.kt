@@ -36,19 +36,11 @@ import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.bridge.NativeBridge
 import org.itxtech.mirainative.message.ChainCodeConverter
-import org.itxtech.mirainative.ui.Tray
-import org.itxtech.mirainative.util.ConfigMan
 
 object EventManager {
     fun registerEvents() {
         MiraiNative.subscribeAlways<BotOnlineEvent> {
-            MiraiNative.botOnline = true
-            MiraiNative.nativeLaunch {
-                ConfigMan.init()
-                MiraiNative.logger.info("Mirai Native 正启用所有插件。")
-                PluginManager.enablePlugins()
-                Tray.update()
-            }
+            MiraiNative.setBotOnline()
         }
 
         // 消息事件

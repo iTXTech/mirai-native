@@ -66,6 +66,18 @@ object MiraiNative : PluginBase() {
         }
     }
 
+    fun setBotOnline() {
+        if (!botOnline) {
+            botOnline = true
+            nativeLaunch {
+                ConfigMan.init()
+                MiraiNative.logger.info("Mirai Native 正启用所有插件。")
+                PluginManager.enablePlugins()
+                Tray.update()
+            }
+        }
+    }
+
     override fun onLoad() {
         //暂时只支持 x86 平台运行，不兼容 amd64
         val mode = System.getProperty("sun.arch.data.model")
@@ -91,6 +103,10 @@ object MiraiNative : PluginBase() {
 
         PluginManager.registerCommands()
         EventManager.registerEvents()
+
+        if (Bot.botInstances.isNotEmpty()) {
+            setBotOnline()
+        }
     }
 
     private fun initDataDir() {
