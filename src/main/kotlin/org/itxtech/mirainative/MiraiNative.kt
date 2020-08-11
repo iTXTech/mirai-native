@@ -104,7 +104,7 @@ object MiraiNative : PluginBase() {
         PluginManager.registerCommands()
         EventManager.registerEvents()
 
-        if (Bot.botInstances.isNotEmpty()) {
+        if (Bot.botInstances.isNotEmpty() && Bot.botInstances.first().isOnline) {
             setBotOnline()
         }
     }
