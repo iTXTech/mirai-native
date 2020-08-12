@@ -31,9 +31,9 @@ import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.io.core.*
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
@@ -190,7 +190,7 @@ object MiraiBridge {
             writeString(m.nick)
             writeInt(0) // TODO: 性别
             writeInt(0) // TODO: 年龄
-        }.readBytes().encodeBase64()
+        }.encodeBase64()
     }
 
     fun getFriendList(pluginId: Int) = call(pluginId, "") {
@@ -205,7 +205,7 @@ object MiraiBridge {
                     writeString("")
                 }
             }
-        }.readBytes().encodeBase64()
+        }.encodeBase64()
     }
 
     fun getGroupInfo(pluginId: Int, id: Long) = call(pluginId, "") {
@@ -217,7 +217,7 @@ object MiraiBridge {
                 writeInt(info.members.size + 1)
                 //TODO: 上限
                 writeInt(1000)
-            }.readBytes().encodeBase64()
+            }.encodeBase64()
         } else ""
     }
 
@@ -231,14 +231,14 @@ object MiraiBridge {
                     writeString(it.name)
                 }
             }
-        }.readBytes().encodeBase64()
+        }.encodeBase64()
     }
 
     fun getGroupMemberInfo(pluginId: Int, groupId: Long, memberId: Long) = call(pluginId, "") {
         val member = MiraiNative.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
         return buildPacket {
             writeMember(member)
-        }.readBytes().encodeBase64()
+        }.encodeBase64()
     }
 
     fun getGroupMemberList(pluginId: Int, groupId: Long) = call(pluginId, "") {
@@ -250,7 +250,7 @@ object MiraiBridge {
                     writeMember(it)
                 }
             }
-        }.readBytes().encodeBase64()
+        }.encodeBase64()
     }
 
     fun setGroupAddRequest(pluginId: Int, requestId: String, reqType: Int, type: Int, reason: String) =
@@ -407,7 +407,7 @@ object MiraiBridge {
     }
 }
 
-internal object NativeLoggerHelper {
+object NativeLoggerHelper {
     private const val LOG_DEBUG = 0
     private const val LOG_INFO = 10
     private const val LOG_INFO_SUCC = 11
