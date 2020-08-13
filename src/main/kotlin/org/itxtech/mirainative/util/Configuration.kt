@@ -35,7 +35,7 @@ import java.io.File
 @OptIn(UnstableDefault::class)
 object ConfigMan {
     private val file = File(MiraiNative.dataFolder.absolutePath + File.separatorChar + "config.json")
-    private val config: Configuration by lazy {
+    val config: Configuration by lazy {
         if (file.exists()) {
             Json {
                 isLenient = true
@@ -89,6 +89,7 @@ object ConfigMan {
 
 @Serializable
 data class Configuration(
+    var codePage: Int = 54936,
     var fwState: Boolean = false,
     var plugins: ArrayList<PluginEntry> = ArrayList()
 )

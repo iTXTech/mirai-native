@@ -39,196 +39,198 @@ import org.itxtech.mirainative.message.ChainCodeConverter
 
 object EventManager {
     fun registerEvents() {
-        MiraiNative.subscribeAlways<BotOnlineEvent> {
-            MiraiNative.setBotOnline()
-        }
+        with(MiraiNative) {
+            subscribeAlways<BotOnlineEvent> {
+                setBotOnline()
+            }
 
-        // 消息事件
-        MiraiNative.subscribeAlways<FriendMessageEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventPrivateMessage(
-                    Bridge.PRI_MSG_SUBTYPE_FRIEND,
-                    CacheManager.cacheMessage(message.source),
-                    sender.id,
-                    ChainCodeConverter.chainToCode(message),
-                    0
-                )
+            // 消息事件
+            subscribeAlways<FriendMessageEvent> {
+                nativeLaunch {
+                    NativeBridge.eventPrivateMessage(
+                        Bridge.PRI_MSG_SUBTYPE_FRIEND,
+                        CacheManager.cacheMessage(message.source),
+                        sender.id,
+                        ChainCodeConverter.chainToCode(message),
+                        0
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<GroupMessageEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupMessage(
-                    1,
-                    CacheManager.cacheMessage(message.source),
-                    group.id,
-                    sender.id,
-                    "",
-                    ChainCodeConverter.chainToCode(message),
-                    0
-                )
+            subscribeAlways<GroupMessageEvent> {
+                nativeLaunch {
+                    NativeBridge.eventGroupMessage(
+                        1,
+                        CacheManager.cacheMessage(message.source),
+                        group.id,
+                        sender.id,
+                        "",
+                        ChainCodeConverter.chainToCode(message),
+                        0
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<TempMessageEvent> { msg ->
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventPrivateMessage(
-                    Bridge.PRI_MSG_SUBTYPE_GROUP,
-                    CacheManager.cacheTempMessage(msg),
-                    sender.id,
-                    ChainCodeConverter.chainToCode(message),
-                    0
-                )
+            subscribeAlways<TempMessageEvent> { msg ->
+                nativeLaunch {
+                    NativeBridge.eventPrivateMessage(
+                        Bridge.PRI_MSG_SUBTYPE_GROUP,
+                        CacheManager.cacheTempMessage(msg),
+                        sender.id,
+                        ChainCodeConverter.chainToCode(message),
+                        0
+                    )
+                }
             }
-        }
 
-        // 权限事件
-        MiraiNative.subscribeAlways<MemberPermissionChangeEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupAdmin(
-                    if (new == MemberPermission.MEMBER) Bridge.PERM_SUBTYPE_CANCEL_ADMIN else Bridge.PERM_SUBTYPE_SET_ADMIN,
-                    getTimestamp(), group.id, member.id
-                )
+            // 权限事件
+            subscribeAlways<MemberPermissionChangeEvent> {
+                nativeLaunch {
+                    NativeBridge.eventGroupAdmin(
+                        if (new == MemberPermission.MEMBER) Bridge.PERM_SUBTYPE_CANCEL_ADMIN else Bridge.PERM_SUBTYPE_SET_ADMIN,
+                        getTimestamp(), group.id, member.id
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<BotGroupPermissionChangeEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupAdmin(
-                    if (new == MemberPermission.MEMBER) Bridge.PERM_SUBTYPE_CANCEL_ADMIN else Bridge.PERM_SUBTYPE_SET_ADMIN,
-                    getTimestamp(), group.id, bot.id
-                )
+            subscribeAlways<BotGroupPermissionChangeEvent> {
+                nativeLaunch {
+                    NativeBridge.eventGroupAdmin(
+                        if (new == MemberPermission.MEMBER) Bridge.PERM_SUBTYPE_CANCEL_ADMIN else Bridge.PERM_SUBTYPE_SET_ADMIN,
+                        getTimestamp(), group.id, bot.id
+                    )
+                }
             }
-        }
 
-        // 加群事件
-        MiraiNative.subscribeAlways<MemberJoinEvent> { ev ->
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupMemberJoin(
-                    if (ev is MemberJoinEvent.Invite) Bridge.MEMBER_JOIN_PERMITTED else Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
-                    getTimestamp(), group.id, 0, member.id
-                )
+            // 加群事件
+            subscribeAlways<MemberJoinEvent> { ev ->
+                nativeLaunch {
+                    NativeBridge.eventGroupMemberJoin(
+                        if (ev is MemberJoinEvent.Invite) Bridge.MEMBER_JOIN_PERMITTED else Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
+                        getTimestamp(), group.id, 0, member.id
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<MemberJoinRequestEvent> { ev ->
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventRequestAddGroup(
-                    Bridge.REQUEST_GROUP_APPLY,
-                    getTimestamp(), groupId, fromId, message, CacheManager.cacheEvent(ev)
-                )
+            subscribeAlways<MemberJoinRequestEvent> { ev ->
+                nativeLaunch {
+                    NativeBridge.eventRequestAddGroup(
+                        Bridge.REQUEST_GROUP_APPLY,
+                        getTimestamp(), groupId, fromId, message, CacheManager.cacheEvent(ev)
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<BotInvitedJoinGroupRequestEvent> { ev ->
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventRequestAddGroup(
-                    Bridge.REQUEST_GROUP_INVITED,
-                    getTimestamp(), groupId, invitorId, "", CacheManager.cacheEvent(ev)
-                )
+            subscribeAlways<BotInvitedJoinGroupRequestEvent> { ev ->
+                nativeLaunch {
+                    NativeBridge.eventRequestAddGroup(
+                        Bridge.REQUEST_GROUP_INVITED,
+                        getTimestamp(), groupId, invitorId, "", CacheManager.cacheEvent(ev)
+                    )
+                }
             }
-        }
 
-        //加好友事件
-        MiraiNative.subscribeAlways<NewFriendRequestEvent> { ev ->
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventRequestAddFriend(1, getTimestamp(), fromId, message, CacheManager.cacheEvent(ev))
+            //加好友事件
+            subscribeAlways<NewFriendRequestEvent> { ev ->
+                nativeLaunch {
+                    NativeBridge.eventRequestAddFriend(1, getTimestamp(), fromId, message, CacheManager.cacheEvent(ev))
+                }
             }
-        }
-        MiraiNative.subscribeAlways<FriendAddEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventFriendAdd(1, getTimestamp(), friend.id)
+            subscribeAlways<FriendAddEvent> {
+                nativeLaunch {
+                    NativeBridge.eventFriendAdd(1, getTimestamp(), friend.id)
+                }
             }
-        }
 
-        // 退群事件
-        MiraiNative.subscribeAlways<MemberLeaveEvent.Kick> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupMemberLeave(
-                    Bridge.MEMBER_LEAVE_KICK,
-                    getTimestamp(), group.id, operator?.id ?: bot.id, member.id
-                )
+            // 退群事件
+            subscribeAlways<MemberLeaveEvent.Kick> {
+                nativeLaunch {
+                    NativeBridge.eventGroupMemberLeave(
+                        Bridge.MEMBER_LEAVE_KICK,
+                        getTimestamp(), group.id, operator?.id ?: bot.id, member.id
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<MemberLeaveEvent.Quit> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupMemberLeave(
-                    Bridge.MEMBER_LEAVE_QUIT,
-                    getTimestamp(), group.id, 0, member.id
-                )
+            subscribeAlways<MemberLeaveEvent.Quit> {
+                nativeLaunch {
+                    NativeBridge.eventGroupMemberLeave(
+                        Bridge.MEMBER_LEAVE_QUIT,
+                        getTimestamp(), group.id, 0, member.id
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<BotLeaveEvent.Active> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupMemberLeave(
-                    Bridge.MEMBER_LEAVE_QUIT,
-                    getTimestamp(), group.id, 0, bot.id
-                )
+            subscribeAlways<BotLeaveEvent.Active> {
+                nativeLaunch {
+                    NativeBridge.eventGroupMemberLeave(
+                        Bridge.MEMBER_LEAVE_QUIT,
+                        getTimestamp(), group.id, 0, bot.id
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<BotLeaveEvent.Kick> { ev ->
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupMemberLeave(
-                    Bridge.MEMBER_LEAVE_KICK,
-                    getTimestamp(), group.id, ev.operator.id, bot.id
-                )
+            subscribeAlways<BotLeaveEvent.Kick> { ev ->
+                nativeLaunch {
+                    NativeBridge.eventGroupMemberLeave(
+                        Bridge.MEMBER_LEAVE_KICK,
+                        getTimestamp(), group.id, ev.operator.id, bot.id
+                    )
+                }
             }
-        }
 
-        // 禁言事件
-        MiraiNative.subscribeAlways<MemberMuteEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupBan(
-                    Bridge.GROUP_MUTE,
-                    getTimestamp(),
-                    group.id,
-                    operator?.id ?: bot.id,
-                    member.id,
-                    durationSeconds.toLong()
-                )
+            // 禁言事件
+            subscribeAlways<MemberMuteEvent> {
+                nativeLaunch {
+                    NativeBridge.eventGroupBan(
+                        Bridge.GROUP_MUTE,
+                        getTimestamp(),
+                        group.id,
+                        operator?.id ?: bot.id,
+                        member.id,
+                        durationSeconds.toLong()
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<MemberUnmuteEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupBan(
-                    Bridge.GROUP_UNMUTE,
-                    getTimestamp(),
-                    group.id,
-                    operator?.id ?: bot.id,
-                    member.id,
-                    0
-                )
+            subscribeAlways<MemberUnmuteEvent> {
+                nativeLaunch {
+                    NativeBridge.eventGroupBan(
+                        Bridge.GROUP_UNMUTE,
+                        getTimestamp(),
+                        group.id,
+                        operator?.id ?: bot.id,
+                        member.id,
+                        0
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<BotMuteEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupBan(
-                    Bridge.GROUP_MUTE,
-                    getTimestamp(),
-                    group.id,
-                    operator.id,
-                    bot.id,
-                    durationSeconds.toLong()
-                )
+            subscribeAlways<BotMuteEvent> {
+                nativeLaunch {
+                    NativeBridge.eventGroupBan(
+                        Bridge.GROUP_MUTE,
+                        getTimestamp(),
+                        group.id,
+                        operator.id,
+                        bot.id,
+                        durationSeconds.toLong()
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<BotUnmuteEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupBan(
-                    Bridge.GROUP_UNMUTE,
-                    getTimestamp(),
-                    group.id,
-                    operator.id,
-                    bot.id,
-                    0
-                )
+            subscribeAlways<BotUnmuteEvent> {
+                nativeLaunch {
+                    NativeBridge.eventGroupBan(
+                        Bridge.GROUP_UNMUTE,
+                        getTimestamp(),
+                        group.id,
+                        operator.id,
+                        bot.id,
+                        0
+                    )
+                }
             }
-        }
-        MiraiNative.subscribeAlways<GroupMuteAllEvent> {
-            MiraiNative.nativeLaunch {
-                NativeBridge.eventGroupBan(
-                    if (new) Bridge.GROUP_MUTE else Bridge.GROUP_UNMUTE,
-                    getTimestamp(),
-                    group.id,
-                    operator?.id ?: bot.id,
-                    0,
-                    0
-                )
+            subscribeAlways<GroupMuteAllEvent> {
+                nativeLaunch {
+                    NativeBridge.eventGroupBan(
+                        if (new) Bridge.GROUP_MUTE else Bridge.GROUP_UNMUTE,
+                        getTimestamp(),
+                        group.id,
+                        operator?.id ?: bot.id,
+                        0,
+                        0
+                    )
+                }
             }
         }
     }

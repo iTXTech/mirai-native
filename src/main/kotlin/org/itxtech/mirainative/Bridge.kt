@@ -53,6 +53,9 @@ object Bridge {
     // Native
 
     @JvmStatic
+    external fun config(codePage: Int): Int
+
+    @JvmStatic
     external fun loadNativePlugin(file: String, id: Int): Int
 
     @JvmStatic

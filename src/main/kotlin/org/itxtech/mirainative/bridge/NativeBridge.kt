@@ -29,11 +29,16 @@ import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.plugin.Event
 import org.itxtech.mirainative.plugin.NativePlugin
+import org.itxtech.mirainative.util.ConfigMan
 
 object NativeBridge {
     private fun getPlugins() = PluginManager.plugins
 
     private fun getLogger() = MiraiNative.logger
+
+    fun init() {
+        Bridge.config(ConfigMan.config.codePage)
+    }
 
     fun loadPlugin(plugin: NativePlugin): Int {
         val code = Bridge.loadNativePlugin(
