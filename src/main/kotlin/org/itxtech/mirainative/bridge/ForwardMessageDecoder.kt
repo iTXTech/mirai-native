@@ -24,10 +24,9 @@
 
 package org.itxtech.mirainative.bridge
 
-import io.ktor.util.InternalAPI
-import io.ktor.util.decodeBase64Bytes
+import io.ktor.util.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.io.core.ByteReadPacket
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.nameCardOrNick
