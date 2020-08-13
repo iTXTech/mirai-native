@@ -39,22 +39,24 @@ import java.net.URL
 object ChainCodeConverter {
     private val MSG_EMPTY = PlainText("")
 
-    private fun String.escape() =
-        replace("&", "&amp;")
+    private fun String.escape(part: Boolean): String {
+        val s = replace("&", "&amp;")
             .replace("[", "&#91;")
             .replace("]", "&#93;")
-            .replace(",", "&#44;")
+        return if (part) s.replace(",", "&#44;") else s
+    }
 
-    private fun String.unescape() =
-        replace("&amp;", "&")
+    private fun String.unescape(part: Boolean): String {
+        val s = replace("&amp;", "&")
             .replace("&#91;", "[")
             .replace("&#93;", "]")
-            .replace("&#44;", ",")
+        return if (part) s.replace("&#44;", ",") else s
+    }
 
     private fun String.toMap() = HashMap<String, String>().apply {
         this@toMap.split(",").forEach {
             val parts = it.split(delimiters = *arrayOf("="), limit = 2)
-            this[parts[0]] = parts[1].unescape()
+            this[parts[0]] = parts[1].unescape(true)
         }
     }
 
@@ -161,7 +163,7 @@ object ChainCodeConverter {
             }
             return MSG_EMPTY
         }
-        return PlainText(unescape())
+        return PlainText(unescape(false))
     }
 
     fun chainToCode(chain: MessageChain): String {
@@ -169,11 +171,11 @@ object ChainCodeConverter {
             when (it) {
                 is At -> "[CQ:at,qq=${it.target}]"
                 is AtAll -> "[CQ:at,qq=all]"
-                is PlainText -> it.content.escape()
+                is PlainText -> it.content.escape(false)
                 is Face -> "[CQ:face,id=${it.id}]"
                 is VipFace -> "[CQ:vipface,id=${it.kind.id},name=${it.kind.name},count=${it.count}]"
                 is Image -> "[CQ:image,file=${it.imageId}.mnimg]" // Real file not supported
-                is RichMessage -> "[CQ:rich,data=${it.content}]"
+                is RichMessage -> "[CQ:rich,data=${it.content.escape(true)}]"
                 is Voice -> "[CQ:voice,url=${it.url},md5=${it.md5},file=${it.fileName}]"
                 is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.type},name=${it.name}]"
                 is FlashImage -> "[CQ:image,file=${it.image.imageId}.mning,type=flash]"
@@ -224,7 +226,7 @@ object ChainCodeConverter {
                     +sb.toString().toMessageInternal(contact)
                 }
             } else {
-                +PlainText(message.unescape())
+                +PlainText(message.unescape(false))
             }
         }
     }
