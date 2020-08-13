@@ -30,8 +30,10 @@
  - 发送抖一抖 `[CQ:shake]`
  - 发送各类戳一戳 `[CQ:poke,id=xxx,type=xxx]`，ID和Type见 `mirai` 的 `HummerMessage.kt`，必须在该文件中定义的id和type才能发送
  - 接收`VipFace` `[CQ:vipface,id=xxx,name=xxx,count=xxx]`
- - 发送 `Xml` 消息 `[CQ:xml,data=xxxx]`
- - 发送 `Json` 消息 `[CQ:json,data=xxxx]`
+ - 发送 `XML` 消息 `[CQ:xml,data=xxxx]`
+ - 发送 `JSON` 消息 `[CQ:json,data=xxxx]`，少部分 JSON 消息为此类型
+ - 发送 `LightApp` 消息 `[CQ:app,data=xxxx]`，大部分 JSON 消息为此类型
+ - 接收未知类型 `Rich` 消息 `[CQ:rich,data=xxxx,id=xx]`
 
 ## 酷Q API
 

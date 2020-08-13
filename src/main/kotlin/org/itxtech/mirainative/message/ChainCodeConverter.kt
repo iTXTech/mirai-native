@@ -56,7 +56,7 @@ object ChainCodeConverter {
     private fun String.toMap() = HashMap<String, String>().apply {
         this@toMap.split(",").forEach {
             val parts = it.split(delimiters = *arrayOf("="), limit = 2)
-            this[parts[0]] = parts[1].unescape(true)
+            this[parts[0].trim()] = parts[1].unescape(true).trim()
         }
     }
 
@@ -157,6 +157,12 @@ object ChainCodeConverter {
                 "json" -> {
                     return JsonMessage(args["data"]!!)
                 }
+                "app" -> {
+                    return LightApp(args["data"]!!)
+                }
+                "rich" -> {
+                    return ServiceMessage(args["id"]!!.toInt(), args["data"]!!)
+                }
                 else -> {
                     MiraiNative.logger.debug("不支持的 CQ码：${parts[0]}")
                 }
@@ -175,7 +181,18 @@ object ChainCodeConverter {
                 is Face -> "[CQ:face,id=${it.id}]"
                 is VipFace -> "[CQ:vipface,id=${it.kind.id},name=${it.kind.name},count=${it.count}]"
                 is Image -> "[CQ:image,file=${it.imageId}.mnimg]" // Real file not supported
-                is RichMessage -> "[CQ:rich,data=${it.content.escape(true)}]"
+                is RichMessage -> {
+                    val content = it.content.escape(true)
+                    return@joinToString when (it) {
+                        is LightApp -> "[CQ:app,data=$content]"
+                        is ServiceMessage -> when (it.serviceId) {
+                            60 -> "[CQ:xml,data=$content]"
+                            1 -> "[CQ:json,data=$content]"
+                            else -> "[CQ:rich,data=${content},id=${it.serviceId}]"
+                        }
+                        else -> "[CQ:rich,data=$content]" // Which is impossible
+                    }
+                }
                 is Voice -> "[CQ:voice,url=${it.url},md5=${it.md5},file=${it.fileName}]"
                 is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.type},name=${it.name}]"
                 is FlashImage -> "[CQ:image,file=${it.image.imageId}.mning,type=flash]"
