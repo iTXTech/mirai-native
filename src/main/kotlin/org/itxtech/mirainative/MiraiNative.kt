@@ -105,8 +105,6 @@ object MiraiNative : PluginBase() {
         PluginManager.registerCommands()
         EventManager.registerEvents()
 
-        NativeBridge.init()
-
         if (Bot.botInstances.isNotEmpty() && Bot.botInstances.first().isOnline) {
             setBotOnline()
         }
@@ -136,6 +134,9 @@ object MiraiNative : PluginBase() {
 
     override fun onEnable() {
         checkNativeLibs()
+
+        NativeBridge.init()
+
         PluginManager.loadPlugins()
 
         nativeLaunch {

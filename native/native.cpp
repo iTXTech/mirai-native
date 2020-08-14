@@ -35,9 +35,9 @@ const char* JstringToGb(JNIEnv* env, jstring jstr)
 	auto jcstr = env->GetStringChars(jstr, 0);
 	auto size = WideCharToMultiByte(code_page, 0UL, LPCWSTR(jcstr), length,
 	                                nullptr, 0, nullptr, nullptr);
-	auto rtn = static_cast<char*>(malloc((size + 1) * sizeof(char)));
+	auto* rtn = new char[size + 1];
 	size = WideCharToMultiByte(code_page, 0UL, LPCWSTR(jcstr), length, rtn,
-	                                size, nullptr, nullptr);
+	                           size, nullptr, nullptr);
 	if (size <= 0)
 	{
 		return "";
@@ -69,15 +69,12 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 	}
 	jstring rtn = nullptr;
 	const auto length = MultiByteToWideChar(code_page, 0UL, LPCSTR(str), slen, nullptr, 0);
-	jchar* buffer = new jchar[length];
+	auto buffer = new jchar[length];
 	if (MultiByteToWideChar(code_page, 0UL, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
 	{
 		rtn = env->NewString(buffer, length);
 	}
-	if (buffer)
-	{
-		delete[] buffer;
-	}
+	delete[] buffer;
 	return rtn;
 }
 
@@ -178,7 +175,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin(
 	JNIEnv* env, jclass clz, jint id)
 {
 	auto r = FreeLibrary(plugins[id].dll);
-	delete[] plugins[id].file;
+	//free((void*) plugins[id].file);
 	if (r != FALSE)
 	{
 		return 0;
@@ -227,7 +224,10 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
 	const auto m = EvPriMsg(GetMethod(env, id, method));
 	if (m)
 	{
-		return m(type, msg_id, acct, JstringToGb(env, msg), font);
+		auto str1 = JstringToGb(env, msg);
+		auto result = m(type, msg_id, acct, str1, font);
+		//free((void*)str1);
+		return result;
 	}
 	return 0;
 }
@@ -239,7 +239,12 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
 	const auto m = EvGroupMsg(GetMethod(env, id, method));
 	if (m)
 	{
-		return m(type, msg_id, grp, acct, JstringToGb(env, anon), JstringToGb(env, msg), font);
+		auto str1 = JstringToGb(env, anon);
+		auto str2 = JstringToGb(env, msg);
+		auto result = m(type, msg_id, grp, acct, str1, str2, font);
+		//free((void*)str1);
+		//free((void*)str2);
+		return result;
 	}
 	return 0;
 }
@@ -285,7 +290,12 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup(
 	const auto m = EvRequestAddGroup(GetMethod(env, id, method));
 	if (m)
 	{
-		return m(type, time, grp, acct, JstringToGb(env, msg), JstringToChars(env, flag));
+		auto str1 = JstringToGb(env, msg);
+		auto str2 = JstringToChars(env, flag);
+		auto result = m(type, time, grp, acct, str1, str2);
+		//free((void*)str1);
+		//free((void*)str2);
+		return result;
 	}
 	return 0;
 }
@@ -297,7 +307,12 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddFriend(
 	const auto m = EvRequestAddFriend(GetMethod(env, id, method));
 	if (m)
 	{
-		return m(type, time, acct, JstringToGb(env, msg), JstringToChars(env, flag));
+		auto str1 = JstringToGb(env, msg);
+		auto str2 = JstringToChars(env, flag);
+		auto result = m(type, time, acct, str1, str2);
+		//free((void*)str1);
+		//free((void*)str2);
+		return result;
 	}
 	return 0;
 }
