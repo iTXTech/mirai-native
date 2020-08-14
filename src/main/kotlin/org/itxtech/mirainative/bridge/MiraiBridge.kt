@@ -273,13 +273,7 @@ object MiraiBridge {
                 } else {
                     (CacheManager.getEvent(requestId) as? BotInvitedJoinGroupRequestEvent)?.apply {
                         when (type) {//1通过，2忽略
-                            1 -> {
-                                accept()
-                                NativeBridge.eventGroupMemberJoin(
-                                    Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
-                                    EventManager.getTimestamp(), groupId, invitorId, bot.id
-                                )
-                            }
+                            1 -> accept()
                             2 -> ignore()
                         }
                     }

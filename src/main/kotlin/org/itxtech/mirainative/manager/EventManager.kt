@@ -124,6 +124,24 @@ object EventManager {
                     )
                 }
             }
+            subscribeAlways<BotJoinGroupEvent.Invite> { ev ->
+                NativeBridge.eventGroupMemberJoin(
+                    Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
+                    getTimestamp(),
+                    group.id,
+                    ev.invitor.id,
+                    bot.id
+                )
+            }
+            subscribeAlways<BotJoinGroupEvent.Active> {
+                NativeBridge.eventGroupMemberJoin(
+                    Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
+                    getTimestamp(),
+                    group.id,
+                    0,
+                    bot.id
+                )
+            }
 
             //加好友事件
             subscribeAlways<NewFriendRequestEvent> { ev ->
