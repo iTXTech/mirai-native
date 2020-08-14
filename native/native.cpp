@@ -33,15 +33,17 @@ const char* JstringToGb(JNIEnv* env, jstring jstr)
 {
 	int length = env->GetStringLength(jstr);
 	auto jcstr = env->GetStringChars(jstr, 0);
-	auto rtn = static_cast<char*>(malloc(length * 2 + 1));
-	auto size = WideCharToMultiByte(code_page, 0, LPCWSTR(jcstr), length, rtn,
-	                                length * 2 + 1, nullptr, nullptr);
+	auto size = WideCharToMultiByte(code_page, 0UL, LPCWSTR(jcstr), length,
+	                                nullptr, 0, nullptr, nullptr);
+	auto rtn = static_cast<char*>(malloc((size + 1) * sizeof(char)));
+	size = WideCharToMultiByte(code_page, 0UL, LPCWSTR(jcstr), length, rtn,
+	                                size, nullptr, nullptr);
 	if (size <= 0)
 	{
 		return "";
 	}
 	env->ReleaseStringChars(jstr, jcstr);
-	rtn[size] = 0;
+	rtn[size] = '\0';
 	return rtn;
 }
 
@@ -66,16 +68,15 @@ jstring GbToJstring(JNIEnv* env, const char* str)
 		return env->NewStringUTF(str);
 	}
 	jstring rtn = nullptr;
-	unsigned short* buffer = 0;
-	const auto length = MultiByteToWideChar(code_page, 0, LPCSTR(str), slen, nullptr, 0);
-	buffer = static_cast<unsigned short*>(malloc(length * 2 + 1));
-	if (MultiByteToWideChar(code_page, 0, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
+	const auto length = MultiByteToWideChar(code_page, 0UL, LPCSTR(str), slen, nullptr, 0);
+	jchar* buffer = new jchar[length];
+	if (MultiByteToWideChar(code_page, 0UL, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
 	{
-		rtn = env->NewString(static_cast<jchar*>(buffer), length);
+		rtn = env->NewString(buffer, length);
 	}
 	if (buffer)
 	{
-		free(buffer);
+		delete[] buffer;
 	}
 	return rtn;
 }
