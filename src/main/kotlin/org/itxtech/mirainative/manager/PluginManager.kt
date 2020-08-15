@@ -81,7 +81,7 @@ object PluginManager {
     }
 
     fun loadPluginFromFile(f: String): Boolean {
-        val file = File(MiraiNative.dataFolder.absolutePath + File.separatorChar + f)
+        val file = File(pl.absolutePath + File.separatorChar + f)
         if (file.isFile && file.exists()) {
             loadPlugin(file)
             return true
