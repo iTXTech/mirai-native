@@ -123,7 +123,15 @@ object MiraiBridge {
     fun sendPrivateMessage(pluginId: Int, id: Long, message: String) = call(pluginId, 0) {
         val internalId = CacheManager.nextId()
         MiraiNative.launch {
-            val contact = MiraiNative.bot.getFriendOrNull(id) ?: CacheManager.findMember(id)
+            var contact = MiraiNative.bot.getFriendOrNull(id) ?: CacheManager.findMember(id)
+            if (contact == null) {
+                MiraiNative.bot.groups.forEach {
+                    if (it.getOrNull(id) != null) {
+                        contact = it[id]
+                        return@forEach
+                    }
+                }
+            }
             contact?.sendMessage(ChainCodeConverter.codeToChain(message, contact))?.apply {
                 CacheManager.cacheMessage(source, internalId)
             }
