@@ -45,10 +45,15 @@ object NativeBridge {
             plugin.file.absolutePath.replace("\\", "\\\\"),
             plugin.id
         )
-        if (plugin.pluginInfo != null) {
-            getLogger().info("Native Plugin (w json) ${plugin.pluginInfo!!.name} has been loaded with code $code")
+        val info = if (plugin.pluginInfo != null) {
+            "Native Plugin (w json) ${plugin.pluginInfo!!.name} has been loaded with code $code"
         } else {
-            getLogger().info("Native Plugin (w/o json) ${plugin.file.name} has been loaded with code $code")
+            "Native Plugin (w/o json) ${plugin.file.name} has been loaded with code $code"
+        }
+        if (code == 0) {
+            getLogger().info(info)
+        } else {
+            getLogger().error(info)
         }
         return code
     }
