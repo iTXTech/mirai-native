@@ -112,7 +112,11 @@ object EventManager {
                 nativeLaunch {
                     NativeBridge.eventRequestAddGroup(
                         Bridge.REQUEST_GROUP_APPLY,
-                        getTimestamp(), groupId, fromId, message, CacheManager.cacheEvent(ev)
+                        getTimestamp(),
+                        groupId,
+                        fromId,
+                        message,
+                        CacheManager.cacheEvent(ev)
                     )
                 }
             }

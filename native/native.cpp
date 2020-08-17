@@ -27,12 +27,12 @@ struct native_plugin
 };
 
 priority_queue<pair<time_t, const char*>> mem_queue;
-
 mutex mem_mutex;
+bool running = true;
 
 thread mem_thread([]
 {
-	while (true)
+	while (running)
 	{
 		{
 			unique_lock<mutex> lock(mem_mutex);
@@ -42,14 +42,14 @@ thread mem_thread([]
 				mem_queue.pop();
 			}
 		}
-		this_thread::sleep_for(1s);
+		this_thread::sleep_for(500ms);
 	}
 });
 
 const char* delay_mem_free(const char* str)
 {
 	unique_lock<mutex> lock(mem_mutex);
-	mem_queue.push({ time(nullptr), str });
+	mem_queue.push({time(nullptr), str});
 	return str;
 }
 
@@ -83,10 +83,10 @@ const char* JstringToGb(JNIEnv* env, jstring jstr)
 	return rtn;
 }
 
-std::string JstringToGbString(JNIEnv* env, jstring jstr)
+string JstringToGbString(JNIEnv* env, jstring jstr)
 {
 	const auto* str = JstringToGb(env, jstr);
-	std::string ret(str);
+	string ret(str);
 	free((void*)str);
 	return ret;
 }
@@ -192,6 +192,16 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_config(JNIEnv* env, j
 	return 0;
 }
 
+// Shutdown
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_shutdown(JNIEnv* env, jclass clz)
+{
+	env->DeleteGlobalRef(bclz);
+	running = false;
+	mem_thread.join();
+	return 0;
+}
+
 // Plugin
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
@@ -282,7 +292,8 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
 	const auto m = EvGroupMsg(GetMethod(env, id, method));
 	if (m)
 	{
-		auto result = m(type, msg_id, grp, acct, JstringToGbString(env, anon).c_str() , JstringToGbString(env, msg).c_str(), font);
+		auto result = m(type, msg_id, grp, acct, JstringToGbString(env, anon).c_str(),
+		                JstringToGbString(env, msg).c_str(), font);
 		return result;
 	}
 	return 0;

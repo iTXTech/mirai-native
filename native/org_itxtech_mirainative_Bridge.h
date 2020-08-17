@@ -45,6 +45,14 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_config
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
+ * Method:    shutdown
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_shutdown
+(JNIEnv*, jclass);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
  * Method:    loadNativePlugin
  * Signature: (Ljava/lang/String;I)I
  */

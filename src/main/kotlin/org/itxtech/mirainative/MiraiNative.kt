@@ -151,6 +151,13 @@ object MiraiNative : PluginBase() {
         ConfigMan.save()
         PluginManager.unloadPlugins()
         CacheManager.clear()
+        nativeLaunch {
+            Bridge.shutdown()
+        }
+        dispatcher.cancel()
+        runBlocking {
+            dispatcher[Job]?.join()
+        }
     }
 
     fun nativeLaunch(b: suspend CoroutineScope.() -> Unit) = launch(context = dispatcher, block = b)

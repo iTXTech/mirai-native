@@ -56,6 +56,9 @@ object Bridge {
     external fun config(codePage: Int): Int
 
     @JvmStatic
+    external fun shutdown(): Int
+
+    @JvmStatic
     external fun loadNativePlugin(file: String, id: Int): Int
 
     @JvmStatic
