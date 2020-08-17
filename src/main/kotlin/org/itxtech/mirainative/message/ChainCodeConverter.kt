@@ -39,18 +39,18 @@ import java.net.URL
 object ChainCodeConverter {
     private val MSG_EMPTY = PlainText("")
 
-    private fun String.escape(part: Boolean): String {
+    fun String.escape(comma: Boolean): String {
         val s = replace("&", "&amp;")
             .replace("[", "&#91;")
             .replace("]", "&#93;")
-        return if (part) s.replace(",", "&#44;") else s
+        return if (comma) s.replace(",", "&#44;") else s
     }
 
-    private fun String.unescape(part: Boolean): String {
+    fun String.unescape(comma: Boolean): String {
         val s = replace("&amp;", "&")
             .replace("&#91;", "[")
             .replace("&#93;", "]")
-        return if (part) s.replace("&#44;", ",") else s
+        return if (comma) s.replace("&#44;", ",") else s
     }
 
     private fun String.toMap() = HashMap<String, String>().apply {
