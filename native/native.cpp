@@ -1,9 +1,12 @@
 ﻿#include <jni.h>
 #include <vector>
 #include <string>
+#include <thread>
 #include <Windows.h>
 #include "org_itxtech_mirainative_Bridge.h"
 #include "native.h"
+#include <mutex>
+#include <queue>
 
 using namespace std;
 
@@ -23,28 +26,69 @@ struct native_plugin
 	}
 };
 
+priority_queue<pair<time_t, const char*>> mem_queue;
+
+mutex mem_mutex;
+
+thread mem_thread([]
+{
+	while (true)
+	{
+		{
+			unique_lock<mutex> lock(mem_mutex);
+			while (!mem_queue.empty() && time(nullptr) - mem_queue.top().first > 300)
+			{
+				free((void*)mem_queue.top().second);
+				mem_queue.pop();
+			}
+		}
+		this_thread::sleep_for(1s);
+	}
+});
+
+const char* delay_mem_free(const char* str)
+{
+	unique_lock<mutex> lock(mem_mutex);
+	mem_queue.push({ time(nullptr), str });
+	return str;
+}
+
 // Global var
 
 vector<native_plugin> plugins;
 int code_page = 54936;
 
 // Helper
+
+// Memory returned from this function need to be freed using free()
 const char* JstringToGb(JNIEnv* env, jstring jstr)
 {
 	int length = env->GetStringLength(jstr);
 	auto jcstr = env->GetStringChars(jstr, 0);
 	auto size = WideCharToMultiByte(code_page, 0UL, LPCWSTR(jcstr), length,
 	                                nullptr, 0, nullptr, nullptr);
-	auto* rtn = new char[size + 1];
+	auto* rtn = (char*)malloc(size + 1);
 	size = WideCharToMultiByte(code_page, 0UL, LPCWSTR(jcstr), length, rtn,
 	                           size, nullptr, nullptr);
 	if (size <= 0)
 	{
-		return "";
+		// Cannot return "" here if the conversion failed or if the string is empty
+		// as both the memory would leak and the free() call later would cause a fatal error
+		env->ReleaseStringChars(jstr, jcstr);
+		*rtn = '\0';
+		return rtn;
 	}
 	env->ReleaseStringChars(jstr, jcstr);
 	rtn[size] = '\0';
 	return rtn;
+}
+
+std::string JstringToGbString(JNIEnv* env, jstring jstr)
+{
+	const auto* str = JstringToGb(env, jstr);
+	std::string ret(str);
+	free((void*)str);
+	return ret;
 }
 
 jstring UtfToJString(JNIEnv* env, const char* str)
@@ -90,6 +134,7 @@ string JstringToString(JNIEnv* env, jstring str)
 	return s;
 }
 
+// Memory returned from this function need to be freed using free()
 const char* JstringToChars(JNIEnv* env, jstring str)
 {
 	return _strdup(JstringToString(env, str).c_str());
@@ -175,7 +220,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_freeNativePlugin(
 	JNIEnv* env, jclass clz, jint id)
 {
 	auto r = FreeLibrary(plugins[id].dll);
-	//free((void*) plugins[id].file);
+	free((void*)plugins[id].file);
 	if (r != FALSE)
 	{
 		return 0;
@@ -224,9 +269,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
 	const auto m = EvPriMsg(GetMethod(env, id, method));
 	if (m)
 	{
-		auto str1 = JstringToGb(env, msg);
-		auto result = m(type, msg_id, acct, str1, font);
-		//free((void*)str1);
+		auto result = m(type, msg_id, acct, JstringToGbString(env, msg).c_str(), font);
 		return result;
 	}
 	return 0;
@@ -239,11 +282,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
 	const auto m = EvGroupMsg(GetMethod(env, id, method));
 	if (m)
 	{
-		auto str1 = JstringToGb(env, anon);
-		auto str2 = JstringToGb(env, msg);
-		auto result = m(type, msg_id, grp, acct, str1, str2, font);
-		//free((void*)str1);
-		//free((void*)str2);
+		auto result = m(type, msg_id, grp, acct, JstringToGbString(env, anon).c_str() , JstringToGbString(env, msg).c_str(), font);
 		return result;
 	}
 	return 0;
@@ -290,11 +329,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup(
 	const auto m = EvRequestAddGroup(GetMethod(env, id, method));
 	if (m)
 	{
-		auto str1 = JstringToGb(env, msg);
-		auto str2 = JstringToChars(env, flag);
-		auto result = m(type, time, grp, acct, str1, str2);
-		//free((void*)str1);
-		//free((void*)str2);
+		auto result = m(type, time, grp, acct, JstringToGbString(env, msg).c_str(), JstringToString(env, flag).c_str());
 		return result;
 	}
 	return 0;
@@ -307,11 +342,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddFriend(
 	const auto m = EvRequestAddFriend(GetMethod(env, id, method));
 	if (m)
 	{
-		auto str1 = JstringToGb(env, msg);
-		auto str2 = JstringToChars(env, flag);
-		auto result = m(type, time, acct, str1, str2);
-		//free((void*)str1);
-		//free((void*)str2);
+		auto result = m(type, time, acct, JstringToGbString(env, msg).c_str(), JstringToString(env, flag).c_str());
 		return result;
 	}
 	return 0;
@@ -419,7 +450,7 @@ CQAPI(const char*, CQ_getAppDirectory, 4)(int32_t plugin_id)
 	auto r = JstringToGb(env, result);
 	env->DeleteLocalRef(result);
 	detach_java();
-	return r;
+	return delay_mem_free(r);
 }
 
 CQAPI(int64_t, CQ_getLoginQQ, 4)(int32_t plugin_id)
@@ -437,7 +468,7 @@ CQAPI(const char*, CQ_getLoginNick, 4)(int32_t plugin_id)
 	auto method = env->GetStaticMethodID(bclz, "getLoginNick", "(I)Ljava/lang/String;");
 	auto result = JstringToGb(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)));
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(int32_t, CQ_setGroupAnonymous, 16)(int32_t plugin_id, int64_t group, BOOL enable)
@@ -523,7 +554,7 @@ CQAPI(const char*, CQ_getFriendList, 8)(int32_t plugin_id, BOOL reserved)
 	auto method = env->GetStaticMethodID(bclz, "getFriendList", "(IZ)Ljava/lang/String;");
 	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, reserved != FALSE)));
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getGroupInfo, 16)(int32_t plugin_id, int64_t group, BOOL cache)
@@ -533,7 +564,7 @@ CQAPI(const char*, CQ_getGroupInfo, 16)(int32_t plugin_id, int64_t group, BOOL c
 	auto result = JstringToChars(
 		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group, cache != FALSE)));
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getGroupList, 4)(int32_t plugin_id)
@@ -542,7 +573,7 @@ CQAPI(const char*, CQ_getGroupList, 4)(int32_t plugin_id)
 	auto method = env->GetStaticMethodID(bclz, "getGroupList", "(I)Ljava/lang/String;");
 	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)));
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getGroupMemberInfoV2, 24)(int32_t plugin_id, int64_t group, int64_t account, BOOL cache)
@@ -552,7 +583,7 @@ CQAPI(const char*, CQ_getGroupMemberInfoV2, 24)(int32_t plugin_id, int64_t group
 	auto result = JstringToChars(
 		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group, account, cache != FALSE)));
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getGroupMemberList, 12)(int32_t plugin_id, int64_t group)
@@ -561,7 +592,7 @@ CQAPI(const char*, CQ_getGroupMemberList, 12)(int32_t plugin_id, int64_t group)
 	auto method = env->GetStaticMethodID(bclz, "getGroupMemberList", "(IJ)Ljava/lang/String;");
 	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group)));
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getCookiesV2, 8)(int32_t plugin_id, const char* domain)
@@ -572,7 +603,7 @@ CQAPI(const char*, CQ_getCookiesV2, 8)(int32_t plugin_id, const char* domain)
 	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr)));
 	env->DeleteLocalRef(jstr);
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getCsrfToken, 4)(int32_t plugin_id)
@@ -581,7 +612,7 @@ CQAPI(const char*, CQ_getCsrfToken, 4)(int32_t plugin_id)
 	auto method = env->GetStaticMethodID(bclz, "getCsrfToken", "(I)Ljava/lang/String;");
 	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)));
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getImage, 8)(int32_t plugin_id, const char* image)
@@ -591,7 +622,7 @@ CQAPI(const char*, CQ_getImage, 8)(int32_t plugin_id, const char* image)
 	auto jstr = GbToJstring(env, image);
 	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr)));
 	env->DeleteLocalRef(jstr);
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getRecordV2, 12)(int32_t plugin_id, const char* file, const char* format)
@@ -605,7 +636,7 @@ CQAPI(const char*, CQ_getRecordV2, 12)(int32_t plugin_id, const char* file, cons
 	env->DeleteLocalRef(f);
 	env->DeleteLocalRef(fmt);
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(const char*, CQ_getStrangerInfo, 16)(int32_t plugin_id, int64_t account, BOOL cache)
@@ -615,7 +646,7 @@ CQAPI(const char*, CQ_getStrangerInfo, 16)(int32_t plugin_id, int64_t account, B
 	auto result = JstringToChars(
 		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, account, cache != FALSE)));
 	detach_java();
-	return result;
+	return delay_mem_free(result);
 }
 
 CQAPI(int32_t, CQ_sendDiscussMsg, 16)(int32_t plugin_id, int64_t group, const char* msg)
