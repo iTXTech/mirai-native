@@ -25,7 +25,6 @@
 package org.itxtech.mirainative.manager
 
 import kotlinx.atomicfu.atomic
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.registerCommand
 import org.itxtech.mirainative.Bridge
@@ -37,7 +36,6 @@ import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.NpmHelper
 import java.io.File
 
-@OptIn(UnstableDefault::class)
 object PluginManager {
     private val pluginId = atomic(0)
     val plugins = hashMapOf<Int, NativePlugin>()
@@ -103,9 +101,9 @@ object PluginManager {
                 plugin.pluginInfo = Json {
                     isLenient = true
                     ignoreUnknownKeys = true
-                    serializeSpecialFloatingPointValues = true
+                    allowSpecialFloatingPointValues = true
                     useArrayPolymorphism = true
-                }.parse(PluginInfo.serializer(), json.readText())
+                }.decodeFromString(PluginInfo.serializer(), json.readText())
             }
             if (NativeBridge.loadPlugin(plugin) == 0) {
                 plugin.loaded = true

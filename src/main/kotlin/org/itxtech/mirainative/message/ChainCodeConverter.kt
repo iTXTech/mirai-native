@@ -30,6 +30,8 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.uploadImage
+import net.mamoe.mirai.utils.toExternalImage
+import net.mamoe.mirai.utils.upload
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.util.Music
 import org.itxtech.mirainative.util.NeteaseMusic
@@ -55,14 +57,14 @@ object ChainCodeConverter {
 
     private fun String.toMap() = HashMap<String, String>().apply {
         this@toMap.split(",").forEach {
-            val parts = it.split(delimiters = *arrayOf("="), limit = 2)
+            val parts = it.split(delimiters = arrayOf("="), limit = 2)
             this[parts[0].trim()] = parts[1].unescape(true).trim()
         }
     }
 
     private suspend fun String.toMessageInternal(contact: Contact?): Message {
         if (startsWith("[CQ:") && endsWith("]")) {
-            val parts = substring(4, length - 1).split(delimiters = *arrayOf(","), limit = 2)
+            val parts = substring(4, length - 1).split(delimiters = arrayOf(","), limit = 2)
             val args = if (parts.size == 2) {
                 parts[1].toMap()
             } else {
@@ -103,7 +105,9 @@ object ChainCodeConverter {
                             image = contact!!.uploadImage(file)
                         }
                     } else if (args.containsKey("url")) {
-                        image = withContext(Dispatchers.IO) { contact!!.uploadImage(URL(args["url"]!!)) }
+                        image = withContext(Dispatchers.IO) {
+                            URL(args["url"]!!).openStream().toExternalImage().upload(contact!!)
+                        }
                     }
                     if (image != null) {
                         if (args["type"] == "flash") {

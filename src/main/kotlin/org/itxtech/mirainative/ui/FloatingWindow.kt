@@ -90,7 +90,7 @@ object FloatingWindow {
                 if (p.entries.isNotEmpty()) {
                     p.entries.forEach { e ->
                         if (p.enabled && e.visible) {
-                            t.append(e.status.name).append(": ").append(e.data).append(" ").appendln(e.unit)
+                            t.append(e.status.name).append(": ").append(e.data).append(" ").appendLine(e.unit)
                         }
                     }
                 }

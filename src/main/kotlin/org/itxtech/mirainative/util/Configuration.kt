@@ -25,14 +25,12 @@
 package org.itxtech.mirainative.util
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.ui.FloatingWindow
 import java.io.File
 
-@OptIn(UnstableDefault::class)
 object ConfigMan {
     private val file = File(MiraiNative.dataFolder.absolutePath + File.separatorChar + "config.json")
     val config: Configuration by lazy {
@@ -40,9 +38,9 @@ object ConfigMan {
             Json {
                 isLenient = true
                 ignoreUnknownKeys = true
-                serializeSpecialFloatingPointValues = true
+                allowSpecialFloatingPointValues = true
                 useArrayPolymorphism = true
-            }.parse(Configuration.serializer(), file.readText())
+            }.decodeFromString(Configuration.serializer(), file.readText())
         } else {
             Configuration()
         }
@@ -83,7 +81,7 @@ object ConfigMan {
             }
             config.plugins.add(entry)
         }
-        file.writeText(Json.stringify(Configuration.serializer(), config))
+        file.writeText(Json.encodeToString(Configuration.serializer(), config))
     }
 }
 
