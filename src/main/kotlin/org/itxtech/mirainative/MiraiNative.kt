@@ -26,8 +26,7 @@ package org.itxtech.mirainative
 
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.plugins.PluginBase
-import net.mamoe.mirai.console.plugins.PluginManager.getPluginDescription
+import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import org.itxtech.mirainative.bridge.NativeBridge
 import org.itxtech.mirainative.manager.CacheManager
 import org.itxtech.mirainative.manager.EventManager
@@ -42,7 +41,7 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.jar.Manifest
 
-object MiraiNative : PluginBase() {
+object MiraiNative : KotlinPlugin() {
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
@@ -91,9 +90,9 @@ object MiraiNative : PluginBase() {
         if (!dll.exists()) {
             logger.error("找不到 ${dll.absolutePath}，写出自带的 CQP.dll。")
             val cqp = FileOutputStream(dll)
-            getResources("CQP.dll")?.copyTo(cqp)
+            getResourceAsStream("CQP.dll").copyTo(cqp)
             cqp.close()
-        } else if (getResources("CQP.dll")!!.readBytes().checksum() != dll.readBytes().checksum()) {
+        } else if (getResourceAsStream("CQP.dll").readBytes().checksum() != dll.readBytes().checksum()) {
             logger.warning("${dll.absolutePath} 与 Mirai Native 内置的 CQP.dll 的校验和不同。")
             logger.warning("如运行时出现问题，请尝试删除 ${dll.absolutePath} 并重启 Mirai。")
         }
@@ -164,7 +163,7 @@ object MiraiNative : PluginBase() {
     fun nativeLaunch(b: suspend CoroutineScope.() -> Unit) = launch(context = dispatcher, block = b)
 
     fun getVersion(): String {
-        var version = getPluginDescription(MiraiNative).version
+        var version = description.version.value
         val mf = javaClass.classLoader.getResources("META-INF/MANIFEST.MF")
         while (mf.hasMoreElements()) {
             val manifest = Manifest(mf.nextElement().openStream())

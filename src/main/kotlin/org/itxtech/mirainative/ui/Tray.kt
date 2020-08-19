@@ -40,7 +40,7 @@ object Tray {
     fun create() {
         try {
             if (SystemTray.isSupported()) {
-                icon = TrayIcon(ImageIO.read(MiraiNative.getResources("icon.jpg")), "Mirai Native 插件菜单").apply {
+                icon = TrayIcon(ImageIO.read(MiraiNative.getResourceAsStream("icon.jpg")), "Mirai Native 插件菜单").apply {
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseClicked(e: MouseEvent?) {
                             if (e?.button == 1 && !FloatingWindow.isVisible()) {

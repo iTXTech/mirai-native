@@ -26,7 +26,12 @@ package org.itxtech.mirainative.manager
 
 import kotlinx.atomicfu.atomic
 import kotlinx.serialization.json.Json
-import net.mamoe.mirai.console.command.registerCommand
+import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
+import net.mamoe.mirai.console.command.CommandSender
+import net.mamoe.mirai.console.command.CompositeCommand
+import net.mamoe.mirai.console.command.ConsoleCommandOwner
+import net.mamoe.mirai.console.command.sendMessage
+import net.mamoe.mirai.console.util.ConsoleExperimentalAPI
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.bridge.NativeBridge
@@ -159,95 +164,111 @@ object PluginManager {
         }
     }
 
-    fun registerCommands() {
-        MiraiNative.registerCommand {
-            name = "npm"
-            description = "Mirai Native 插件管理器"
-            usage = "npm [list|enable|disable|menu|info|load|unload] (插件 Id / 路径) (方法名)"
-            onCommand {
-                if ((it.isEmpty() || (it[0] != "list" && it.size < 2))) {
-                    return@onCommand false
-                }
-                when (it[0]) {
-                    "list" -> {
-                        appendMessage("共加载了 " + plugins.size + " 个 Mirai Native 插件")
-                        plugins.values.forEach { p ->
-                            if (p.pluginInfo != null) {
-                                appendMessage(
-                                    "Id：" + p.id + " 标识符：" + p.identifier + " 名称：" + p.pluginInfo!!.name +
-                                            " 版本：" + p.pluginInfo!!.version + " " + NpmHelper.state(p)
+    @OptIn(ConsoleExperimentalAPI::class)
+    object NpmCommand : CompositeCommand(
+        ConsoleCommandOwner, "npm",
+        description = "Mirai Native 插件管理器"
+    ) {
+        override val usage: String
+            get() = "npm [list|enable|disable|menu|info|load|unload] (插件 Id / 路径) (方法名)"
 
+        @SubCommand
+        suspend fun CommandSender.list() {
+            sendMessage(buildString {
+                appendLine("共加载了 ${plugins.size} 个 Mirai Native 插件")
+                plugins.values.forEach { p ->
+                    if (p.pluginInfo != null) {
+                        appendLine(
+                            "Id：${p.id} 标识符：${p.identifier} 名称：${p.pluginInfo!!.name} 版本：${p.pluginInfo!!.version} ${
+                                NpmHelper.state(
+                                    p
                                 )
-                            } else {
-                                appendMessage(
-                                    "Id：" + p.id + " 标识符：" + p.identifier + " （JSON文件缺失）" +
-                                            NpmHelper.state(p)
-                                )
-                            }
-                        }
-                    }
-                    "enable" -> {
-                        if (!MiraiNative.botOnline) {
-                            appendMessage("Bot 还未上线，无法调用 Enable 事件。")
-                        } else {
-                            if (plugins.containsKey(it[1].toInt())) {
-                                val p = plugins[it[1].toInt()]!!
-                                enablePlugin(p)
-                                appendMessage("插件 " + p.identifier + " 已启用。")
-                            } else {
-                                appendMessage("Id " + it[1] + " 不存在。")
-                            }
-                        }
-                    }
-                    "disable" -> {
-                        if (plugins.containsKey(it[1].toInt())) {
-                            val p = plugins[it[1].toInt()]!!
-                            disablePlugin(p)
-                            appendMessage("插件 " + p.identifier + " 已禁用。")
-                        } else {
-                            appendMessage("Id " + it[1] + " 不存在。")
-                        }
-                    }
-                    "menu" -> {
-                        if (it.size < 3) {
-                            return@onCommand false
-                        }
-                        if (plugins.containsKey(it[1].toInt()) && plugins[it[1].toInt()]!!.verifyMenuFunc(it[2])) {
-                            MiraiNative.nativeLaunch {
-                                Bridge.callIntMethod(it[1].toInt(), it[2])
-                            }
-                            appendMessage("已调用 Id " + it[1] + " 的 " + it[2] + " 方法。")
-                        } else {
-                            appendMessage("Id " + it[2] + " 不存在，或未注册该菜单入口。")
-                        }
-                    }
-                    "info" -> {
-                        if (plugins.containsKey(it[1].toInt())) {
-                            appendMessage(NpmHelper.summary(plugins[it[1].toInt()]!!))
-                        } else {
-                            appendMessage("Id " + it[1] + " 不存在。")
-                        }
-                    }
-                    "load" -> {
-                        if (!loadPluginFromFile(it[1])) {
-                            appendMessage("文件 ${it[1]} 不存在")
-                        }
-                    }
-                    "unload" -> {
-                        if (plugins.containsKey(it[1].toInt())) {
-                            unloadPlugin(
-                                plugins[it[1].toInt()]!!
-                            )
-                        } else {
-                            appendMessage("Id " + it[1] + " 不存在。")
-                        }
-                    }
-                    else -> {
-                        return@onCommand false
+                            }"
+                        )
+                    } else {
+                        appendLine("Id：${p.id} 标识符：${p.identifier} （JSON文件缺失）${NpmHelper.state(p)}")
                     }
                 }
-                true
-            }
+            })
         }
+
+        @SubCommand
+        suspend fun CommandSender.enable(id: Int) {
+            sendMessage(buildString {
+                if (!MiraiNative.botOnline) {
+                    appendLine("Bot 还未上线，无法调用 Enable 事件。")
+                } else {
+                    if (plugins.containsKey(id)) {
+                        val p = plugins[id]!!
+                        enablePlugin(p)
+                        appendLine("插件 ${p.identifier} 已启用。")
+                    } else {
+                        appendLine("Id $id 不存在。")
+                    }
+                }
+            })
+        }
+
+        @SubCommand
+        suspend fun CommandSender.disable(id: Int) {
+            sendMessage(buildString {
+                if (plugins.containsKey(id)) {
+                    val p = plugins[id]!!
+                    disablePlugin(p)
+                    appendLine("插件 ${p.identifier} 已禁用。")
+                } else {
+                    appendLine("Id $id 不存在。")
+                }
+            })
+        }
+
+        @SubCommand
+        suspend fun CommandSender.menu(id: Int, method: String) {
+            sendMessage(buildString {
+                if (plugins[id]?.verifyMenuFunc(method) == true) {
+                    MiraiNative.nativeLaunch {
+                        Bridge.callIntMethod(id, method)
+                    }
+                    appendLine("已调用 Id $id 的 $method 方法。")
+                } else {
+                    appendLine("Id $id 不存在，或未注册该菜单入口。")
+                }
+            })
+        }
+
+        @SubCommand
+        suspend fun CommandSender.info(id: Int) {
+            sendMessage(buildString {
+                if (plugins.containsKey(id)) {
+                    appendLine(NpmHelper.summary(plugins[id]!!))
+                } else {
+                    appendLine("Id $id 不存在。")
+                }
+            })
+        }
+
+        @SubCommand
+        suspend fun CommandSender.load(file: String) {
+            sendMessage(buildString {
+                if (!loadPluginFromFile(file)) {
+                    appendLine("文件 $file 不存在。")
+                }
+            })
+        }
+
+        @SubCommand
+        suspend fun CommandSender.unload(id: Int) {
+            sendMessage(buildString {
+                if (plugins.containsKey(id)) {
+                    unloadPlugin(plugins[id]!!)
+                } else {
+                    appendLine("Id $id 不存在。")
+                }
+            })
+        }
+    }
+
+    fun registerCommands() {
+        NpmCommand.register()
     }
 }
