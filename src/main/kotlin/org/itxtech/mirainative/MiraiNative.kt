@@ -46,6 +46,7 @@ object MiraiNative : PluginBase() {
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
+    val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
     @OptIn(ObsoleteCoroutinesApi::class)
     private val dispatcher = newSingleThreadContext("MiraiNative")

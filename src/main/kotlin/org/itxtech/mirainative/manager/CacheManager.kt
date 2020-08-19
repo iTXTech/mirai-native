@@ -30,6 +30,7 @@ import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.message.TempMessageEvent
 import net.mamoe.mirai.message.data.MessageSource
+import net.mamoe.mirai.message.data.Voice
 import net.mamoe.mirai.message.data.recall
 import net.mamoe.mirai.message.data.source
 import org.itxtech.mirainative.MiraiNative
@@ -38,6 +39,7 @@ object CacheManager {
     private val msgCache = hashMapOf<Int, MessageSource>()
     private val evCache = hashMapOf<Int, BotEvent>()
     private val senders = hashMapOf<Long, Member>()
+    private val records = hashMapOf<String, Voice>()
     private val internalId = atomic(0)
 
     fun nextId() = internalId.getAndIncrement()
@@ -63,6 +65,8 @@ object CacheManager {
     }
 
     fun getMessage(id: Int) = msgCache[id]
+
+    fun getRecord(name: String) = records[name.replace(".mnrec", "")]
 
     fun findMember(id: Long) = senders[id]
 

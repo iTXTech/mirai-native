@@ -274,16 +274,17 @@ object Bridge {
         return MiraiBridge.getImage(pluginId, image)
     }
 
+    @JvmStatic
+    fun getRecord(pluginId: Int, file: String, format: String): String {
+        return MiraiBridge.getRecord(pluginId, file, format)
+    }
+
+
     // Placeholder methods which mirai hasn't supported yet
 
     @JvmStatic
     fun setGroupAnonymous(pluginId: Int, group: Long, enable: Boolean): Int {
         return 0
-    }
-
-    @JvmStatic
-    fun getRecord(pluginId: Int, file: String, format: String): String {
-        return ""
     }
 
     @JvmStatic

@@ -325,6 +325,29 @@ object MiraiBridge {
             }
         }
 
+    fun getRecord(pluginId: Int, record: String, format: String) =
+        call(pluginId, "", "Error occurred when plugin %0 downloading record $record") {
+            return runBlocking {
+                val rec = CacheManager.getRecord(record.replace(".mnrec", ""))
+                if (rec != null) {
+                    val file = File(
+                        MiraiNative.recDataPath.absolutePath + File.separatorChar +
+                                BigInteger(1, rec.md5).toString(16)
+                                    .padStart(32, '0') + ".silk"
+                    )
+                    if (rec.url != null) {
+                        val client = HttpClient()
+                        val response = client.get<HttpResponse>(rec.url!!)
+                        if (response.status.isSuccess()) {
+                            response.content.copyAndClose(file.writeChannel())
+                            return@runBlocking file.absolutePath
+                        }
+                    }
+                }
+                return@runBlocking ""
+            }
+        }
+
     fun addLog(pluginId: Int, priority: Int, type: String, content: String) {
         NativeLoggerHelper.log(PluginManager.plugins[pluginId]!!, priority, type, content)
     }

@@ -27,12 +27,14 @@ package org.itxtech.mirainative.message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.uploadImage
 import net.mamoe.mirai.utils.toExternalImage
 import net.mamoe.mirai.utils.upload
 import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.manager.CacheManager
 import org.itxtech.mirainative.util.Music
 import org.itxtech.mirainative.util.NeteaseMusic
 import org.itxtech.mirainative.util.QQMusic
@@ -99,10 +101,11 @@ object ChainCodeConverter {
                     if (args.containsKey("file")) {
                         if (args["file"]!!.endsWith(".mnimg")) {
                             image = Image(args["file"]!!.replace(".mnimg", ""))
-                        }
-                        val file = MiraiNative.getDataFile("image", args["file"]!!)
-                        if (file != null) {
-                            image = contact!!.uploadImage(file)
+                        } else {
+                            val file = MiraiNative.getDataFile("image", args["file"]!!)
+                            if (file != null) {
+                                image = contact!!.uploadImage(file)
+                            }
                         }
                     } else if (args.containsKey("url")) {
                         image = withContext(Dispatchers.IO) {
@@ -115,6 +118,7 @@ object ChainCodeConverter {
                         }
                         return image
                     }
+                    return MSG_EMPTY
                 }
                 "share" -> {
                     return RichMessageHelper.share(
@@ -167,6 +171,24 @@ object ChainCodeConverter {
                 "rich" -> {
                     return ServiceMessage(args["id"]!!.toInt(), args["data"]!!)
                 }
+                "record" -> {
+                    var rec: Voice? = null
+                    if (args.containsKey("file")) {
+                        if (args["file"]!!.endsWith(".mnrec")) {
+                            rec = CacheManager.getRecord(args["file"]!!)
+                        } else {
+                            val file = MiraiNative.getDataFile("record", args["file"]!!)
+                            if (file != null) {
+                                rec = (contact!! as Group).uploadVoice(file.inputStream())
+                            }
+                        }
+                    } else if (args.containsKey("url")) {
+                        rec = withContext(Dispatchers.IO) {
+                            (contact!! as Group).uploadVoice(URL(args["url"]!!).openStream())
+                        }
+                    }
+                    return rec ?: MSG_EMPTY
+                }
                 else -> {
                     MiraiNative.logger.debug("不支持的 CQ码：${parts[0]}")
                 }
@@ -197,7 +219,7 @@ object ChainCodeConverter {
                         else -> "[CQ:rich,data=$content]" // Which is impossible
                     }
                 }
-                is Voice -> "[CQ:voice,url=${it.url},md5=${it.md5},file=${it.fileName}]"
+                is Voice -> "[CQ:record,file=${it.fileName}.mnrec]"
                 is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.type},name=${it.name}]"
                 is FlashImage -> "[CQ:image,file=${it.image.imageId}.mning,type=flash]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
