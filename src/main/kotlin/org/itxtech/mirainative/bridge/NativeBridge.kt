@@ -110,6 +110,15 @@ object NativeBridge {
     }
 
     // Events
+
+    private inline fun event(ev: Int, defaultMethod: String, block: NativePlugin.(evName: String) -> Int) {
+        for (plugin in getPlugins().values) {
+            if (plugin.shouldCallEvent(ev) && block(plugin, plugin.getEventOrDefault(ev, defaultMethod)) == 1) {
+                break
+            }
+        }
+    }
+
     fun eventPrivateMessage(
         subType: Int,
         msgId: Int,
@@ -117,19 +126,16 @@ object NativeBridge {
         msg: String,
         font: Int
     ) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_PRI_MSG) && Bridge.pEvPrivateMessage(
-                    plugin.id,
-                    plugin.getEventOrDefault(Event.EVENT_PRI_MSG, "_eventPrivateMsg"),
-                    subType,
-                    msgId,
-                    fromAccount,
-                    plugin.processMessage(Event.EVENT_PRI_MSG, msg),
-                    font
-                ) == 1
-            ) {
-                break
-            }
+        event(Event.EVENT_PRI_MSG, "_eventPrivateMsg") {
+            Bridge.pEvPrivateMessage(
+                id,
+                it,
+                subType,
+                msgId,
+                fromAccount,
+                processMessage(Event.EVENT_PRI_MSG, msg),
+                font
+            )
         }
     }
 
@@ -142,59 +148,30 @@ object NativeBridge {
         msg: String,
         font: Int
     ) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MSG) && Bridge.pEvGroupMessage(
-                    plugin.id,
-                    plugin.getEventOrDefault(Event.EVENT_GROUP_MSG, "_eventGroupMsg"),
-                    subType,
-                    msgId,
-                    fromGroup,
-                    fromAccount,
-                    fromAnonymous,
-                    plugin.processMessage(Event.EVENT_GROUP_MSG, msg),
-                    font
-                ) == 1
-            ) {
-                break
-            }
+        event(Event.EVENT_GROUP_MSG, "_eventGroupMsg") {
+            Bridge.pEvGroupMessage(
+                id,
+                it,
+                subType,
+                msgId,
+                fromGroup,
+                fromAccount,
+                fromAnonymous,
+                processMessage(Event.EVENT_GROUP_MSG, msg),
+                font
+            )
         }
     }
 
     fun eventGroupAdmin(subType: Int, time: Int, fromGroup: Long, beingOperateAccount: Long) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_ADMIN) && Bridge.pEvGroupAdmin(
-                    plugin.id,
-                    plugin.getEventOrDefault(
-                        Event.EVENT_GROUP_ADMIN,
-                        "_eventSystem_GroupAdmin"
-                    ),
-                    subType, time, fromGroup, beingOperateAccount
-                ) == 1
-            ) {
-                break
-            }
+        event(Event.EVENT_GROUP_ADMIN, "_eventSystem_GroupAdmin") {
+            Bridge.pEvGroupAdmin(id, it, subType, time, fromGroup, beingOperateAccount)
         }
     }
 
-    fun eventGroupMemberLeave(
-        subType: Int,
-        time: Int,
-        fromGroup: Long,
-        fromAccount: Long,
-        beingOperateAccount: Long
-    ) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_DEC) && Bridge.pEvGroupMember(
-                    plugin.id,
-                    plugin.getEventOrDefault(
-                        Event.EVENT_GROUP_MEMBER_DEC,
-                        "_eventSystem_GroupMemberDecrease"
-                    ),
-                    subType, time, fromGroup, fromAccount, beingOperateAccount
-                ) == 1
-            ) {
-                break
-            }
+    fun eventGroupMemberLeave(subType: Int, time: Int, fromGroup: Long, fromAccount: Long, beingOperateAccount: Long) {
+        event(Event.EVENT_GROUP_MEMBER_DEC, "_eventSystem_GroupMemberDecrease") {
+            Bridge.pEvGroupMember(id, it, subType, time, fromGroup, fromAccount, beingOperateAccount)
         }
     }
 
@@ -206,18 +183,8 @@ object NativeBridge {
         beingOperateAccount: Long,
         duration: Long
     ) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_BAN) && Bridge.pEvGroupBan(
-                    plugin.id,
-                    plugin.getEventOrDefault(
-                        Event.EVENT_GROUP_BAN,
-                        "_eventSystem_GroupBan"
-                    ),
-                    subType, time, fromGroup, fromAccount, beingOperateAccount, duration
-                ) == 1
-            ) {
-                break
-            }
+        event(Event.EVENT_GROUP_BAN, "_eventSystem_GroupBan") {
+            Bridge.pEvGroupBan(id, it, subType, time, fromGroup, fromAccount, beingOperateAccount, duration)
         }
     }
 
@@ -228,18 +195,8 @@ object NativeBridge {
         fromAccount: Long,
         beingOperateAccount: Long
     ) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_GROUP_MEMBER_INC) && Bridge.pEvGroupMember(
-                    plugin.id,
-                    plugin.getEventOrDefault(
-                        Event.EVENT_GROUP_MEMBER_INC,
-                        "_eventSystem_GroupMemberIncrease"
-                    ),
-                    subType, time, fromGroup, fromAccount, beingOperateAccount
-                ) == 1
-            ) {
-                break
-            }
+        event(Event.EVENT_GROUP_MEMBER_INC, "_eventSystem_GroupMemberIncrease") {
+            Bridge.pEvGroupMember(id, it, subType, time, fromGroup, fromAccount, beingOperateAccount)
         }
     }
 
@@ -251,18 +208,8 @@ object NativeBridge {
         msg: String,
         flag: String
     ) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_REQUEST_GROUP) && Bridge.pEvRequestAddGroup(
-                    plugin.id,
-                    plugin.getEventOrDefault(
-                        Event.EVENT_REQUEST_GROUP,
-                        "_eventRequest_AddGroup"
-                    ),
-                    subType, time, fromGroup, fromAccount, msg, flag
-                ) == 1
-            ) {
-                break
-            }
+        event(Event.EVENT_REQUEST_GROUP, "_eventRequest_AddGroup") {
+            Bridge.pEvRequestAddGroup(id, it, subType, time, fromGroup, fromAccount, msg, flag)
         }
     }
 
@@ -273,34 +220,14 @@ object NativeBridge {
         msg: String,
         flag: String
     ) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_REQUEST_FRIEND) && Bridge.pEvRequestAddFriend(
-                    plugin.id,
-                    plugin.getEventOrDefault(
-                        Event.EVENT_REQUEST_FRIEND,
-                        "_eventRequest_AddFriend"
-                    ),
-                    subType, time, fromAccount, msg, flag
-                ) == 1
-            ) {
-                break
-            }
+        event(Event.EVENT_REQUEST_FRIEND, "_eventRequest_AddFriend") {
+            Bridge.pEvRequestAddFriend(id, it, subType, time, fromAccount, msg, flag)
         }
     }
 
     fun eventFriendAdd(subType: Int, time: Int, fromAccount: Long) {
-        for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(Event.EVENT_FRIEND_ADD) && Bridge.pEvFriendAdd(
-                    plugin.id,
-                    plugin.getEventOrDefault(
-                        Event.EVENT_FRIEND_ADD,
-                        "_eventRequest_AddFriend"
-                    ),
-                    subType, time, fromAccount
-                ) == 1
-            ) {
-                break
-            }
+        event(Event.EVENT_FRIEND_ADD, "_eventRequest_AddFriend") {
+            Bridge.pEvFriendAdd(id, it, subType, time, fromAccount)
         }
     }
 }
