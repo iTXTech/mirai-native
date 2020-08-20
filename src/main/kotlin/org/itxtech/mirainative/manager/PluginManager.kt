@@ -169,9 +169,6 @@ object PluginManager {
         ConsoleCommandOwner, "npm",
         description = "Mirai Native 插件管理器"
     ) {
-        override val usage: String
-            get() = "npm [list|enable|disable|menu|info|load|unload] (插件 Id / 路径) (方法名)"
-
         @SubCommand
         suspend fun CommandSender.list() {
             sendMessage(buildString {
@@ -193,7 +190,7 @@ object PluginManager {
         }
 
         @SubCommand
-        suspend fun CommandSender.enable(id: Int) {
+        suspend fun CommandSender.enable(@Name("插件Id") id: Int) {
             sendMessage(buildString {
                 if (!MiraiNative.botOnline) {
                     appendLine("Bot 还未上线，无法调用 Enable 事件。")
@@ -210,7 +207,7 @@ object PluginManager {
         }
 
         @SubCommand
-        suspend fun CommandSender.disable(id: Int) {
+        suspend fun CommandSender.disable(@Name("插件Id") id: Int) {
             sendMessage(buildString {
                 if (plugins.containsKey(id)) {
                     val p = plugins[id]!!
@@ -223,7 +220,7 @@ object PluginManager {
         }
 
         @SubCommand
-        suspend fun CommandSender.menu(id: Int, method: String) {
+        suspend fun CommandSender.menu(@Name("插件Id") id: Int, @Name("方法名") method: String) {
             sendMessage(buildString {
                 if (plugins[id]?.verifyMenuFunc(method) == true) {
                     MiraiNative.nativeLaunch {
@@ -237,7 +234,7 @@ object PluginManager {
         }
 
         @SubCommand
-        suspend fun CommandSender.info(id: Int) {
+        suspend fun CommandSender.info(@Name("插件Id") id: Int) {
             sendMessage(buildString {
                 if (plugins.containsKey(id)) {
                     appendLine(NpmHelper.summary(plugins[id]!!))
@@ -248,7 +245,7 @@ object PluginManager {
         }
 
         @SubCommand
-        suspend fun CommandSender.load(file: String) {
+        suspend fun CommandSender.load(@Name("DLL文件名") file: String) {
             sendMessage(buildString {
                 if (!loadPluginFromFile(file)) {
                     appendLine("文件 $file 不存在。")
@@ -257,7 +254,7 @@ object PluginManager {
         }
 
         @SubCommand
-        suspend fun CommandSender.unload(id: Int) {
+        suspend fun CommandSender.unload(@Name("插件Id") id: Int) {
             sendMessage(buildString {
                 if (plugins.containsKey(id)) {
                     unloadPlugin(plugins[id]!!)
