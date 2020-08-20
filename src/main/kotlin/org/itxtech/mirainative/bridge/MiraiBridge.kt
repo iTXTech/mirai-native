@@ -103,15 +103,17 @@ object MiraiBridge {
                 if (!src.isAboutGroup()) {
                     if (src.fromId != MiraiNative.bot.id) {
                         val f = MiraiNative.bot.getFriend(src.fromId)
-                        f.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, f)).apply {
-                            CacheManager.cacheMessage(source, internalId)
+                        val chain = src.quote() + ChainCodeConverter.codeToChain(message, f)
+                        f.sendMessage(chain).apply {
+                            CacheManager.cacheMessage(source, internalId, chain)
                         }
                     }
                 } else {
                     val group = MiraiNative.bot.getGroup(src.targetId)
                     if (src.fromId != MiraiNative.bot.id) {
-                        group.sendMessage(src.quote() + ChainCodeConverter.codeToChain(message, group)).apply {
-                            CacheManager.cacheMessage(source, internalId)
+                        val chain = src.quote() + ChainCodeConverter.codeToChain(message, group)
+                        group.sendMessage(chain).apply {
+                            CacheManager.cacheMessage(source, internalId, chain)
                         }
                     }
                 }
@@ -132,8 +134,11 @@ object MiraiBridge {
                     }
                 }
             }
-            contact?.sendMessage(ChainCodeConverter.codeToChain(message, contact))?.apply {
-                CacheManager.cacheMessage(source, internalId)
+            contact?.apply {
+                val chain = ChainCodeConverter.codeToChain(message, contact)
+                sendMessage(chain).apply {
+                    CacheManager.cacheMessage(source, internalId, chain)
+                }
             }
         }
         return internalId
@@ -143,8 +148,9 @@ object MiraiBridge {
         val internalId = CacheManager.nextId()
         MiraiNative.launch {
             val contact = MiraiNative.bot.getGroup(id)
-            contact.sendMessage(ChainCodeConverter.codeToChain(message, contact)).apply {
-                CacheManager.cacheMessage(source, internalId)
+            val chain = ChainCodeConverter.codeToChain(message, contact)
+            contact.sendMessage(chain).apply {
+                CacheManager.cacheMessage(source, internalId, chain)
             }
         }
         return internalId

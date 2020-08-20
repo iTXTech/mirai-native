@@ -50,7 +50,7 @@ object EventManager {
                 nativeLaunch {
                     NativeBridge.eventPrivateMessage(
                         Bridge.PRI_MSG_SUBTYPE_FRIEND,
-                        CacheManager.cacheMessage(message.source),
+                        CacheManager.cacheMessage(message.source, chain = message),
                         sender.id,
                         ChainCodeConverter.chainToCode(message),
                         0
@@ -61,7 +61,7 @@ object EventManager {
                 nativeLaunch {
                     NativeBridge.eventGroupMessage(
                         1,
-                        CacheManager.cacheMessage(message.source),
+                        CacheManager.cacheMessage(message.source, chain = message),
                         group.id,
                         sender.id,
                         "",

@@ -29,10 +29,7 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.message.TempMessageEvent
-import net.mamoe.mirai.message.data.MessageSource
-import net.mamoe.mirai.message.data.Voice
-import net.mamoe.mirai.message.data.recall
-import net.mamoe.mirai.message.data.source
+import net.mamoe.mirai.message.data.*
 import org.itxtech.mirainative.MiraiNative
 
 object CacheManager {
@@ -48,11 +45,19 @@ object CacheManager {
 
     fun getEvent(id: String) = evCache[id.toInt()]?.also { evCache.remove(id.toInt()) }
 
-    fun cacheMessage(message: MessageSource, id: Int = nextId()) = id.apply { msgCache[this] = message }
+    fun cacheMessage(source: MessageSource, id: Int = nextId(), chain: MessageChain? = null): Int {
+        msgCache[id] = source
+        chain?.forEach {
+            if (it is Voice) {
+                records[it.fileName] = it
+            }
+        }
+        return id
+    }
 
     fun cacheTempMessage(message: TempMessageEvent, id: Int = nextId()): Int {
         senders[message.sender.id] = message.sender
-        return cacheMessage(message.message.source, id)
+        return cacheMessage(message.message.source, id, message.message)
     }
 
     fun recall(id: Int): Boolean {

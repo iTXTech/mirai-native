@@ -169,6 +169,7 @@ object PluginManager {
         ConsoleCommandOwner, "npm",
         description = "Mirai Native 插件管理器"
     ) {
+        @Description("列出所有 Mirai Native 插件")
         @SubCommand
         suspend fun CommandSender.list() {
             sendMessage(buildString {
@@ -189,6 +190,7 @@ object PluginManager {
             })
         }
 
+        @Description("启用指定 Mirai Native 插件")
         @SubCommand
         suspend fun CommandSender.enable(@Name("插件Id") id: Int) {
             sendMessage(buildString {
@@ -206,6 +208,7 @@ object PluginManager {
             })
         }
 
+        @Description("停用指定 Mirai Native 插件")
         @SubCommand
         suspend fun CommandSender.disable(@Name("插件Id") id: Int) {
             sendMessage(buildString {
@@ -219,6 +222,7 @@ object PluginManager {
             })
         }
 
+        @Description("调用指定 Mirai Native 插件的菜单方法")
         @SubCommand
         suspend fun CommandSender.menu(@Name("插件Id") id: Int, @Name("方法名") method: String) {
             sendMessage(buildString {
@@ -233,6 +237,7 @@ object PluginManager {
             })
         }
 
+        @Description("查看指定 Mirai Native 插件的详细信息")
         @SubCommand
         suspend fun CommandSender.info(@Name("插件Id") id: Int) {
             sendMessage(buildString {
@@ -244,6 +249,7 @@ object PluginManager {
             })
         }
 
+        @Description("加载指定DLL文件")
         @SubCommand
         suspend fun CommandSender.load(@Name("DLL文件名") file: String) {
             sendMessage(buildString {
@@ -253,6 +259,7 @@ object PluginManager {
             })
         }
 
+        @Description("卸载指定 Mirai Native 插件")
         @SubCommand
         suspend fun CommandSender.unload(@Name("插件Id") id: Int) {
             sendMessage(buildString {
