@@ -1,5 +1,5 @@
 name: MiraiNative
 main: org.itxtech.mirainative.MiraiNative
-version: 1.8.6
+version: 1.9.0-rc.1
 author: iTX Technologies
 info: 强大的 Mirai 原生插件加载器
