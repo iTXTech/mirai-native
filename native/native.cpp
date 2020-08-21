@@ -56,7 +56,6 @@ const char* delay_mem_free(const char* str)
 // Global var
 
 vector<native_plugin> plugins;
-int code_page = 54936;
 
 // Strings
 
@@ -130,14 +129,6 @@ JNIEnv* attach_java()
 void detach_java()
 {
 	jvm->DetachCurrentThread();
-}
-
-// Initialization
-
-JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_config(JNIEnv* env, jclass clz, jint page)
-{
-	code_page = page;
-	return 0;
 }
 
 // Shutdown

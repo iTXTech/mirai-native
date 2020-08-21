@@ -37,14 +37,6 @@ extern "C" {
 #define org_itxtech_mirainative_Bridge_GROUP_MUTE 2L
 /*
  * Class:     org_itxtech_mirainative_Bridge
- * Method:    config
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_config
-  (JNIEnv *, jclass, jint);
-
-/*
- * Class:     org_itxtech_mirainative_Bridge
  * Method:    shutdown
  * Signature: ()I
  */
