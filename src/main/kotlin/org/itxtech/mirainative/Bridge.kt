@@ -59,7 +59,7 @@ object Bridge {
     external fun shutdown(): Int
 
     @JvmStatic
-    external fun loadNativePlugin(file: String, id: Int): Int
+    external fun loadNativePlugin(file: ByteArray, id: Int): Int
 
     @JvmStatic
     external fun freeNativePlugin(id: Int): Int
@@ -67,18 +67,18 @@ object Bridge {
     @JvmStatic
     external fun pEvPrivateMessage(
         pluginId: Int,
-        name: String,
+        method: ByteArray,
         subType: Int,
         msgId: Int,
         fromAccount: Long,
-        msg: String,
+        msg: ByteArray,
         font: Int
     ): Int
 
     @JvmStatic
     external fun pEvGroupMessage(
         pluginId: Int,
-        name: String,
+        method: ByteArray,
         subType: Int,
         msgId: Int,
         fromGroup: Long,
@@ -91,7 +91,7 @@ object Bridge {
     @JvmStatic
     external fun pEvGroupAdmin(
         pluginId: Int,
-        name: String,
+        method: ByteArray,
         subType: Int,
         time: Int,
         fromGroup: Long,
@@ -101,7 +101,7 @@ object Bridge {
     @JvmStatic
     external fun pEvGroupMember(
         pluginId: Int,
-        name: String,
+        method: ByteArray,
         subType: Int,
         time: Int,
         fromGroup: Long,
@@ -112,7 +112,7 @@ object Bridge {
     @JvmStatic
     external fun pEvGroupBan(
         pluginId: Int,
-        name: String,
+        method: ByteArray,
         subType: Int,
         time: Int,
         fromGroup: Long,
@@ -124,7 +124,7 @@ object Bridge {
     @JvmStatic
     external fun pEvRequestAddGroup(
         pluginId: Int,
-        name: String,
+        method: ByteArray,
         subType: Int,
         time: Int,
         fromGroup: Long,
@@ -136,7 +136,7 @@ object Bridge {
     @JvmStatic
     external fun pEvRequestAddFriend(
         pluginId: Int,
-        name: String,
+        method: ByteArray,
         subType: Int,
         time: Int,
         fromAccount: Long,
@@ -145,13 +145,13 @@ object Bridge {
     ): Int
 
     @JvmStatic
-    external fun pEvFriendAdd(pluginId: Int, name: String, subType: Int, time: Int, fromAccount: Long): Int
+    external fun pEvFriendAdd(pluginId: Int, method: ByteArray, subType: Int, time: Int, fromAccount: Long): Int
 
     @JvmStatic
-    external fun callIntMethod(pluginId: Int, name: String): Int
+    external fun callIntMethod(pluginId: Int, method: ByteArray): Int
 
     @JvmStatic
-    external fun callStringMethod(pluginId: Int, name: String): String
+    external fun callStringMethod(pluginId: Int, method: ByteArray): ByteArray
 
     @JvmStatic
     external fun processMessage()

@@ -140,9 +140,37 @@ const char* JstringToChars(JNIEnv* env, jstring str)
 	return _strdup(JstringToString(env, str).c_str());
 }
 
-FARPROC GetMethod(JNIEnv* env, jint id, jstring method)
+// Memory returned from this function need to be freed using free()
+const char* ByteArrayToChars(JNIEnv* env, jbyteArray arr)
 {
-	return GetProcAddress(plugins[id].dll, JstringToString(env, method).c_str());
+	jsize len = env->GetArrayLength(arr);
+	char* buffer = (char*)malloc(len + 1);
+	jbyte* elements = env->GetByteArrayElements(arr, nullptr);
+	memcpy(buffer, elements, len);
+	buffer[len] = '\0';
+	env->ReleaseByteArrayElements(arr, elements, JNI_ABORT);
+	return buffer;
+}
+
+string ByteArrayToString(JNIEnv* env, jbyteArray arr)
+{
+	const auto* buf = ByteArrayToChars(env, arr);
+	string s(buf);
+	free((void*)buf);
+	return s;
+}
+
+jbyteArray CharsToByteArray(JNIEnv* env, const char* str)
+{
+	auto len = strlen(str);
+	auto arr = env->NewByteArray(len);
+	env->SetByteArrayRegion(arr, 0, len, reinterpret_cast<const jbyte*>(str));
+	return arr;
+}
+
+FARPROC GetMethod(JNIEnv* env, jint id, jbyteArray method)
+{
+	return GetProcAddress(plugins[id].dll, ByteArrayToString(env, method).c_str());
 }
 
 // Load
@@ -205,9 +233,9 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_shutdown(JNIEnv* env,
 // Plugin
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
-	JNIEnv* env, jclass clz, jstring file, jint id)
+	JNIEnv* env, jclass clz, jbyteArray file, jint id)
 {
-	native_plugin plugin = {id, const_cast<char*>(JstringToGb(env, file))};
+	native_plugin plugin = {id, const_cast<char*>(ByteArrayToChars(env, file))};
 	const auto dll = LoadLibraryA(plugin.file);
 
 	if (dll != nullptr)
@@ -249,7 +277,7 @@ JNIEXPORT void JNICALL Java_org_itxtech_mirainative_Bridge_processMessage(JNIEnv
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(
-	JNIEnv* env, jclass clz, jint id, jstring method)
+	JNIEnv* env, jclass clz, jint id, jbyteArray method)
 {
 	const auto m = IntMethod(GetMethod(env, id, method));
 	if (m)
@@ -259,8 +287,8 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_callIntMethod(
 	return 0;
 }
 
-JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
-	JNIEnv* env, jclass clz, jint id, jstring method)
+JNIEXPORT jbyteArray JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
+	JNIEnv* env, jclass clz, jint id, jbyteArray method)
 {
 	const char* rtn = "";
 	const auto m = StringMethod(GetMethod(env, id, method));
@@ -268,13 +296,13 @@ JNIEXPORT jstring JNICALL Java_org_itxtech_mirainative_Bridge_callStringMethod(
 	{
 		rtn = m();
 	}
-	return UtfToJString(env, rtn);
+	return CharsToByteArray(env, rtn);
 }
 
 // Event
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
-	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint msg_id, jlong acct, jstring msg, jint font)
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint msg_id, jlong acct, jstring msg, jint font)
 {
 	const auto m = EvPriMsg(GetMethod(env, id, method));
 	if (m)
@@ -286,7 +314,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
-	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint msg_id, jlong grp,
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint msg_id, jlong grp,
 	jlong acct, jstring anon, jstring msg, jint font)
 {
 	const auto m = EvGroupMsg(GetMethod(env, id, method));
@@ -300,7 +328,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin(
-	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time, jlong grp, jlong acct)
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint time, jlong grp, jlong acct)
 {
 	const auto m = EvGroupAdmin(GetMethod(env, id, method));
 	if (m)
@@ -311,7 +339,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupAdmin(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMember(
-	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time, jlong grp, jlong acct, jlong mbr)
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint time, jlong grp, jlong acct, jlong mbr)
 {
 	const auto m = EvGroupMember(GetMethod(env, id, method));
 	if (m)
@@ -322,7 +350,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMember(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan(
-	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time, jlong grp,
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint time, jlong grp,
 	jlong acct, jlong mbr, jlong dur)
 {
 	const auto m = EvGroupBan(GetMethod(env, id, method));
@@ -334,7 +362,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup(
-	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time,
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint time,
 	jlong grp, jlong acct, jstring msg, jstring flag)
 {
 	const auto m = EvRequestAddGroup(GetMethod(env, id, method));
@@ -347,7 +375,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddFriend(
-	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time,
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint time,
 	jlong acct, jstring msg, jstring flag)
 {
 	const auto m = EvRequestAddFriend(GetMethod(env, id, method));
@@ -360,7 +388,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddFriend(
 }
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvFriendAdd(
-	JNIEnv* env, jclass clz, jint id, jstring method, jint type, jint time, jlong acct)
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint time, jlong acct)
 {
 	const auto m = EvFriendAdd(GetMethod(env, id, method));
 	if (m)

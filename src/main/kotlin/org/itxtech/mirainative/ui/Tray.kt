@@ -26,6 +26,7 @@ package org.itxtech.mirainative.ui
 
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.bridge.NativeBridge.toNative
 import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.util.NpmHelper
 import java.awt.*
@@ -158,7 +159,7 @@ object Tray {
                             val item = MenuItem(m.name)
                             item.addActionListener {
                                 MiraiNative.nativeLaunch {
-                                    Bridge.callIntMethod(plugin.id, m.function)
+                                    Bridge.callIntMethod(plugin.id, m.function.toNative())
                                 }
                             }
                             menu.add(item)

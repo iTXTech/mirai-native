@@ -87,12 +87,13 @@ object MiraiNative : KotlinPlugin() {
             logger.warning("如果您正在开发或调试其他环境下的 Mirai Native，请忽略此警告。")
         }
 
+        val nativeLib = getResourceAsStream("CQP.dll")!!
         if (!dll.exists()) {
             logger.error("找不到 ${dll.absolutePath}，写出自带的 CQP.dll。")
             val cqp = FileOutputStream(dll)
-            getResourceAsStream("CQP.dll").copyTo(cqp)
+            nativeLib.copyTo(cqp)
             cqp.close()
-        } else if (getResourceAsStream("CQP.dll").readBytes().checksum() != dll.readBytes().checksum()) {
+        } else if (nativeLib.readBytes().checksum() != dll.readBytes().checksum()) {
             logger.warning("${dll.absolutePath} 与 Mirai Native 内置的 CQP.dll 的校验和不同。")
             logger.warning("如运行时出现问题，请尝试删除 ${dll.absolutePath} 并重启 Mirai。")
         }

@@ -38,7 +38,7 @@ data class NativePlugin(val file: File, val id: Int) {
     var api = -1
     var identifier: String = file.name
     val appDir: File by lazy {
-        File(MiraiNative.dataFolder.absolutePath + File.separatorChar + "data" + File.separatorChar + identifier).also { it.mkdir() }
+        File(MiraiNative.dataFolder.absolutePath + File.separatorChar + "data" + File.separatorChar + identifier).also { it.mkdirs() }
     }
     var pluginInfo: PluginInfo? = null
         set(v) {

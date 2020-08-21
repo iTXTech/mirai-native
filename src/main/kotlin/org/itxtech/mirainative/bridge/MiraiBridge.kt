@@ -47,6 +47,8 @@ import net.mamoe.mirai.message.data.queryUrl
 import net.mamoe.mirai.message.data.quote
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.bridge.NativeBridge.fromNative
+import org.itxtech.mirainative.bridge.NativeBridge.toNative
 import org.itxtech.mirainative.manager.CacheManager
 import org.itxtech.mirainative.manager.EventManager
 import org.itxtech.mirainative.manager.PluginManager
@@ -381,7 +383,7 @@ object MiraiBridge {
 
     fun updateFwe(pluginId: Int, fwe: FloatingWindowEntry) {
         val pk = ByteReadPacket(
-            Bridge.callStringMethod(pluginId, fwe.status.function).decodeBase64Bytes()
+            Bridge.callStringMethod(pluginId, fwe.status.function.toNative()).fromNative().decodeBase64Bytes()
         )
         fwe.data = pk.readString()
         fwe.unit = pk.readString()
@@ -439,14 +441,14 @@ object MiraiBridge {
 }
 
 object NativeLoggerHelper {
-    private const val LOG_DEBUG = 0
-    private const val LOG_INFO = 10
-    private const val LOG_INFO_SUCC = 11
-    private const val LOG_INFO_RECV = 12
-    private const val LOG_INFO_SEND = 13
-    private const val LOG_WARNING = 20
-    private const val LOG_ERROR = 21
-    private const val LOG_FATAL = 22
+    const val LOG_DEBUG = 0
+    const val LOG_INFO = 10
+    const val LOG_INFO_SUCC = 11
+    const val LOG_INFO_RECV = 12
+    const val LOG_INFO_SEND = 13
+    const val LOG_WARNING = 20
+    const val LOG_ERROR = 21
+    const val LOG_FATAL = 22
 
     private fun getLogger() = MiraiNative.logger
 

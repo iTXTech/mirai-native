@@ -30,26 +30,29 @@ import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.plugin.Event
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.util.ConfigMan
+import java.nio.charset.Charset
 
 object NativeBridge {
     private fun getPlugins() = PluginManager.plugins
 
     private fun getLogger() = MiraiNative.logger
 
+    fun String.toNative() = toByteArray(Charset.forName("GB18030"))
+
+    fun ByteArray.fromNative() = String(this, Charset.forName("GB18030"))
+
     fun init() {
         Bridge.config(ConfigMan.config.codePage)
     }
 
+    fun getPluginInfo(plugin: NativePlugin) = Bridge.callStringMethod(plugin.id, "pluginInfo".toNative()).fromNative()
+
     fun loadPlugin(plugin: NativePlugin): Int {
         val code = Bridge.loadNativePlugin(
-            plugin.file.absolutePath.replace("\\", "\\\\"),
+            plugin.file.absolutePath.replace("\\", "\\\\").toNative(),
             plugin.id
         )
-        val info = if (plugin.pluginInfo != null) {
-            "Native Plugin (w json) ${plugin.pluginInfo!!.name} has been loaded with code $code"
-        } else {
-            "Native Plugin (w/o json) ${plugin.file.name} has been loaded with code $code"
-        }
+        val info = "Native Plugin ${plugin.file.name} has been loaded with code $code"
         if (code == 0) {
             getLogger().info(info)
         } else {
@@ -67,7 +70,7 @@ object NativeBridge {
             if (plugin.shouldCallEvent(Event.EVENT_DISABLE, true)) {
                 Bridge.callIntMethod(
                     plugin.id,
-                    plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable")
+                    plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable").toNative()
                 )
             }
         }
@@ -78,7 +81,7 @@ object NativeBridge {
             if (plugin.shouldCallEvent(Event.EVENT_ENABLE, true)) {
                 Bridge.callIntMethod(
                     plugin.id,
-                    plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable")
+                    plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable").toNative()
                 )
             }
         }
@@ -88,7 +91,7 @@ object NativeBridge {
         if (plugin.shouldCallEvent(Event.EVENT_STARTUP, true)) {
             Bridge.callIntMethod(
                 plugin.id,
-                plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup")
+                plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup").toNative()
             )
         }
     }
@@ -97,13 +100,13 @@ object NativeBridge {
         if (plugin.shouldCallEvent(Event.EVENT_EXIT, true)) {
             Bridge.callIntMethod(
                 plugin.id,
-                plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit")
+                plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit").toNative()
             )
         }
     }
 
     fun updateInfo(plugin: NativePlugin) {
-        val info = Bridge.callStringMethod(plugin.id, "AppInfo")
+        val info = Bridge.callStringMethod(plugin.id, "AppInfo".toNative()).fromNative()
         if ("" != info) {
             plugin.setInfo(info)
         }
@@ -111,9 +114,13 @@ object NativeBridge {
 
     // Events
 
-    private inline fun event(ev: Int, defaultMethod: String, block: NativePlugin.(evName: String) -> Int) {
+    private inline fun event(ev: Int, defaultMethod: String, block: NativePlugin.(evName: ByteArray) -> Int) {
         for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(ev) && block(plugin, plugin.getEventOrDefault(ev, defaultMethod)) == 1) {
+            if (plugin.shouldCallEvent(ev) && block(
+                    plugin,
+                    plugin.getEventOrDefault(ev, defaultMethod).toNative()
+                ) == 1
+            ) {
                 break
             }
         }
@@ -133,7 +140,7 @@ object NativeBridge {
                 subType,
                 msgId,
                 fromAccount,
-                processMessage(Event.EVENT_PRI_MSG, msg),
+                processMessage(Event.EVENT_PRI_MSG, msg).toNative(),
                 font
             )
         }
