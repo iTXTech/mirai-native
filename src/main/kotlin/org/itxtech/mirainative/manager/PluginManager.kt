@@ -35,9 +35,9 @@ import net.mamoe.mirai.console.util.ConsoleExperimentalAPI
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.bridge.NativeBridge
-import org.itxtech.mirainative.bridge.NativeBridge.toNative
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.plugin.PluginInfo
+import org.itxtech.mirainative.toNative
 import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.NpmHelper
 import java.io.File

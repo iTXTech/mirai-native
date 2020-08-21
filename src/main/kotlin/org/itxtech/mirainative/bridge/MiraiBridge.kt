@@ -47,14 +47,14 @@ import net.mamoe.mirai.message.data.queryUrl
 import net.mamoe.mirai.message.data.quote
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
-import org.itxtech.mirainative.bridge.NativeBridge.fromNative
-import org.itxtech.mirainative.bridge.NativeBridge.toNative
+import org.itxtech.mirainative.fromNative
 import org.itxtech.mirainative.manager.CacheManager
 import org.itxtech.mirainative.manager.EventManager
 import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
 import org.itxtech.mirainative.plugin.NativePlugin
+import org.itxtech.mirainative.toNative
 import java.io.File
 import java.math.BigInteger
 import java.nio.charset.Charset

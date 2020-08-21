@@ -26,24 +26,16 @@ package org.itxtech.mirainative.bridge
 
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.fromNative
 import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.plugin.Event
 import org.itxtech.mirainative.plugin.NativePlugin
-import org.itxtech.mirainative.util.ConfigMan
-import java.nio.charset.Charset
+import org.itxtech.mirainative.toNative
 
 object NativeBridge {
     private fun getPlugins() = PluginManager.plugins
 
     private fun getLogger() = MiraiNative.logger
-
-    fun String.toNative() = toByteArray(Charset.forName("GB18030"))
-
-    fun ByteArray.fromNative() = String(this, Charset.forName("GB18030"))
-
-    fun init() {
-        Bridge.config(ConfigMan.config.codePage)
-    }
 
     fun getPluginInfo(plugin: NativePlugin) = Bridge.callStringMethod(plugin.id, "pluginInfo".toNative()).fromNative()
 

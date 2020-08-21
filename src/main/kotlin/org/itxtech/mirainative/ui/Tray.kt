@@ -26,8 +26,8 @@ package org.itxtech.mirainative.ui
 
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
-import org.itxtech.mirainative.bridge.NativeBridge.toNative
 import org.itxtech.mirainative.manager.PluginManager
+import org.itxtech.mirainative.toNative
 import org.itxtech.mirainative.util.NpmHelper
 import java.awt.*
 import java.awt.event.MouseAdapter

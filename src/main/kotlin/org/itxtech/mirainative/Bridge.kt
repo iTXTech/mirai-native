@@ -28,6 +28,7 @@ package org.itxtech.mirainative
 
 import org.itxtech.mirainative.bridge.MiraiBridge
 import org.itxtech.mirainative.manager.CacheManager
+import java.nio.charset.Charset
 
 object Bridge {
     const val PRI_MSG_SUBTYPE_FRIEND = 11
@@ -51,9 +52,6 @@ object Bridge {
     const val GROUP_MUTE = 2
 
     // Native
-
-    @JvmStatic
-    external fun config(codePage: Int): Int
 
     @JvmStatic
     external fun shutdown(): Int
@@ -159,23 +157,23 @@ object Bridge {
     // Bridge
 
     @JvmStatic
-    fun sendPrivateMessage(pluginId: Int, account: Long, msg: String): Int {
-        return MiraiBridge.sendPrivateMessage(pluginId, account, msg)
+    fun sendPrivateMessage(pluginId: Int, account: Long, msg: ByteArray): Int {
+        return MiraiBridge.sendPrivateMessage(pluginId, account, msg.fromNative())
     }
 
     @JvmStatic
-    fun sendGroupMessage(pluginId: Int, group: Long, msg: String): Int {
-        return MiraiBridge.sendGroupMessage(pluginId, group, msg)
+    fun sendGroupMessage(pluginId: Int, group: Long, msg: ByteArray): Int {
+        return MiraiBridge.sendGroupMessage(pluginId, group, msg.fromNative())
     }
 
     @JvmStatic
-    fun addLog(pluginId: Int, priority: Int, type: String, content: String) {
-        MiraiBridge.addLog(pluginId, priority, type, content)
+    fun addLog(pluginId: Int, priority: Int, type: ByteArray, content: ByteArray) {
+        MiraiBridge.addLog(pluginId, priority, type.fromNative(), content.fromNative())
     }
 
     @JvmStatic
-    fun getPluginDataDir(pluginId: Int): String {
-        return MiraiBridge.getPluginDataDir(pluginId)
+    fun getPluginDataDir(pluginId: Int): ByteArray {
+        return MiraiBridge.getPluginDataDir(pluginId).toNative()
     }
 
     @JvmStatic
@@ -184,8 +182,8 @@ object Bridge {
     }
 
     @JvmStatic
-    fun getLoginNick(pluginId: Int): String {
-        return MiraiBridge.getLoginNick(pluginId)
+    fun getLoginNick(pluginId: Int): ByteArray {
+        return MiraiBridge.getLoginNick(pluginId).toNative()
     }
 
     @JvmStatic
@@ -194,8 +192,8 @@ object Bridge {
     }
 
     @JvmStatic
-    fun setGroupCard(pluginId: Int, group: Long, member: Long, card: String): Int {
-        return MiraiBridge.setGroupCard(pluginId, group, member, card)
+    fun setGroupCard(pluginId: Int, group: Long, member: Long, card: ByteArray): Int {
+        return MiraiBridge.setGroupCard(pluginId, group, member, card.fromNative())
     }
 
     @JvmStatic
@@ -209,8 +207,8 @@ object Bridge {
     }
 
     @JvmStatic
-    fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: String, duration: Long): Int {
-        return MiraiBridge.setGroupSpecialTitle(pluginId, group, member, title, duration)
+    fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: ByteArray, duration: Long): Int {
+        return MiraiBridge.setGroupSpecialTitle(pluginId, group, member, title.fromNative(), duration)
     }
 
     @JvmStatic
@@ -224,59 +222,59 @@ object Bridge {
     }
 
     @JvmStatic
-    fun getFriendList(pluginId: Int, reserved: Boolean): String {
-        return MiraiBridge.getFriendList(pluginId)
+    fun getFriendList(pluginId: Int, reserved: Boolean): ByteArray {
+        return MiraiBridge.getFriendList(pluginId).toNative()
     }
 
     @JvmStatic
-    fun getGroupInfo(pluginId: Int, groupId: Long, cache: Boolean): String {
-        return MiraiBridge.getGroupInfo(pluginId, groupId)
+    fun getGroupInfo(pluginId: Int, groupId: Long, cache: Boolean): ByteArray {
+        return MiraiBridge.getGroupInfo(pluginId, groupId).toNative()
     }
 
     @JvmStatic
-    fun getGroupList(pluginId: Int): String {
-        return MiraiBridge.getGroupList(pluginId)
+    fun getGroupList(pluginId: Int): ByteArray {
+        return MiraiBridge.getGroupList(pluginId).toNative()
     }
 
     @JvmStatic
-    fun getGroupMemberInfo(pluginId: Int, group: Long, member: Long, cache: Boolean): String {
-        return MiraiBridge.getGroupMemberInfo(pluginId, group, member)
+    fun getGroupMemberInfo(pluginId: Int, group: Long, member: Long, cache: Boolean): ByteArray {
+        return MiraiBridge.getGroupMemberInfo(pluginId, group, member).toNative()
     }
 
     @JvmStatic
-    fun getGroupMemberList(pluginId: Int, group: Long): String {
-        return MiraiBridge.getGroupMemberList(pluginId, group)
+    fun getGroupMemberList(pluginId: Int, group: Long): ByteArray {
+        return MiraiBridge.getGroupMemberList(pluginId, group).toNative()
     }
 
     @JvmStatic
     fun setGroupAddRequest(
         pluginId: Int,
-        requestId: String,
+        requestId: ByteArray,
         reqType: Int,
         fbType: Int,
-        reason: String
+        reason: ByteArray
     ): Int {
-        return MiraiBridge.setGroupAddRequest(pluginId, requestId, reqType, fbType, reason)
+        return MiraiBridge.setGroupAddRequest(pluginId, requestId.fromNative(), reqType, fbType, reason.fromNative())
     }
 
     @JvmStatic
-    fun setFriendAddRequest(pluginId: Int, requestId: String, type: Int, remark: String): Int {
-        return MiraiBridge.setFriendAddRequest(pluginId, requestId, type, remark)
+    fun setFriendAddRequest(pluginId: Int, requestId: ByteArray, type: Int, remark: ByteArray): Int {
+        return MiraiBridge.setFriendAddRequest(pluginId, requestId.fromNative(), type, remark.fromNative())
     }
 
     @JvmStatic
-    fun getStrangerInfo(pluginId: Int, account: Long, cache: Boolean): String {
-        return MiraiBridge.getStrangerInfo(pluginId, account)
+    fun getStrangerInfo(pluginId: Int, account: Long, cache: Boolean): ByteArray {
+        return MiraiBridge.getStrangerInfo(pluginId, account).toNative()
     }
 
     @JvmStatic
-    fun getImage(pluginId: Int, image: String): String {
-        return MiraiBridge.getImage(pluginId, image)
+    fun getImage(pluginId: Int, image: ByteArray): ByteArray {
+        return MiraiBridge.getImage(pluginId, image.fromNative()).toNative()
     }
 
     @JvmStatic
-    fun getRecord(pluginId: Int, file: String, format: String): String {
-        return MiraiBridge.getRecord(pluginId, file, format)
+    fun getRecord(pluginId: Int, file: ByteArray, format: ByteArray): ByteArray {
+        return MiraiBridge.getRecord(pluginId, file.fromNative(), format.fromNative()).toNative()
     }
 
 
@@ -294,7 +292,7 @@ object Bridge {
     }
 
     @JvmStatic
-    fun setGroupAnonymousBan(pluginId: Int, group: Long, id: String, duration: Long): Int {
+    fun setGroupAnonymousBan(pluginId: Int, group: Long, id: ByteArray, duration: Long): Int {
         return 0
     }
 
@@ -306,17 +304,17 @@ object Bridge {
     }
 
     @JvmStatic
-    fun getCookies(pluginId: Int, domain: String): String {
-        return ""
+    fun getCookies(pluginId: Int, domain: ByteArray): ByteArray {
+        return "".toNative()
     }
 
     @JvmStatic
-    fun getCsrfToken(pluginId: Int): String {
-        return ""
+    fun getCsrfToken(pluginId: Int): ByteArray {
+        return "".toNative()
     }
 
     @JvmStatic
-    fun sendDiscussMessage(pluginId: Int, group: Long, msg: String): Int {
+    fun sendDiscussMessage(pluginId: Int, group: Long, msg: ByteArray): Int {
         return 0
     }
 
@@ -328,12 +326,16 @@ object Bridge {
     // Mirai Unique Methods
 
     @JvmStatic
-    fun quoteMessage(pluginId: Int, msgId: Int, msg: String): Int {
-        return MiraiBridge.quoteMessage(pluginId, msgId, msg)
+    fun quoteMessage(pluginId: Int, msgId: Int, msg: ByteArray): Int {
+        return MiraiBridge.quoteMessage(pluginId, msgId, msg.fromNative())
     }
 
     @JvmStatic
-    fun forwardMessage(pluginId: Int, type: Int, id: Long, strategy: String, msg: String): Int {
-        return MiraiBridge.forwardMessage(pluginId, type, id, strategy, msg)
+    fun forwardMessage(pluginId: Int, type: Int, id: Long, strategy: ByteArray, msg: ByteArray): Int {
+        return MiraiBridge.forwardMessage(pluginId, type, id, strategy.fromNative(), msg.fromNative())
     }
 }
+
+fun String.toNative() = toByteArray(Charset.forName("GB18030"))
+
+fun ByteArray.fromNative() = String(this, Charset.forName("GB18030"))

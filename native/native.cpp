@@ -58,87 +58,7 @@ const char* delay_mem_free(const char* str)
 vector<native_plugin> plugins;
 int code_page = 54936;
 
-// Helper
-
-// Memory returned from this function need to be freed using free()
-const char* JstringToGb(JNIEnv* env, jstring jstr)
-{
-	int length = env->GetStringLength(jstr);
-	auto jcstr = env->GetStringChars(jstr, 0);
-	auto size = WideCharToMultiByte(code_page, 0UL, LPCWSTR(jcstr), length,
-	                                nullptr, 0, nullptr, nullptr);
-	auto* rtn = (char*)malloc(size + 1);
-	size = WideCharToMultiByte(code_page, 0UL, LPCWSTR(jcstr), length, rtn,
-	                           size, nullptr, nullptr);
-	if (size <= 0)
-	{
-		// Cannot return "" here if the conversion failed or if the string is empty
-		// as both the memory would leak and the free() call later would cause a fatal error
-		env->ReleaseStringChars(jstr, jcstr);
-		*rtn = '\0';
-		return rtn;
-	}
-	env->ReleaseStringChars(jstr, jcstr);
-	rtn[size] = '\0';
-	return rtn;
-}
-
-string JstringToGbString(JNIEnv* env, jstring jstr)
-{
-	const auto* str = JstringToGb(env, jstr);
-	string ret(str);
-	free((void*)str);
-	return ret;
-}
-
-jstring UtfToJString(JNIEnv* env, const char* str)
-{
-	if (str == nullptr)
-	{
-		str = "";
-	}
-	return env->NewStringUTF(str);
-}
-
-jstring GbToJstring(JNIEnv* env, const char* str)
-{
-	if (str == nullptr)
-	{
-		str = "";
-	}
-	int slen = strlen(str);
-	if (slen == 0)
-	{
-		return env->NewStringUTF(str);
-	}
-	jstring rtn = nullptr;
-	const auto length = MultiByteToWideChar(code_page, 0UL, LPCSTR(str), slen, nullptr, 0);
-	auto buffer = new jchar[length];
-	if (MultiByteToWideChar(code_page, 0UL, LPCSTR(str), slen, LPWSTR(buffer), length) > 0)
-	{
-		rtn = env->NewString(buffer, length);
-	}
-	delete[] buffer;
-	return rtn;
-}
-
-string JstringToString(JNIEnv* env, jstring str)
-{
-	auto jstr = env->GetStringUTFChars(str, nullptr);
-	if (jstr == nullptr)
-	{
-		return "";
-	}
-	string s(jstr);
-	env->ReleaseStringUTFChars(str, jstr);
-	return s;
-}
-
-// Memory returned from this function need to be freed using free()
-const char* JstringToChars(JNIEnv* env, jstring str)
-{
-	return _strdup(JstringToString(env, str).c_str());
-}
+// Strings
 
 // Memory returned from this function need to be freed using free()
 const char* ByteArrayToChars(JNIEnv* env, jbyteArray arr)
@@ -408,8 +328,8 @@ CQAPI(int32_t, isMiraiNative, 0)()
 CQAPI(int32_t, mQuoteMessage, 12)(int32_t plugin_id, int32_t msg_id, const char* msg)
 {
 	auto env = attach_java();
-	auto m = GbToJstring(env, msg);
-	auto method = env->GetStaticMethodID(bclz, "quoteMessage", "(IILjava/lang/String;)I");
+	auto m = CharsToByteArray(env, msg);
+	auto method = env->GetStaticMethodID(bclz, "quoteMessage", "(II[B)I");
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, msg_id, m);
 	env->DeleteLocalRef(m);
 	detach_java();
@@ -419,9 +339,9 @@ CQAPI(int32_t, mQuoteMessage, 12)(int32_t plugin_id, int32_t msg_id, const char*
 CQAPI(int32_t, mForwardMessage, 24)(int32_t plugin_id, int32_t type, int64_t id, const char* strategy, const char* msg)
 {
 	auto env = attach_java();
-	auto s = UtfToJString(env, strategy);
-	auto m = UtfToJString(env, msg);
-	auto method = env->GetStaticMethodID(bclz, "forwardMessage", "(IIJLjava/lang/String;Ljava/lang/String;)I");
+	auto s = CharsToByteArray(env, strategy);
+	auto m = CharsToByteArray(env, msg);
+	auto method = env->GetStaticMethodID(bclz, "forwardMessage", "(IIJ[B[B)I");
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, type, id, s, m);
 	env->DeleteLocalRef(s);
 	env->DeleteLocalRef(m);
@@ -434,9 +354,9 @@ CQAPI(int32_t, mForwardMessage, 24)(int32_t plugin_id, int32_t type, int64_t id,
 CQAPI(int32_t, CQ_addLog, 16)(int32_t plugin_id, int32_t priority, const char* type, const char* content)
 {
 	auto env = attach_java();
-	auto t = GbToJstring(env, type);
-	auto c = GbToJstring(env, content);
-	auto method = env->GetStaticMethodID(bclz, "addLog", "(IILjava/lang/String;Ljava/lang/String;)V");
+	auto t = CharsToByteArray(env, type);
+	auto c = CharsToByteArray(env, content);
+	auto method = env->GetStaticMethodID(bclz, "addLog", "(II[B[B)V");
 	env->CallStaticIntMethod(bclz, method, plugin_id, priority, t, c);
 	env->DeleteLocalRef(t);
 	env->DeleteLocalRef(c);
@@ -457,8 +377,8 @@ CQAPI(int32_t, CQ_canSendRecord, 4)(int32_t)
 int32_t sendMsg(int32_t plugin_id, int64_t acc, const char* msg, const char* m)
 {
 	auto env = attach_java();
-	auto jstr = GbToJstring(env, msg);
-	auto method = env->GetStaticMethodID(bclz, m, "(IJLjava/lang/String;)I");
+	auto jstr = CharsToByteArray(env, msg);
+	auto method = env->GetStaticMethodID(bclz, m, "(IJ[B)I");
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, acc, jstr);
 	env->DeleteLocalRef(jstr);
 	detach_java();
@@ -484,9 +404,9 @@ CQAPI(int32_t, CQ_setFatal, 8)(int32_t plugin_id, const char* info)
 CQAPI(const char*, CQ_getAppDirectory, 4)(int32_t plugin_id)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getPluginDataDir", "(I)Ljava/lang/String;");
-	auto result = jstring(env->CallStaticObjectMethod(bclz, method, plugin_id));
-	auto r = JstringToGb(env, result);
+	auto method = env->GetStaticMethodID(bclz, "getPluginDataDir", "(I)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id));
+	auto r = ByteArrayToChars(env, result);
 	env->DeleteLocalRef(result);
 	detach_java();
 	return delay_mem_free(r);
@@ -504,10 +424,12 @@ CQAPI(int64_t, CQ_getLoginQQ, 4)(int32_t plugin_id)
 CQAPI(const char*, CQ_getLoginNick, 4)(int32_t plugin_id)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getLoginNick", "(I)Ljava/lang/String;");
-	auto result = JstringToGb(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)));
+	auto method = env->GetStaticMethodID(bclz, "getLoginNick", "(I)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(int32_t, CQ_setGroupAnonymous, 16)(int32_t plugin_id, int64_t group, BOOL enable)
@@ -531,8 +453,8 @@ CQAPI(int32_t, CQ_setGroupBan, 28)(int32_t plugin_id, int64_t group, int64_t mem
 CQAPI(int32_t, CQ_setGroupCard, 24)(int32_t plugin_id, int64_t group, int64_t member, const char* card)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "setGroupCard", "(IJJLjava/lang/String;)I");
-	auto jstr = GbToJstring(env, card);
+	auto method = env->GetStaticMethodID(bclz, "setGroupCard", "(IJJ[B)I");
+	auto jstr = CharsToByteArray(env, card);
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, member, jstr);
 	env->DeleteLocalRef(jstr);
 	detach_java();
@@ -561,8 +483,8 @@ CQAPI(int32_t, CQ_setGroupSpecialTitle, 32)(int32_t plugin_id, int64_t group, in
                                             const char* title, int64_t duration)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "setGroupSpecialTitle", "(IJJLjava/lang/String;J)I");
-	auto jstr = GbToJstring(env, title);
+	auto method = env->GetStaticMethodID(bclz, "setGroupSpecialTitle", "(IJJ[BJ)I");
+	auto jstr = CharsToByteArray(env, title);
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, member, jstr, duration);
 	env->DeleteLocalRef(jstr);
 	detach_java();
@@ -590,102 +512,119 @@ CQAPI(int32_t, CQ_deleteMsg, 12)(int32_t plugin_id, int64_t msg_id)
 CQAPI(const char*, CQ_getFriendList, 8)(int32_t plugin_id, BOOL reserved)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getFriendList", "(IZ)Ljava/lang/String;");
-	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, reserved != FALSE)));
+	auto method = env->GetStaticMethodID(bclz, "getFriendList", "(IZ)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, reserved != FALSE));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getGroupInfo, 16)(int32_t plugin_id, int64_t group, BOOL cache)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getGroupInfo", "(IJZ)Ljava/lang/String;");
-	auto result = JstringToChars(
-		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group, cache != FALSE)));
+	auto method = env->GetStaticMethodID(bclz, "getGroupInfo", "(IJZ)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, group, cache != FALSE));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getGroupList, 4)(int32_t plugin_id)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getGroupList", "(I)Ljava/lang/String;");
-	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)));
+	auto method = env->GetStaticMethodID(bclz, "getGroupList", "(I)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getGroupMemberInfoV2, 24)(int32_t plugin_id, int64_t group, int64_t account, BOOL cache)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getGroupMemberInfo", "(IJJZ)Ljava/lang/String;");
-	auto result = JstringToChars(
-		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group, account, cache != FALSE)));
+	auto method = env->GetStaticMethodID(bclz, "getGroupMemberInfo", "(IJJZ)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, group, account, cache != FALSE));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getGroupMemberList, 12)(int32_t plugin_id, int64_t group)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getGroupMemberList", "(IJ)Ljava/lang/String;");
-	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, group)));
+	auto method = env->GetStaticMethodID(bclz, "getGroupMemberList", "(IJ)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, group));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getCookiesV2, 8)(int32_t plugin_id, const char* domain)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getCookies", "(ILjava/lang/String;)Ljava/lang/String;");
-	auto jstr = GbToJstring(env, domain);
-	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr)));
+	auto method = env->GetStaticMethodID(bclz, "getCookies", "(I[B)[B");
+	auto jstr = CharsToByteArray(env, domain);
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	env->DeleteLocalRef(jstr);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getCsrfToken, 4)(int32_t plugin_id)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getCsrfToken", "(I)Ljava/lang/String;");
-	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id)));
+	auto method = env->GetStaticMethodID(bclz, "getCsrfToken", "(I)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getImage, 8)(int32_t plugin_id, const char* image)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getImage", "(ILjava/lang/String;)Ljava/lang/String;");
-	auto jstr = GbToJstring(env, image);
-	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr)));
+	auto method = env->GetStaticMethodID(bclz, "getImage", "(I[B)[B");
+	auto jstr = CharsToByteArray(env, image);
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, jstr));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	env->DeleteLocalRef(jstr);
-	return delay_mem_free(result);
+	detach_java();
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getRecordV2, 12)(int32_t plugin_id, const char* file, const char* format)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getRecord",
-	                                     "(ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
-	auto f = GbToJstring(env, file);
-	auto fmt = GbToJstring(env, format);
-	auto result = JstringToChars(env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, f, fmt)));
+	auto method = env->GetStaticMethodID(bclz, "getRecord","(I[B[B)[B");
+	auto f = CharsToByteArray(env, file);
+	auto fmt = CharsToByteArray(env, format);
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, f, fmt));
+	auto r = ByteArrayToChars(env, result);
 	env->DeleteLocalRef(f);
 	env->DeleteLocalRef(fmt);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(const char*, CQ_getStrangerInfo, 16)(int32_t plugin_id, int64_t account, BOOL cache)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getStrangerInfo", "(IJZ)Ljava/lang/String;");
-	auto result = JstringToChars(
-		env, jstring(env->CallStaticObjectMethod(bclz, method, plugin_id, account, cache != FALSE)));
+	auto method = env->GetStaticMethodID(bclz, "getStrangerInfo", "(IJZ)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, account, cache != FALSE));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
 	detach_java();
-	return delay_mem_free(result);
+	return delay_mem_free(r);
 }
 
 CQAPI(int32_t, CQ_sendDiscussMsg, 16)(int32_t plugin_id, int64_t group, const char* msg)
@@ -714,9 +653,9 @@ CQAPI(int32_t, CQ_setDiscussLeave, 12)(int32_t plugin_id, int64_t group)
 CQAPI(int32_t, CQ_setFriendAddRequest, 16)(int32_t plugin_id, const char* id, int32_t type, const char* remark)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "setFriendAddRequest", "(ILjava/lang/String;ILjava/lang/String;)I");
-	auto i = UtfToJString(env, id);
-	auto r = GbToJstring(env, remark);
+	auto method = env->GetStaticMethodID(bclz, "setFriendAddRequest", "(I[BI[B)I");
+	auto i = CharsToByteArray(env, id);
+	auto r = CharsToByteArray(env, remark);
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, i, type, r);
 	env->DeleteLocalRef(i);
 	env->DeleteLocalRef(r);
@@ -728,9 +667,9 @@ CQAPI(int32_t, CQ_setGroupAddRequestV2, 20)(int32_t plugin_id, const char* id, i
                                             const char* reason)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "setGroupAddRequest", "(ILjava/lang/String;IILjava/lang/String;)I");
-	auto i = UtfToJString(env, id);
-	auto r = GbToJstring(env, reason);
+	auto method = env->GetStaticMethodID(bclz, "setGroupAddRequest", "(I[BII[B)I");
+	auto i = CharsToByteArray(env, id);
+	auto r = CharsToByteArray(env, reason);
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, i, req_type, fb_type, r);
 	env->DeleteLocalRef(i);
 	env->DeleteLocalRef(r);
@@ -750,8 +689,8 @@ CQAPI(int32_t, CQ_setGroupAdmin, 24)(int32_t plugin_id, int64_t group, int64_t a
 CQAPI(int32_t, CQ_setGroupAnonymousBan, 24)(int32_t plugin_id, int64_t group, const char* id, int64_t duration)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "setGroupAnonymousBan", "(IJLjava/lang/String;J)I");
-	auto i = UtfToJString(env, id);
+	auto method = env->GetStaticMethodID(bclz, "setGroupAnonymousBan", "(IJ[BJ)I");
+	auto i = CharsToByteArray(env, id);
 	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, i, duration);
 	env->DeleteLocalRef(i);
 	detach_java();

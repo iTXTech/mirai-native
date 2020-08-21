@@ -87,7 +87,6 @@ object ConfigMan {
 
 @Serializable
 data class Configuration(
-    var codePage: Int = 54936,
     var fwState: Boolean = false,
     var plugins: ArrayList<PluginEntry> = ArrayList()
 )
