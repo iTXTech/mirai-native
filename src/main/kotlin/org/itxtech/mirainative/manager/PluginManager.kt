@@ -25,6 +25,7 @@
 package org.itxtech.mirainative.manager
 
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.Job
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandSender
@@ -61,9 +62,9 @@ object PluginManager {
         }
     }
 
-    fun unloadPlugins() {
+    fun unloadPlugins(): Job {
         MiraiNative.logger.info("正停用所有插件并调用Exit事件。")
-        MiraiNative.nativeLaunch {
+        return MiraiNative.nativeLaunch {
             plugins.values.forEach {
                 if (it.enabled) {
                     NativeBridge.disablePlugin(it)

@@ -47,7 +47,7 @@ object MiraiNative : KotlinPlugin() {
     val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    private val dispatcher = newSingleThreadContext("MiraiNative")
+    private val dispatcher = newSingleThreadContext("MiraiNative") + SupervisorJob()
 
     var botOnline = false
     val bot: Bot by lazy { Bot.botInstances.first() }
@@ -146,13 +146,11 @@ object MiraiNative : KotlinPlugin() {
 
     override fun onDisable() {
         ConfigMan.save()
-        PluginManager.unloadPlugins()
         CacheManager.clear()
-        nativeLaunch {
-            Bridge.shutdown()
-        }
-        dispatcher.cancel()
         runBlocking {
+            PluginManager.unloadPlugins().join()
+            nativeLaunch { Bridge.shutdown() }.join()
+            dispatcher.cancel()
             dispatcher[Job]?.join()
         }
     }

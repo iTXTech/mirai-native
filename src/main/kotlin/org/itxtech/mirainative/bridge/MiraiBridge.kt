@@ -271,16 +271,18 @@ object MiraiBridge {
 
     fun setGroupAddRequest(pluginId: Int, requestId: String, reqType: Int, type: Int, reason: String) =
         call(pluginId, 0) {
-            MiraiNative.nativeLaunch {
+            MiraiNative.launch {
                 if (reqType == Bridge.REQUEST_GROUP_APPLY) {
                     (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
                         when (type) {//1通过，2拒绝，3忽略
                             1 -> {
                                 accept()
-                                NativeBridge.eventGroupMemberJoin(
-                                    Bridge.MEMBER_JOIN_PERMITTED,
-                                    EventManager.getTimestamp(), groupId, 0, fromId
-                                )
+                                MiraiNative.nativeLaunch {
+                                    NativeBridge.eventGroupMemberJoin(
+                                        Bridge.MEMBER_JOIN_PERMITTED,
+                                        EventManager.getTimestamp(), groupId, 0, fromId
+                                    )
+                                }
                             }
                             2 -> reject(message = reason)
                             3 -> ignore()
@@ -299,7 +301,7 @@ object MiraiBridge {
         }
 
     fun setFriendAddRequest(pluginId: Int, requestId: String, type: Int, remark: String) = call(pluginId, 0) {
-        MiraiNative.nativeLaunch {
+        MiraiNative.launch {
             (CacheManager.getEvent(requestId) as? NewFriendRequestEvent)?.apply {
                 when (type) {//1通过，2拒绝
                     1 -> accept()
