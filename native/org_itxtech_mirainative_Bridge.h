@@ -78,10 +78,10 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage
 /*
  * Class:     org_itxtech_mirainative_Bridge
  * Method:    pEvGroupMessage
- * Signature: (I[BIIJJLjava/lang/String;Ljava/lang/String;I)I
+ * Signature: (I[BIIJJ[B[BI)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage
-  (JNIEnv *, jclass, jint, jbyteArray, jint, jint, jlong, jlong, jstring, jstring, jint);
+  (JNIEnv *, jclass, jint, jbyteArray, jint, jint, jlong, jlong, jbyteArray, jbyteArray, jint);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
@@ -110,18 +110,18 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan
 /*
  * Class:     org_itxtech_mirainative_Bridge
  * Method:    pEvRequestAddGroup
- * Signature: (I[BIIJJLjava/lang/String;Ljava/lang/String;)I
+ * Signature: (I[BIIJJ[B[B)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup
-  (JNIEnv *, jclass, jint, jbyteArray, jint, jint, jlong, jlong, jstring, jstring);
+  (JNIEnv *, jclass, jint, jbyteArray, jint, jint, jlong, jlong, jbyteArray, jbyteArray);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
  * Method:    pEvRequestAddFriend
- * Signature: (I[BIIJLjava/lang/String;Ljava/lang/String;)I
+ * Signature: (I[BIIJ[B[B)I
  */
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddFriend
-  (JNIEnv *, jclass, jint, jbyteArray, jint, jint, jlong, jstring, jstring);
+  (JNIEnv *, jclass, jint, jbyteArray, jint, jint, jlong, jbyteArray, jbyteArray);
 
 /*
  * Class:     org_itxtech_mirainative_Bridge

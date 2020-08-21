@@ -302,12 +302,12 @@ JNIEXPORT jbyteArray JNICALL Java_org_itxtech_mirainative_Bridge_callStringMetho
 // Event
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
-	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint msg_id, jlong acct, jstring msg, jint font)
+	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint msg_id, jlong acct, jbyteArray msg, jint font)
 {
 	const auto m = EvPriMsg(GetMethod(env, id, method));
 	if (m)
 	{
-		auto result = m(type, msg_id, acct, JstringToGbString(env, msg).c_str(), font);
+		auto result = m(type, msg_id, acct, ByteArrayToString(env, msg).c_str(), font);
 		return result;
 	}
 	return 0;
@@ -315,13 +315,13 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvPrivateMessage(
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
 	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint msg_id, jlong grp,
-	jlong acct, jstring anon, jstring msg, jint font)
+	jlong acct, jbyteArray anon, jbyteArray msg, jint font)
 {
 	const auto m = EvGroupMsg(GetMethod(env, id, method));
 	if (m)
 	{
-		auto result = m(type, msg_id, grp, acct, JstringToGbString(env, anon).c_str(),
-		                JstringToGbString(env, msg).c_str(), font);
+		auto result = m(type, msg_id, grp, acct, ByteArrayToString(env, anon).c_str(),
+			ByteArrayToString(env, msg).c_str(), font);
 		return result;
 	}
 	return 0;
@@ -363,12 +363,12 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupBan(
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup(
 	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint time,
-	jlong grp, jlong acct, jstring msg, jstring flag)
+	jlong grp, jlong acct, jbyteArray msg, jbyteArray flag)
 {
 	const auto m = EvRequestAddGroup(GetMethod(env, id, method));
 	if (m)
 	{
-		auto result = m(type, time, grp, acct, JstringToGbString(env, msg).c_str(), JstringToString(env, flag).c_str());
+		auto result = m(type, time, grp, acct, ByteArrayToString(env, msg).c_str(), ByteArrayToString(env, flag).c_str());
 		return result;
 	}
 	return 0;
@@ -376,12 +376,12 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup(
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddFriend(
 	JNIEnv* env, jclass clz, jint id, jbyteArray method, jint type, jint time,
-	jlong acct, jstring msg, jstring flag)
+	jlong acct, jbyteArray msg, jbyteArray flag)
 {
 	const auto m = EvRequestAddFriend(GetMethod(env, id, method));
 	if (m)
 	{
-		auto result = m(type, time, acct, JstringToGbString(env, msg).c_str(), JstringToString(env, flag).c_str());
+		auto result = m(type, time, acct, ByteArrayToString(env, msg).c_str(), ByteArrayToString(env, flag).c_str());
 		return result;
 	}
 	return 0;

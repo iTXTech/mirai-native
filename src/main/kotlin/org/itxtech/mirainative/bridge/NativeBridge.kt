@@ -163,8 +163,8 @@ object NativeBridge {
                 msgId,
                 fromGroup,
                 fromAccount,
-                fromAnonymous,
-                processMessage(Event.EVENT_GROUP_MSG, msg),
+                fromAnonymous.toNative(),
+                processMessage(Event.EVENT_GROUP_MSG, msg).toNative(),
                 font
             )
         }
@@ -216,7 +216,7 @@ object NativeBridge {
         flag: String
     ) {
         event(Event.EVENT_REQUEST_GROUP, "_eventRequest_AddGroup") {
-            Bridge.pEvRequestAddGroup(id, it, subType, time, fromGroup, fromAccount, msg, flag)
+            Bridge.pEvRequestAddGroup(id, it, subType, time, fromGroup, fromAccount, msg.toNative(), flag.toNative())
         }
     }
 
@@ -228,7 +228,7 @@ object NativeBridge {
         flag: String
     ) {
         event(Event.EVENT_REQUEST_FRIEND, "_eventRequest_AddFriend") {
-            Bridge.pEvRequestAddFriend(id, it, subType, time, fromAccount, msg, flag)
+            Bridge.pEvRequestAddFriend(id, it, subType, time, fromAccount, msg.toNative(), flag.toNative())
         }
     }
 

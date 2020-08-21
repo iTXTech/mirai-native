@@ -83,8 +83,8 @@ object Bridge {
         msgId: Int,
         fromGroup: Long,
         fromAccount: Long,
-        fromAnonymous: String,
-        msg: String,
+        fromAnonymous: ByteArray,
+        msg: ByteArray,
         font: Int
     ): Int
 
@@ -129,8 +129,8 @@ object Bridge {
         time: Int,
         fromGroup: Long,
         fromAccount: Long,
-        msg: String,
-        flag: String
+        msg: ByteArray,
+        flag: ByteArray
     ): Int
 
     @JvmStatic
@@ -140,8 +140,8 @@ object Bridge {
         subType: Int,
         time: Int,
         fromAccount: Long,
-        msg: String,
-        flag: String
+        msg: ByteArray,
+        flag: ByteArray
     ): Int
 
     @JvmStatic
