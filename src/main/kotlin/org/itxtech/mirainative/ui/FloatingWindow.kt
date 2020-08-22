@@ -83,6 +83,14 @@ object FloatingWindow {
         }
     }
 
+    fun close() {
+        if (window?.isVisible == true) {
+            window!!.isVisible = false
+        }
+        window = null
+        text = null
+    }
+
     private fun update() {
         if (text != null) {
             val t = StringBuilder()

@@ -58,6 +58,12 @@ object Tray {
         }
     }
 
+    fun close() {
+        if (icon != null) {
+            SystemTray.getSystemTray().remove(icon)
+        }
+    }
+
     fun update() {
         if (icon != null) {
             val popupMenu = PopupMenu()

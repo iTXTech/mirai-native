@@ -98,16 +98,6 @@ object MiraiNative : KotlinPlugin() {
         }
 
         initDataDir()
-
-        Tray.create()
-        FloatingWindow.create()
-
-        PluginManager.registerCommands()
-        EventManager.registerEvents()
-
-        if (Bot.botInstances.isNotEmpty() && Bot.botInstances.first().isOnline) {
-            setBotOnline()
-        }
     }
 
     private fun initDataDir() {
@@ -142,11 +132,23 @@ object MiraiNative : KotlinPlugin() {
                 delay(10)
             }
         }
+
+        Tray.create()
+        FloatingWindow.create()
+
+        PluginManager.registerCommands()
+        EventManager.registerEvents()
+
+        if (Bot.botInstances.isNotEmpty() && Bot.botInstances.first().isOnline) {
+            setBotOnline()
+        }
     }
 
     override fun onDisable() {
         ConfigMan.save()
         CacheManager.clear()
+        Tray.close()
+        FloatingWindow.close()
         runBlocking {
             PluginManager.unloadPlugins().join()
             nativeLaunch { Bridge.shutdown() }.join()
