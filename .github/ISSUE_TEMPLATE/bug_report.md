@@ -1,8 +1,8 @@
 ---
-name: Bug report
+name: 报告Bug
 about: 创建一个Bug报告
 title: ''
-labels: ''
+labels: 'bug'
 assignees: ''
 
 ---

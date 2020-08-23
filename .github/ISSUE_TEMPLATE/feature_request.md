@@ -1,8 +1,8 @@
 ---
-name: Feature request
-about: 创建一个新特性请求
+name: 特性请求
+about: 创建一个特性请求
 title: ''
-labels: ''
+labels: 'enhancement'
 assignees: ''
 
 ---

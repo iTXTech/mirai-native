@@ -8,10 +8,7 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 ## [欢迎参与建设`Mirai Native`插件中心](https://github.com/iTXTech/mirai-native/issues/50)
 
-## 写在前面
-
-* 本项目欢迎一切形式的贡献，详见 [API 文档](Docs.md)
-* [Wiki](https://github.com/iTXTech/mirai-native/wiki) - `开发文档`, `搭建指南`（如`CQHTTP`）等文档
+## [开发文档](https://github.com/iTXTech/mirai-native/wiki)
 
 ## 关于托盘菜单
 

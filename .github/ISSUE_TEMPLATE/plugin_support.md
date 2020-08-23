@@ -1,8 +1,8 @@
 ---
-name: Plugin support
+name: 插件支持
 about: 创建一个插件支持请求
 title: ''
-labels: ''
+labels: 'plugin support'
 assignees: ''
 
 ---
