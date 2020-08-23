@@ -39,7 +39,6 @@ import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
-import net.mamoe.mirai.getFriendOrNull
 import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.isAboutGroup
@@ -127,17 +126,8 @@ object MiraiBridge {
     fun sendPrivateMessage(pluginId: Int, id: Long, message: String) = call(pluginId, 0) {
         val internalId = CacheManager.nextId()
         MiraiNative.launch {
-            var contact = MiraiNative.bot.getFriendOrNull(id) ?: CacheManager.findMember(id)
-            if (contact == null) {
-                MiraiNative.bot.groups.forEach {
-                    if (it.getOrNull(id) != null) {
-                        contact = it[id]
-                        return@forEach
-                    }
-                }
-            }
-            contact?.apply {
-                val chain = ChainCodeConverter.codeToChain(message, contact)
+            CacheManager.findUser(id)?.apply {
+                val chain = ChainCodeConverter.codeToChain(message, this)
                 sendMessage(chain).apply {
                     CacheManager.cacheMessage(source, internalId, chain)
                 }
@@ -200,7 +190,7 @@ object MiraiBridge {
     }
 
     fun getStrangerInfo(pluginId: Int, account: Long) = call(pluginId, "") {
-        val m = CacheManager.findMember(account) ?: return ""
+        val m = CacheManager.findUser(account) ?: return ""
         return buildPacket {
             writeLong(m.id)
             writeString(m.nick)

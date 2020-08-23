@@ -27,7 +27,9 @@ package org.itxtech.mirainative.manager
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.Member
+import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.event.events.BotEvent
+import net.mamoe.mirai.getFriendOrNull
 import net.mamoe.mirai.message.TempMessageEvent
 import net.mamoe.mirai.message.data.*
 import org.itxtech.mirainative.MiraiNative
@@ -73,7 +75,17 @@ object CacheManager {
 
     fun getRecord(name: String) = records[name.replace(".mnrec", "")]
 
-    fun findMember(id: Long) = senders[id]
+    fun findUser(id: Long): User? {
+        val member = MiraiNative.bot.getFriendOrNull(id) ?: senders[id]
+        if (member == null) {
+            MiraiNative.bot.groups.forEach {
+                if (it.getOrNull(id) != null) {
+                    return it[id]
+                }
+            }
+        }
+        return member
+    }
 
     fun clear() {
         msgCache.clear()
