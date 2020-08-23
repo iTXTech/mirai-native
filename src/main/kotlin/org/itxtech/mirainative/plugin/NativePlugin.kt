@@ -35,6 +35,7 @@ data class NativePlugin(val file: File, val id: Int) {
     var autoEnable = true
     var loaded = false
     var enabled = false
+    var started = false
     var api = -1
     var identifier: String = file.name
     val appDir: File by lazy {

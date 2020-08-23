@@ -126,7 +126,6 @@ object PluginManager {
                 plugin.loaded = true
                 plugins[pluginId.getAndIncrement()] = plugin
                 NativeBridge.updateInfo(plugin)
-                NativeBridge.startPlugin(plugin)
                 Tray.update()
             }
         }
@@ -147,6 +146,10 @@ object PluginManager {
     fun enablePlugin(plugin: NativePlugin): Boolean {
         if (MiraiNative.botOnline && !plugin.enabled) {
             MiraiNative.nativeLaunch {
+                if (!plugin.started) {
+                    NativeBridge.startPlugin(plugin)
+                    plugin.started = true
+                }
                 NativeBridge.enablePlugin(plugin)
                 plugin.enabled = true
                 Tray.update()
