@@ -132,28 +132,24 @@ object PluginManager {
     }
 
     fun unloadPlugin(plugin: NativePlugin) {
-        MiraiNative.nativeLaunch {
-            disablePlugin(plugin)
-            NativeBridge.exitPlugin(plugin)
-            if (NativeBridge.unloadPlugin(plugin) == 0) {
-                plugin.loaded = false
-                plugin.enabled = false
-                Tray.update()
-            }
+        disablePlugin(plugin)
+        NativeBridge.exitPlugin(plugin)
+        if (NativeBridge.unloadPlugin(plugin) == 0) {
+            plugin.loaded = false
+            plugin.enabled = false
+            Tray.update()
         }
     }
 
     fun enablePlugin(plugin: NativePlugin): Boolean {
         if (MiraiNative.botOnline && !plugin.enabled) {
-            MiraiNative.nativeLaunch {
-                if (!plugin.started) {
-                    NativeBridge.startPlugin(plugin)
-                    plugin.started = true
-                }
-                NativeBridge.enablePlugin(plugin)
-                plugin.enabled = true
-                Tray.update()
+            if (!plugin.started) {
+                NativeBridge.startPlugin(plugin)
+                plugin.started = true
             }
+            NativeBridge.enablePlugin(plugin)
+            plugin.enabled = true
+            Tray.update()
             return true
         }
         return false
@@ -161,20 +157,20 @@ object PluginManager {
 
     fun disablePlugin(plugin: NativePlugin): Boolean {
         if (plugin.enabled) {
-            MiraiNative.nativeLaunch {
-                NativeBridge.disablePlugin(plugin)
-                plugin.enabled = false
-                Tray.update()
-            }
+            NativeBridge.disablePlugin(plugin)
+            plugin.enabled = false
+            Tray.update()
             return true
         }
         return false
     }
 
     fun enablePlugins() {
-        plugins.values.forEach {
-            if (it.autoEnable) {
-                enablePlugin(it)
+        MiraiNative.nativeLaunch {
+            plugins.values.forEach {
+                if (it.autoEnable) {
+                    enablePlugin(it)
+                }
             }
         }
     }
@@ -216,7 +212,9 @@ object PluginManager {
                 } else {
                     if (plugins.containsKey(id)) {
                         val p = plugins[id]!!
-                        enablePlugin(p)
+                        MiraiNative.nativeLaunch {
+                            enablePlugin(p)
+                        }
                         appendLine("插件 ${p.identifier} 已启用。")
                     } else {
                         appendLine("Id $id 不存在。")
@@ -231,7 +229,9 @@ object PluginManager {
             sendMessage(buildString {
                 if (plugins.containsKey(id)) {
                     val p = plugins[id]!!
-                    disablePlugin(p)
+                    MiraiNative.nativeLaunch {
+                        disablePlugin(p)
+                    }
                     appendLine("插件 ${p.identifier} 已禁用。")
                 } else {
                     appendLine("Id $id 不存在。")
@@ -281,7 +281,9 @@ object PluginManager {
         suspend fun CommandSender.unload(@Name("插件Id") id: Int) {
             sendMessage(buildString {
                 if (plugins.containsKey(id)) {
-                    unloadPlugin(plugins[id]!!)
+                    MiraiNative.nativeLaunch {
+                        unloadPlugin(plugins[id]!!)
+                    }
                 } else {
                     appendLine("Id $id 不存在。")
                 }

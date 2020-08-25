@@ -143,17 +143,21 @@ object Tray {
 
                     val unload = MenuItem("卸载")
                     unload.addActionListener {
-                        PluginManager.unloadPlugin(plugin)
+                        MiraiNative.nativeLaunch {
+                            PluginManager.unloadPlugin(plugin)
+                        }
                     }
                     p.add(unload)
 
                     val en = MenuItem(if (plugin.enabled) "禁用" else "启用")
                     en.isEnabled = MiraiNative.botOnline
                     en.addActionListener {
-                        if (plugin.enabled) {
-                            PluginManager.disablePlugin(plugin)
-                        } else {
-                            PluginManager.enablePlugin(plugin)
+                        MiraiNative.nativeLaunch {
+                            if (plugin.enabled) {
+                                PluginManager.disablePlugin(plugin)
+                            } else {
+                                PluginManager.enablePlugin(plugin)
+                            }
                         }
                     }
                     p.add(en)

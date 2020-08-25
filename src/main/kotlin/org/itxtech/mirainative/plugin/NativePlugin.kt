@@ -69,9 +69,7 @@ data class NativePlugin(val file: File, val id: Int) {
         }
     }
 
-    fun getName(): String {
-        return pluginInfo?.name ?: identifier
-    }
+    fun getName() = pluginInfo?.name ?: identifier
 
     fun setInfo(i: String) {
         val parts = i.split(",")
@@ -81,9 +79,7 @@ data class NativePlugin(val file: File, val id: Int) {
         }
     }
 
-    fun getEventOrDefault(key: Int, default: String): String {
-        return events.getOrDefault(key, default)
-    }
+    fun getEventOrDefault(key: Int, default: String) = events.getOrDefault(key, default)
 
     @JvmOverloads
     fun shouldCallEvent(key: Int, ignoreState: Boolean = false): Boolean {

@@ -47,7 +47,7 @@ object MiraiNative : KotlinPlugin() {
     val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    private val dispatcher = newSingleThreadContext("MiraiNative") + SupervisorJob()
+    private val dispatcher = newFixedThreadPoolContext(16, "MiraiNative") + SupervisorJob()
 
     var botOnline = false
     val bot: Bot by lazy { Bot.botInstances.first() }
