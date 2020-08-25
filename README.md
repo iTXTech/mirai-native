@@ -10,13 +10,15 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 ## [Wiki - 开发者和用户必读](https://github.com/iTXTech/mirai-native/wiki)
 
-## 关于 `Mirai Native Tray`
+## [下载 `Mirai Native`](https://github.com/iTXTech/mirai-native/releases)
 
-* 右键流泪猫猫头打开 `Mirai Native` 托盘菜单
-* 左键流泪猫猫头显示悬浮窗
-* 插画由作者女朋友提供
+## `Mirai Native Tray`
 
-## `Mirai Native` 插件管理器 `npm`
+* 右键`流泪猫猫头`打开 `Mirai Native` 托盘菜单。
+* 左键`流泪猫猫头`显示悬浮窗。
+* 插画由作者女朋友提供，**版权所有**。
+
+## `mirai Native Plugin Manager`
 
 ```
 > npm

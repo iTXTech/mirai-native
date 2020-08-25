@@ -1,12 +1,12 @@
 ﻿#include <jni.h>
-#include <vector>
 #include <string>
 #include <thread>
+#include <map>
+#include <mutex>
+#include <queue>
 #include <Windows.h>
 #include "org_itxtech_mirainative_Bridge.h"
 #include "native.h"
-#include <mutex>
-#include <queue>
 
 using namespace std;
 
@@ -16,6 +16,14 @@ struct native_plugin
 	const char* file;
 	HMODULE dll;
 	bool enabled;
+
+	native_plugin()
+	{
+		id = -1;
+		file = "";
+		dll = nullptr;
+		enabled = false;
+	};
 
 	native_plugin(int i, char* f)
 	{
@@ -55,7 +63,7 @@ const char* delay_mem_free(const char* str)
 
 // Global var
 
-vector<native_plugin> plugins;
+map<int, native_plugin> plugins;
 
 // Strings
 
@@ -156,7 +164,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_loadNativePlugin(
 	if (dll != nullptr)
 	{
 		plugin.dll = dll;
-		plugins.push_back(plugin);
+		plugins[id] = plugin;
 
 		const auto init = FuncInitialize(GetProcAddress(dll, "Initialize"));
 		if (init)
