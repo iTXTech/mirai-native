@@ -47,7 +47,7 @@ object MiraiNative : KotlinPlugin() {
     val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    private val dispatcher = newFixedThreadPoolContext(16, "MiraiNative") + SupervisorJob()
+    private val dispatcher = newSingleThreadContext("MiraiNative") + SupervisorJob()
 
     var botOnline = false
     val bot: Bot by lazy { Bot.botInstances.first() }
@@ -126,6 +126,9 @@ object MiraiNative : KotlinPlugin() {
     }
 
     override fun onEnable() {
+        Tray.create()
+        FloatingWindow.create()
+
         checkNativeLibs()
         PluginManager.loadPlugins()
 
@@ -135,9 +138,6 @@ object MiraiNative : KotlinPlugin() {
                 delay(10)
             }
         }
-
-        Tray.create()
-        FloatingWindow.create()
 
         PluginManager.registerCommands()
         EventManager.registerEvents()
