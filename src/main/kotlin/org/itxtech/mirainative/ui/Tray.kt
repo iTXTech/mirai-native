@@ -89,7 +89,7 @@ object Tray {
             load.addActionListener {
                 val file = JOptionPane.showInputDialog("请输入位于 MiraiNative 目录下的 DLL文件名。")
                 if (file != null) {
-                    if (!PluginManager.loadPluginFromFile(file)) {
+                    if (!PluginManager.readPluginFromFile(file)) {
                         JOptionPane.showMessageDialog(null, "加载 DLL 文件出错 “$file”。", "错误", JOptionPane.ERROR_MESSAGE)
                     }
                 }
@@ -148,6 +148,15 @@ object Tray {
                         }
                     }
                     p.add(unload)
+
+
+                    val reload = MenuItem("重新加载")
+                    reload.addActionListener {
+                        MiraiNative.nativeLaunch {
+                            PluginManager.reloadPlugin(plugin)
+                        }
+                    }
+                    p.add(reload)
 
                     val en = MenuItem(if (plugin.enabled) "禁用" else "启用")
                     en.isEnabled = MiraiNative.botOnline

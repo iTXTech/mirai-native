@@ -8,22 +8,32 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 ## [欢迎参与建设`Mirai Native`插件中心](https://github.com/iTXTech/mirai-native/issues/50)
 
-## [开发文档](https://github.com/iTXTech/mirai-native/wiki)
+## [Wiki - 开发者和用户必读](https://github.com/iTXTech/mirai-native/wiki)
 
-## 关于托盘菜单
+## 关于 `Mirai Native Tray`
 
-* 右键流泪猫猫头打开菜单
+* 右键流泪猫猫头打开 `Mirai Native` 托盘菜单
+* 左键流泪猫猫头显示悬浮窗
 * 插画由作者女朋友提供
 
-## Mirai Native 插件管理器 `npm`
+## `Mirai Native` 插件管理器 `npm`
 
-1. 在 `mirai console` 中键入 `npm` 获得帮助
-1. `npm` (`Native Plugin Manager`) 可`列出插件`、`启用或停用插件`以及`执行指定方法`（比如调用`menu`）
+```
+> npm
+Mirai Native 插件管理器
 
-`npm [list|enable|disable|menu|info|load|unload] (插件 Id / 路径) (方法名)`
+/disable <插件Id>   停用指定 Mirai Native 插件
+/enable <插件Id>   启用指定 Mirai Native 插件
+/info <插件Id>   查看指定 Mirai Native 插件的详细信息
+/list    列出所有 Mirai Native 插件
+/load <DLL文件名>   加载指定DLL文件
+/menu <插件Id> <方法名>   调用指定 Mirai Native 插件的菜单方法
+/reload <插件Id>   重新载入指定 Mirai Native 插件
+/unload <插件Id>   卸载指定 Mirai Native 插件
+```
 
 
-## 开源协议
+## 开源许可证
 
     Copyright (C) 2020 iTX Technologies
 
