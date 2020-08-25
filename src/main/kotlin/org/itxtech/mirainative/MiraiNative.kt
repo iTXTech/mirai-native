@@ -94,24 +94,27 @@ object MiraiNative : KotlinPlugin() {
             cqp.close()
         } else if (nativeLib.readBytes().checksum() != dll.readBytes().checksum()) {
             logger.warning("${dll.absolutePath} 与 Mirai Native 内置的 CQP.dll 的校验和不同。")
-            logger.warning("如运行时出现问题，请尝试删除 ${dll.absolutePath} 并重启 Mirai。")
+            logger.warning("如运行时出现问题，请尝试删除 ${dll.absolutePath} 并重启 mirai。")
         }
 
         initDataDir()
     }
 
+    private fun libPath(d: String) = System.getProperty("java.library.path")
+        .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + d
+
     private fun initDataDir() {
-        File(
-            System.getProperty("java.library.path")
-                .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + "image"
-        ).mkdirs()
+        if (!File(libPath("image")).mkdirs() || !File(libPath("record")).mkdirs()) {
+            logger.warning("图片或语音文件夹创建失败，可能没有使用管理员权限运行。位置：${libPath("")}")
+        }
+        File(imageDataPath, "MIRAI_NATIVE_IMAGE_DATA").createNewFile()
+        File(recDataPath, "MIRAI_NATIVE_RECORD_DATA").createNewFile()
     }
 
     fun getDataFile(type: String, name: String): File? {
         arrayOf(
             "data" + File.separatorChar + type + File.separatorChar,
-            System.getProperty("java.library.path")
-                .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + type + File.separatorChar,
+            libPath(type) + File.separatorChar,
             ""
         ).forEach {
             val f = File(it + name).absoluteFile
