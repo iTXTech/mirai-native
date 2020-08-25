@@ -81,6 +81,10 @@ string ByteArrayToString(JNIEnv* env, jbyteArray arr)
 
 jbyteArray CharsToByteArray(JNIEnv* env, const char* str)
 {
+	if (str == nullptr)
+	{
+		str = "\0";
+	}
 	auto len = strlen(str);
 	auto arr = env->NewByteArray(len);
 	env->SetByteArrayRegion(arr, 0, len, reinterpret_cast<const jbyte*>(str));
@@ -232,7 +236,7 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvGroupMessage(
 	if (m)
 	{
 		auto result = m(type, msg_id, grp, acct, ByteArrayToString(env, anon).c_str(),
-			ByteArrayToString(env, msg).c_str(), font);
+		                ByteArrayToString(env, msg).c_str(), font);
 		return result;
 	}
 	return 0;
@@ -279,7 +283,8 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_pEvRequestAddGroup(
 	const auto m = EvRequestAddGroup(GetMethod(env, id, method));
 	if (m)
 	{
-		auto result = m(type, time, grp, acct, ByteArrayToString(env, msg).c_str(), ByteArrayToString(env, flag).c_str());
+		auto result = m(type, time, grp, acct, ByteArrayToString(env, msg).c_str(),
+		                ByteArrayToString(env, flag).c_str());
 		return result;
 	}
 	return 0;
@@ -595,7 +600,7 @@ CQAPI(const char*, CQ_getImage, 8)(int32_t plugin_id, const char* image)
 CQAPI(const char*, CQ_getRecordV2, 12)(int32_t plugin_id, const char* file, const char* format)
 {
 	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "getRecord","(I[B[B)[B");
+	auto method = env->GetStaticMethodID(bclz, "getRecord", "(I[B[B)[B");
 	auto f = CharsToByteArray(env, file);
 	auto fmt = CharsToByteArray(env, format);
 	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, f, fmt));

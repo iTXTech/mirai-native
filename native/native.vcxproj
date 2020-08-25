@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Java\jdk1.8.0_241\include\win32;C:\Program Files %28x86%29\Java\jdk1.8.0_241\include;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Program Files %28x86%29\Java\jdk1.8.0_241\include\win32;C:\Program Files %28x86%29\Java\jdk1.8.0_241\include;$(ReferencePath)</ReferencePath>
+    <IncludePath>C:\Program Files (x86)\Java\jdk-11.0.7\include\win32;C:\Program Files (x86)\Java\jdk-11.0.7\include;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Program Files (x86)\Java\jdk-11.0.7\include\win32;C:\Program Files (x86)\Java\jdk-11.0.7\include;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
