@@ -31,6 +31,7 @@ import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.plugin.Event
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.toNative
+import org.itxtech.mirainative.util.ConfigMan
 
 object NativeBridge {
     private fun getPlugins() = PluginManager.plugins
@@ -44,7 +45,7 @@ object NativeBridge {
             plugin.file.absolutePath.replace("\\", "\\\\").toNative(),
             plugin.id
         )
-        val info = "Native Plugin ${plugin.file.name} has been loaded with code $code"
+        val info = "插件 ${plugin.file.name} 已被加载，返回值为 $code 。"
         if (code == 0) {
             getLogger().info(info)
         } else {
@@ -54,50 +55,33 @@ object NativeBridge {
     }
 
     fun unloadPlugin(plugin: NativePlugin) = Bridge.freeNativePlugin(plugin.id).apply {
-        getLogger().info("Native Plugin ${plugin.id} has been unloaded with code $this")
+        getLogger().info("插件 ${plugin.detailedIdentifier} 已被卸载，返回值为 $this 。")
     }
 
     fun disablePlugin(plugin: NativePlugin) {
         if (plugin.loaded && plugin.enabled) {
-            if (plugin.shouldCallEvent(Event.EVENT_DISABLE, true)) {
-                Bridge.callIntMethod(
-                    plugin.id,
-                    plugin.getEventOrDefault(Event.EVENT_DISABLE, "_eventDisable").toNative()
-                )
-            }
+            singleEvent(plugin, Event.EVENT_DISABLE, true, "_eventDisable")
         }
     }
 
     fun enablePlugin(plugin: NativePlugin) {
         if (plugin.loaded && !plugin.enabled) {
-            if (plugin.shouldCallEvent(Event.EVENT_ENABLE, true)) {
-                Bridge.callIntMethod(
-                    plugin.id,
-                    plugin.getEventOrDefault(Event.EVENT_ENABLE, "_eventEnable").toNative()
-                )
-            }
+            singleEvent(plugin, Event.EVENT_ENABLE, true, "_eventEnable")
         }
     }
 
     fun startPlugin(plugin: NativePlugin) {
-        if (plugin.shouldCallEvent(Event.EVENT_STARTUP, true)) {
-            Bridge.callIntMethod(
-                plugin.id,
-                plugin.getEventOrDefault(Event.EVENT_STARTUP, "_eventStartup").toNative()
-            )
-        }
+        singleEvent(plugin, Event.EVENT_STARTUP, true, "_eventStartup")
     }
 
     fun exitPlugin(plugin: NativePlugin) {
-        if (plugin.shouldCallEvent(Event.EVENT_EXIT, true)) {
-            Bridge.callIntMethod(
-                plugin.id,
-                plugin.getEventOrDefault(Event.EVENT_EXIT, "_eventExit").toNative()
-            )
-        }
+        singleEvent(plugin, Event.EVENT_EXIT, true, "_eventExit")
     }
 
     fun updateInfo(plugin: NativePlugin) {
+        if (ConfigMan.config.verboseNativeApiLog) {
+            getLogger().verbose("正在调用插件 ${plugin.detailedIdentifier} 的 AppInfo 方法。")
+        }
         val info = Bridge.callStringMethod(plugin.id, "AppInfo".toNative()).fromNative()
         if ("" != info) {
             plugin.setInfo(info)
@@ -106,13 +90,24 @@ object NativeBridge {
 
     // Events
 
+    private inline fun singleEvent(
+        plugin: NativePlugin,
+        ev: Int,
+        ignoreState: Boolean,
+        defaultMethod: String,
+        block: NativePlugin.(evName: ByteArray) -> Int = { Bridge.callIntMethod(plugin.id, it) }
+    ): Boolean {
+        val eventName = plugin.getEventOrDefault(ev, defaultMethod)
+        return (plugin.shouldCallEvent(ev, ignoreState).apply {
+            if (this && ConfigMan.config.verboseNativeApiLog) {
+                getLogger().verbose("正在调用插件 ${plugin.detailedIdentifier} 的 $eventName 事件。")
+            }
+        } && block(plugin, eventName.toNative()) == 1)
+    }
+
     private inline fun event(ev: Int, defaultMethod: String, block: NativePlugin.(evName: ByteArray) -> Int) {
         for (plugin in getPlugins().values) {
-            if (plugin.shouldCallEvent(ev) && block(
-                    plugin,
-                    plugin.getEventOrDefault(ev, defaultMethod).toNative()
-                ) == 1
-            ) {
+            if (singleEvent(plugin, ev, false, defaultMethod, block)) {
                 break
             }
         }

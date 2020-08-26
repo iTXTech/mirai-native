@@ -128,7 +128,7 @@ object PluginManager {
             } catch (ignored: Throwable) {
             }
             if (plugin.pluginInfo == null) {
-                MiraiNative.logger.warning("No valid plugin info found for ${plugin.file.name}.")
+                MiraiNative.logger.warning("无法找到 ${plugin.file.name} 的插件信息。")
             }
             plugin.loaded = true
             NativeBridge.updateInfo(plugin)

@@ -27,7 +27,6 @@
 package org.itxtech.mirainative
 
 import org.itxtech.mirainative.bridge.MiraiBridge
-import org.itxtech.mirainative.manager.CacheManager
 import java.nio.charset.Charset
 
 object Bridge {
@@ -204,7 +203,7 @@ object Bridge {
         MiraiBridge.setGroupWholeBan(pluginId, group, enable)
 
     @JvmStatic
-    fun recallMsg(pluginId: Int, msgId: Long) = if (CacheManager.recall(msgId.toInt())) 0 else -1
+    fun recallMsg(pluginId: Int, msgId: Long) = MiraiBridge.recallMessage(pluginId, msgId)
 
     @JvmStatic
     fun getFriendList(pluginId: Int, reserved: Boolean) = MiraiBridge.getFriendList(pluginId).toNative()

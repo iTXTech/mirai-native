@@ -79,12 +79,12 @@ object ChainCodeConverter {
                     } else {
                         val group = MiraiNative.bot.getGroupOrNull(contact!!.id)
                         if (group == null) {
-                            MiraiNative.logger.debug("你群没了：${contact.id}")
+                            MiraiNative.logger.debug("无法找到群：${contact.id}")
                             return MSG_EMPTY
                         }
                         val member = group.getOrNull(args["qq"]!!.toLong())
                         if (member == null) {
-                            MiraiNative.logger.debug("你人没了：${args["qq"]}")
+                            MiraiNative.logger.debug("无法找到群员：${args["qq"]}")
                             return MSG_EMPTY
                         }
                         return At(member)

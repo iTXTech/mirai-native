@@ -54,6 +54,9 @@ data class NativePlugin(val file: File, val id: Int) {
     val events = hashMapOf<Int, String>()
     val entries = arrayListOf<FloatingWindowEntry>()
 
+    val detailedIdentifier
+        get() = "\"$identifier\" (${file.name}) (ID: $id)"
+
     private fun registerFws(fws: ArrayList<Status>) {
         fws.forEach {
             val entry = FloatingWindowEntry(it)

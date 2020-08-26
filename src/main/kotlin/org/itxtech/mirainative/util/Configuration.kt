@@ -87,6 +87,7 @@ object ConfigMan {
 
 @Serializable
 data class Configuration(
+    var verboseNativeApiLog: Boolean = false,
     var fwState: Boolean = false,
     var plugins: ArrayList<PluginEntry> = ArrayList()
 )

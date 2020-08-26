@@ -37,7 +37,7 @@ object NpmHelper {
         appendLine("标识符：${p.identifier}")
         appendLine("状态：${state(p, false)}")
         if (i == null) {
-            appendLine("Id：${p.id} （JSON文件缺失）")
+            appendLine("Id：${p.id} （插件信息缺失）")
             appendLine("CQ API：${p.api}")
         } else {
             appendLine("Id：${p.id}")
