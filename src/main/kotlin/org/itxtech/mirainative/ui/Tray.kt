@@ -121,84 +121,82 @@ object Tray {
                         val p = Menu(NpmHelper.name(plugin))
                         npm.add(p)
 
-                        val ver =
-                            MenuItem("Id：" + plugin.id + " 版本：" + if (plugin.pluginInfo != null) plugin.pluginInfo!!.version else "未知")
-                        ver.isEnabled = false
-                        p.add(ver)
+                        p.add(MenuItem("Id：" + plugin.id + " 版本：" + if (plugin.pluginInfo != null) plugin.pluginInfo!!.version else "未知").apply {
+                            isEnabled = false
+                        })
 
-                        val status = MenuItem(NpmHelper.state(plugin))
-                        status.isEnabled = false
-                        p.add(status)
+                        p.add(MenuItem(NpmHelper.state(plugin)).apply { isEnabled = false })
 
                         if (plugin.entries.isNotEmpty()) {
-                            //悬浮窗状态项
-                            val fwes = Menu("状态")
-                            plugin.entries.forEach { e ->
-                                fwes.add(MenuItem().apply {
-                                    fun lbl() = e.status.name + "：" + if (e.visible) "显示" else "隐藏"
-                                    label = lbl()
-                                    addActionListener {
-                                        e.visible = !e.visible
+                            p.add(Menu("状态").apply {
+                                plugin.entries.forEach { e ->
+                                    add(MenuItem().apply {
+                                        fun lbl() = e.status.name + "：" + if (e.visible) "显示" else "隐藏"
                                         label = lbl()
-                                    }
-                                })
+                                        addActionListener {
+                                            e.visible = !e.visible
+                                            label = lbl()
+                                        }
+                                    })
+                                }
+                            })
+                        }
+
+                        p.add(MenuItem("信息").apply {
+                            addActionListener {
+                                JOptionPane.showMessageDialog(
+                                    null,
+                                    NpmHelper.summary(plugin),
+                                    "插件信息 " + NpmHelper.name(plugin),
+                                    JOptionPane.INFORMATION_MESSAGE
+                                )
                             }
-                            p.add(fwes)
-                        }
+                        })
 
-                        val summary = MenuItem("信息")
-                        summary.addActionListener {
-                            JOptionPane.showMessageDialog(
-                                null,
-                                NpmHelper.summary(plugin),
-                                "插件信息 " + NpmHelper.name(plugin),
-                                JOptionPane.INFORMATION_MESSAGE
-                            )
-                        }
-                        p.add(summary)
-
-                        val unload = MenuItem("卸载")
-                        unload.addActionListener {
-                            MiraiNative.nativeLaunch {
-                                PluginManager.unloadPlugin(plugin)
-                            }
-                        }
-                        p.add(unload)
-
-
-                        val reload = MenuItem("重新加载")
-                        reload.addActionListener {
-                            MiraiNative.nativeLaunch {
-                                PluginManager.reloadPlugin(plugin)
-                            }
-                        }
-                        p.add(reload)
-
-                        val en = MenuItem(if (plugin.enabled) "禁用" else "启用")
-                        en.isEnabled = MiraiNative.botOnline
-                        en.addActionListener {
-                            MiraiNative.nativeLaunch {
-                                if (plugin.enabled) {
-                                    PluginManager.disablePlugin(plugin)
-                                } else {
-                                    PluginManager.enablePlugin(plugin)
+                        p.add(MenuItem("卸载").apply {
+                            addActionListener {
+                                MiraiNative.nativeLaunch {
+                                    PluginManager.unloadPlugin(plugin)
                                 }
                             }
+                        })
+
+
+                        if (plugin.reloadable) {
+                            p.add(MenuItem("重新加载").apply {
+                                addActionListener {
+                                    MiraiNative.nativeLaunch {
+                                        PluginManager.reloadPlugin(plugin)
+                                    }
+                                }
+                            })
                         }
-                        p.add(en)
+
+                        p.add(MenuItem(if (plugin.enabled) "禁用" else "启用").apply {
+                            isEnabled = MiraiNative.botOnline
+                            addActionListener {
+                                MiraiNative.nativeLaunch {
+                                    if (plugin.enabled) {
+                                        PluginManager.disablePlugin(plugin)
+                                    } else {
+                                        PluginManager.enablePlugin(plugin)
+                                    }
+                                }
+                            }
+                        })
 
                         if (plugin.pluginInfo != null && plugin.pluginInfo!!.menu.count() > 0) {
-                            val menu = Menu(plugin.pluginInfo!!.name)
-                            add(menu)
-                            plugin.pluginInfo!!.menu.forEach { m ->
-                                val item = MenuItem(m.name)
-                                item.addActionListener {
-                                    MiraiNative.nativeLaunch {
-                                        Bridge.callIntMethod(plugin.id, m.function.toNative())
+                            add(Menu(plugin.pluginInfo!!.name).apply {
+                                plugin.pluginInfo!!.menu.forEach { m ->
+                                    val item = MenuItem(m.name)
+                                    item.addActionListener {
+                                        MiraiNative.nativeLaunch {
+                                            Bridge.callIntMethod(plugin.id, m.function.toNative())
+                                        }
                                     }
+                                    add(item)
                                 }
-                                menu.add(item)
-                            }
+                            })
                         }
                     }
                 }

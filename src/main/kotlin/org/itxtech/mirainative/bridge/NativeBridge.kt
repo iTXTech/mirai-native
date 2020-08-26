@@ -32,6 +32,7 @@ import org.itxtech.mirainative.plugin.Event
 import org.itxtech.mirainative.plugin.NativePlugin
 import org.itxtech.mirainative.toNative
 import org.itxtech.mirainative.util.ConfigMan
+import java.io.File
 
 object NativeBridge {
     private fun getPlugins() = PluginManager.plugins
@@ -40,9 +41,9 @@ object NativeBridge {
 
     fun getPluginInfo(plugin: NativePlugin) = Bridge.callStringMethod(plugin.id, "pluginInfo".toNative()).fromNative()
 
-    fun loadPlugin(plugin: NativePlugin): Int {
+    fun loadPlugin(plugin: NativePlugin, file: File): Int {
         val code = Bridge.loadNativePlugin(
-            plugin.file.absolutePath.replace("\\", "\\\\").toNative(),
+            file.absolutePath.replace("\\", "\\\\").toNative(),
             plugin.id
         )
         val info = "插件 ${plugin.file.name} 已被加载，返回值为 $code 。"

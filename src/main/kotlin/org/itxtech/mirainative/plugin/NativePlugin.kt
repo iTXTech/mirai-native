@@ -54,6 +54,10 @@ data class NativePlugin(val file: File, val id: Int) {
     val events = hashMapOf<Int, String>()
     val entries = arrayListOf<FloatingWindowEntry>()
 
+    val reloadable
+        get() = file.name.endsWith(".dev.dll")
+    var tempFile: File? = null
+
     val detailedIdentifier
         get() = "\"$identifier\" (${file.name}) (ID: $id)"
 

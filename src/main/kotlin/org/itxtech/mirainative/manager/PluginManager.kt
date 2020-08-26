@@ -66,13 +66,7 @@ object PluginManager {
         MiraiNative.logger.info("正停用所有插件并调用Exit事件。")
         return MiraiNative.nativeLaunch {
             plugins.values.forEach {
-                if (it.loaded) {
-                    if (it.enabled) {
-                        NativeBridge.disablePlugin(it)
-                    }
-                    NativeBridge.exitPlugin(it)
-                    NativeBridge.unloadPlugin(it)
-                }
+                unloadPlugin(it)
             }
             plugins.clear()
         }
@@ -89,7 +83,7 @@ object PluginManager {
 
     fun readPluginFromFile(f: String): Boolean {
         val file = File(pl.absolutePath + File.separatorChar + f)
-        if (file.isFile && file.exists()) {
+        if (f.endsWith(".dll") && file.isFile && file.exists()) {
             readPlugin(file)
             return true
         }
@@ -112,8 +106,20 @@ object PluginManager {
     }
 
     fun loadPlugin(plugin: NativePlugin) {
-        if (NativeBridge.loadPlugin(plugin) == 0) {
-            val json = File(plugin.file.parent + File.separatorChar + plugin.file.name.replace(".dll", ".json"))
+        if (plugin.loaded) {
+            return
+        }
+        lateinit var suffix: String
+        val file = if (plugin.reloadable) {
+            suffix = ".tmp"
+            plugin.tempFile = File(plugin.file.absolutePath.replace(".dev.dll", suffix))
+            plugin.file.copyTo(plugin.tempFile!!, true)
+        } else {
+            suffix = ".dll"
+            plugin.file
+        }
+        if (NativeBridge.loadPlugin(plugin, file) == 0) {
+            val json = File(file.parent + File.separatorChar + file.name.replace(suffix, ".json"))
 
             try {
                 plugin.pluginInfo = Json {
@@ -136,24 +142,33 @@ object PluginManager {
     }
 
     fun unloadPlugin(plugin: NativePlugin) {
-        disablePlugin(plugin)
-        NativeBridge.exitPlugin(plugin)
-        if (NativeBridge.unloadPlugin(plugin) == 0) {
-            plugin.loaded = false
-            plugin.enabled = false
-            plugin.started = false
-            plugin.entries.forEach { it.vaild = false }
-            plugin.entries.clear()
-            plugin.events.clear()
-            Tray.update()
+        if (plugin.loaded) {
+            disablePlugin(plugin)
+            NativeBridge.exitPlugin(plugin)
+            if (NativeBridge.unloadPlugin(plugin) == 0) {
+                plugin.loaded = false
+                plugin.enabled = false
+                plugin.started = false
+                plugin.entries.forEach { it.vaild = false }
+                plugin.entries.clear()
+                plugin.events.clear()
+                plugin.tempFile?.delete()
+                Tray.update()
+            }
         }
     }
 
     fun reloadPlugin(plugin: NativePlugin) {
-        unloadPlugin(plugin)
-        loadPlugin(plugin)
-        plugins[plugin.id] = plugin
-        Tray.update()
+        if (plugin.loaded) {
+            if (plugin.reloadable) {
+                unloadPlugin(plugin)
+                loadPlugin(plugin)
+                plugins[plugin.id] = plugin
+                Tray.update()
+            } else {
+                MiraiNative.logger.error("插件 ${plugin.detailedIdentifier} 不可重新加载。文件名必须以 \".dev.dll\" 结尾。")
+            }
+        }
     }
 
     fun enablePlugin(plugin: NativePlugin): Boolean {
