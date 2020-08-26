@@ -30,8 +30,6 @@ import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandSender
 import net.mamoe.mirai.console.command.CompositeCommand
-import net.mamoe.mirai.console.command.PluginCommandOwner
-import net.mamoe.mirai.console.command.sendMessage
 import net.mamoe.mirai.console.util.ConsoleExperimentalAPI
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
@@ -205,11 +203,9 @@ object PluginManager {
         }
     }
 
-    object TempOwner : PluginCommandOwner(MiraiNative)
-
     @OptIn(ConsoleExperimentalAPI::class)
     object NpmCommand : CompositeCommand(
-        TempOwner, "npm",
+        MiraiNative, "npm",
         description = "Mirai Native 插件管理器"
     ) {
         @Description("列出所有 Mirai Native 插件")
