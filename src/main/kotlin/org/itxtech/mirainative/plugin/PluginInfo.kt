@@ -99,4 +99,5 @@ data class FloatingWindowEntry(val status: Status) {
     var unit = ""
     var color = 0
     var visible = false
+    var vaild = true
 }

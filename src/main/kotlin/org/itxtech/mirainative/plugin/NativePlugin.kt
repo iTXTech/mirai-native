@@ -59,7 +59,7 @@ data class NativePlugin(val file: File, val id: Int) {
             val entry = FloatingWindowEntry(it)
             entries.add(entry)
             MiraiNative.nativeLaunch {
-                while (isActive && loaded) {
+                while (isActive && loaded && entry.vaild) {
                     if (enabled && entry.visible && FloatingWindow.isVisible()) {
                         MiraiBridge.updateFwe(id, entry)
                     }
@@ -81,7 +81,6 @@ data class NativePlugin(val file: File, val id: Int) {
 
     fun getEventOrDefault(key: Int, default: String) = events.getOrDefault(key, default)
 
-    @JvmOverloads
     fun shouldCallEvent(key: Int, ignoreState: Boolean = false): Boolean {
         if (!enabled && !ignoreState) {
             return false

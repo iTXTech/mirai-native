@@ -142,6 +142,7 @@ object PluginManager {
             plugin.loaded = false
             plugin.enabled = false
             plugin.started = false
+            plugin.entries.forEach { it.vaild = false }
             plugin.entries.clear()
             plugin.events.clear()
             Tray.update()
