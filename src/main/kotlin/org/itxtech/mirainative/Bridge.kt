@@ -157,14 +157,12 @@ object Bridge {
     // Bridge
 
     @JvmStatic
-    fun sendPrivateMessage(pluginId: Int, account: Long, msg: ByteArray): Int {
-        return MiraiBridge.sendPrivateMessage(pluginId, account, msg.fromNative())
-    }
+    fun sendPrivateMessage(pluginId: Int, account: Long, msg: ByteArray) =
+        MiraiBridge.sendPrivateMessage(pluginId, account, msg.fromNative())
 
     @JvmStatic
-    fun sendGroupMessage(pluginId: Int, group: Long, msg: ByteArray): Int {
-        return MiraiBridge.sendGroupMessage(pluginId, group, msg.fromNative())
-    }
+    fun sendGroupMessage(pluginId: Int, group: Long, msg: ByteArray) =
+        MiraiBridge.sendGroupMessage(pluginId, group, msg.fromNative())
 
     @JvmStatic
     fun addLog(pluginId: Int, priority: Int, type: ByteArray, content: ByteArray) {
@@ -172,79 +170,58 @@ object Bridge {
     }
 
     @JvmStatic
-    fun getPluginDataDir(pluginId: Int): ByteArray {
-        return MiraiBridge.getPluginDataDir(pluginId).toNative()
-    }
+    fun getPluginDataDir(pluginId: Int) = MiraiBridge.getPluginDataDir(pluginId).toNative()
 
     @JvmStatic
-    fun getLoginQQ(pluginId: Int): Long {
-        return MiraiBridge.getLoginQQ(pluginId)
-    }
+    fun getLoginQQ(pluginId: Int) = MiraiBridge.getLoginQQ(pluginId)
 
     @JvmStatic
-    fun getLoginNick(pluginId: Int): ByteArray {
-        return MiraiBridge.getLoginNick(pluginId).toNative()
-    }
+    fun getLoginNick(pluginId: Int) = MiraiBridge.getLoginNick(pluginId).toNative()
+
 
     @JvmStatic
-    fun setGroupBan(pluginId: Int, group: Long, member: Long, duration: Long): Int {
-        return MiraiBridge.setGroupBan(pluginId, group, member, duration.toInt())
-    }
+    fun setGroupBan(pluginId: Int, group: Long, member: Long, duration: Long) =
+        MiraiBridge.setGroupBan(pluginId, group, member, duration.toInt())
 
     @JvmStatic
-    fun setGroupCard(pluginId: Int, group: Long, member: Long, card: ByteArray): Int {
-        return MiraiBridge.setGroupCard(pluginId, group, member, card.fromNative())
-    }
+    fun setGroupCard(pluginId: Int, group: Long, member: Long, card: ByteArray) =
+        MiraiBridge.setGroupCard(pluginId, group, member, card.fromNative())
 
     @JvmStatic
-    fun setGroupKick(pluginId: Int, group: Long, member: Long, reject: Boolean): Int {
-        return MiraiBridge.setGroupKick(pluginId, group, member)
-    }
+    fun setGroupKick(pluginId: Int, group: Long, member: Long, reject: Boolean) =
+        MiraiBridge.setGroupKick(pluginId, group, member)
 
     @JvmStatic
-    fun setGroupLeave(pluginId: Int, group: Long, dismiss: Boolean): Int {
-        return MiraiBridge.setGroupLeave(pluginId, group)
-    }
+    fun setGroupLeave(pluginId: Int, group: Long, dismiss: Boolean) =
+        MiraiBridge.setGroupLeave(pluginId, group)
 
     @JvmStatic
-    fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: ByteArray, duration: Long): Int {
-        return MiraiBridge.setGroupSpecialTitle(pluginId, group, member, title.fromNative(), duration)
-    }
+    fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: ByteArray, duration: Long) =
+        MiraiBridge.setGroupSpecialTitle(pluginId, group, member, title.fromNative(), duration)
 
     @JvmStatic
-    fun setGroupWholeBan(pluginId: Int, group: Long, enable: Boolean): Int {
-        return MiraiBridge.setGroupWholeBan(pluginId, group, enable)
-    }
+    fun setGroupWholeBan(pluginId: Int, group: Long, enable: Boolean) =
+        MiraiBridge.setGroupWholeBan(pluginId, group, enable)
 
     @JvmStatic
-    fun recallMsg(pluginId: Int, msgId: Long): Int {
-        return if (CacheManager.recall(msgId.toInt())) 0 else -1
-    }
+    fun recallMsg(pluginId: Int, msgId: Long) = if (CacheManager.recall(msgId.toInt())) 0 else -1
 
     @JvmStatic
-    fun getFriendList(pluginId: Int, reserved: Boolean): ByteArray {
-        return MiraiBridge.getFriendList(pluginId).toNative()
-    }
+    fun getFriendList(pluginId: Int, reserved: Boolean) = MiraiBridge.getFriendList(pluginId).toNative()
 
     @JvmStatic
-    fun getGroupInfo(pluginId: Int, groupId: Long, cache: Boolean): ByteArray {
-        return MiraiBridge.getGroupInfo(pluginId, groupId).toNative()
-    }
+    fun getGroupInfo(pluginId: Int, groupId: Long, cache: Boolean) =
+        MiraiBridge.getGroupInfo(pluginId, groupId).toNative()
 
     @JvmStatic
-    fun getGroupList(pluginId: Int): ByteArray {
-        return MiraiBridge.getGroupList(pluginId).toNative()
-    }
+    fun getGroupList(pluginId: Int) = MiraiBridge.getGroupList(pluginId).toNative()
 
     @JvmStatic
-    fun getGroupMemberInfo(pluginId: Int, group: Long, member: Long, cache: Boolean): ByteArray {
-        return MiraiBridge.getGroupMemberInfo(pluginId, group, member).toNative()
-    }
+    fun getGroupMemberInfo(pluginId: Int, group: Long, member: Long, cache: Boolean) =
+        MiraiBridge.getGroupMemberInfo(pluginId, group, member).toNative()
 
     @JvmStatic
-    fun getGroupMemberList(pluginId: Int, group: Long): ByteArray {
-        return MiraiBridge.getGroupMemberList(pluginId, group).toNative()
-    }
+    fun getGroupMemberList(pluginId: Int, group: Long) = MiraiBridge.getGroupMemberList(pluginId, group).toNative()
 
     @JvmStatic
     fun setGroupAddRequest(
@@ -253,87 +230,63 @@ object Bridge {
         reqType: Int,
         fbType: Int,
         reason: ByteArray
-    ): Int {
-        return MiraiBridge.setGroupAddRequest(pluginId, requestId.fromNative(), reqType, fbType, reason.fromNative())
-    }
+    ) = MiraiBridge.setGroupAddRequest(pluginId, requestId.fromNative(), reqType, fbType, reason.fromNative())
 
     @JvmStatic
-    fun setFriendAddRequest(pluginId: Int, requestId: ByteArray, type: Int, remark: ByteArray): Int {
-        return MiraiBridge.setFriendAddRequest(pluginId, requestId.fromNative(), type, remark.fromNative())
-    }
+    fun setFriendAddRequest(pluginId: Int, requestId: ByteArray, type: Int, remark: ByteArray) =
+        MiraiBridge.setFriendAddRequest(pluginId, requestId.fromNative(), type, remark.fromNative())
 
     @JvmStatic
-    fun getStrangerInfo(pluginId: Int, account: Long, cache: Boolean): ByteArray {
-        return MiraiBridge.getStrangerInfo(pluginId, account).toNative()
-    }
+    fun getStrangerInfo(pluginId: Int, account: Long, cache: Boolean) =
+        MiraiBridge.getStrangerInfo(pluginId, account).toNative()
 
     @JvmStatic
-    fun getImage(pluginId: Int, image: ByteArray): ByteArray {
-        return MiraiBridge.getImage(pluginId, image.fromNative()).toNative()
-    }
+    fun getImage(pluginId: Int, image: ByteArray) =
+        MiraiBridge.getImage(pluginId, image.fromNative()).toNative()
 
     @JvmStatic
-    fun getRecord(pluginId: Int, file: ByteArray, format: ByteArray): ByteArray {
-        return MiraiBridge.getRecord(pluginId, file.fromNative(), format.fromNative()).toNative()
-    }
-
+    fun getRecord(pluginId: Int, file: ByteArray, format: ByteArray) =
+        MiraiBridge.getRecord(pluginId, file.fromNative(), format.fromNative()).toNative()
 
     // Placeholder methods which mirai hasn't supported yet
 
     @JvmStatic
-    fun setGroupAnonymous(pluginId: Int, group: Long, enable: Boolean): Int {
-        return 0
-    }
+    fun setGroupAnonymous(pluginId: Int, group: Long, enable: Boolean) = 0
 
     @JvmStatic
-    fun setGroupAdmin(pluginId: Int, group: Long, account: Long, admin: Boolean): Int {
-        //true => set, false => revoke
-        return 0
-    }
+    fun setGroupAdmin(pluginId: Int, group: Long, account: Long, admin: Boolean) = 0
+    //true => set, false => revoke
 
     @JvmStatic
-    fun setGroupAnonymousBan(pluginId: Int, group: Long, id: ByteArray, duration: Long): Int {
-        return 0
-    }
+    fun setGroupAnonymousBan(pluginId: Int, group: Long, id: ByteArray, duration: Long) = 0
 
     // Wont' Implement
 
     @JvmStatic
-    fun sendLike(pluginId: Int, account: Long, times: Int): Int {
-        return 0
-    }
+    fun sendLike(pluginId: Int, account: Long, times: Int) = 0
 
     @JvmStatic
-    fun getCookies(pluginId: Int, domain: ByteArray): ByteArray {
-        return "".toNative()
-    }
+    fun getCookies(pluginId: Int, domain: ByteArray) = "".toNative()
 
     @JvmStatic
-    fun getCsrfToken(pluginId: Int): ByteArray {
-        return "".toNative()
-    }
+    fun getCsrfToken(pluginId: Int) = "".toNative()
 
     @JvmStatic
-    fun sendDiscussMessage(pluginId: Int, group: Long, msg: ByteArray): Int {
-        return 0
-    }
+    fun sendDiscussMessage(pluginId: Int, group: Long, msg: ByteArray) = 0
 
     @JvmStatic
-    fun setDiscussLeave(pluginId: Int, group: Long): Int {
-        return 0
-    }
+    fun setDiscussLeave(pluginId: Int, group: Long) = 0
 
     // Mirai Unique Methods
 
     @JvmStatic
-    fun quoteMessage(pluginId: Int, msgId: Int, msg: ByteArray): Int {
-        return MiraiBridge.quoteMessage(pluginId, msgId, msg.fromNative())
-    }
+    fun quoteMessage(pluginId: Int, msgId: Int, msg: ByteArray) =
+        MiraiBridge.quoteMessage(pluginId, msgId, msg.fromNative())
 
     @JvmStatic
-    fun forwardMessage(pluginId: Int, type: Int, id: Long, strategy: ByteArray, msg: ByteArray): Int {
-        return MiraiBridge.forwardMessage(pluginId, type, id, strategy.fromNative(), msg.fromNative())
-    }
+    fun forwardMessage(pluginId: Int, type: Int, id: Long, strategy: ByteArray, msg: ByteArray) =
+        MiraiBridge.forwardMessage(pluginId, type, id, strategy.fromNative(), msg.fromNative())
+
 }
 
 fun String.toNative() = toByteArray(Charset.forName("GB18030"))
