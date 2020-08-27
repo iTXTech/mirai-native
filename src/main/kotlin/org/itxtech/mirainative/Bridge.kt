@@ -50,10 +50,17 @@ object Bridge {
     const val GROUP_UNMUTE = 1
     const val GROUP_MUTE = 2
 
+    // Helper
+
+    fun syncWorkingDir() = setCurrentDirectory(System.getProperty("user.dir").toNative())
+
     // Native
 
     @JvmStatic
     external fun shutdown(): Int
+
+    @JvmStatic
+    external fun setCurrentDirectory(dir: ByteArray): Int
 
     @JvmStatic
     external fun loadNativePlugin(file: ByteArray, id: Int): Int

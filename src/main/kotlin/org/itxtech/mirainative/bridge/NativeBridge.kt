@@ -52,6 +52,7 @@ object NativeBridge {
         } else {
             getLogger().error(info)
         }
+        Bridge.syncWorkingDir()
         return code
     }
 

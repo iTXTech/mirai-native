@@ -143,13 +143,19 @@ void detach_java()
 	jvm->DetachCurrentThread();
 }
 
-// Shutdown
+// Utilities
 
 JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_shutdown(JNIEnv* env, jclass clz)
 {
 	env->DeleteGlobalRef(bclz);
 	running = false;
 	mem_thread.join();
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_setCurrentDirectory(JNIEnv* env, jclass clz, jbyteArray dir)
+{
+	SetCurrentDirectoryA(ByteArrayToString(env, dir).c_str());
 	return 0;
 }
 

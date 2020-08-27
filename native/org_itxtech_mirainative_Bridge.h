@@ -45,6 +45,14 @@ JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_shutdown
 
 /*
  * Class:     org_itxtech_mirainative_Bridge
+ * Method:    setCurrentDirectory
+ * Signature: ([B)I
+ */
+JNIEXPORT jint JNICALL Java_org_itxtech_mirainative_Bridge_setCurrentDirectory
+  (JNIEnv *, jclass, jbyteArray);
+
+/*
+ * Class:     org_itxtech_mirainative_Bridge
  * Method:    loadNativePlugin
  * Signature: ([BI)I
  */
