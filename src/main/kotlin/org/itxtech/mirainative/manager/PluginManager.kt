@@ -140,17 +140,18 @@ object PluginManager {
     }
 
     fun unloadPlugin(plugin: NativePlugin) {
-        if (plugin.loaded) {
-            disablePlugin(plugin)
-            NativeBridge.exitPlugin(plugin)
-            if (NativeBridge.unloadPlugin(plugin) == 0) {
-                plugin.loaded = false
-                plugin.enabled = false
-                plugin.started = false
-                plugin.entries.forEach { it.vaild = false }
-                plugin.entries.clear()
-                plugin.events.clear()
-                plugin.tempFile?.delete()
+        with(plugin) {
+            if (loaded) {
+                disablePlugin(this)
+                NativeBridge.exitPlugin(this)
+                loaded = false
+                enabled = false
+                started = false
+                entries.forEach { it.vaild = false }
+                entries.clear()
+                events.clear()
+                tempFile?.delete()
+                plugins.remove(id)
                 Tray.update()
             }
         }
