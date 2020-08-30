@@ -41,8 +41,6 @@ import java.security.MessageDigest
 import java.util.jar.Manifest
 
 object MiraiNative : KotlinPlugin() {
-    val dataFolder: File by lazy { dataFolderPath.toFile() }
-
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
