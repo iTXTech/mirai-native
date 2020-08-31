@@ -26,6 +26,7 @@ package org.itxtech.mirainative.manager
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandSender
@@ -271,7 +272,7 @@ object PluginManager {
         suspend fun CommandSender.menu(@Name("插件Id") id: Int, @Name("方法名") method: String) {
             sendMessage(buildString {
                 if (plugins[id]?.verifyMenuFunc(method) == true) {
-                    MiraiNative.nativeLaunch {
+                    MiraiNative.launch(MiraiNative.menuDispatcher) {
                         Bridge.callIntMethod(id, method.toNative())
                     }
                     appendLine("已调用 Id $id 的 $method 方法。")

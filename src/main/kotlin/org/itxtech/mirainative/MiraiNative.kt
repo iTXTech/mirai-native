@@ -49,6 +49,9 @@ object MiraiNative : KotlinPlugin() {
     @OptIn(ObsoleteCoroutinesApi::class)
     private val dispatcher = newSingleThreadContext("MiraiNative") + SupervisorJob()
 
+    @OptIn(ObsoleteCoroutinesApi::class)
+    val menuDispatcher = newSingleThreadContext("MiraiNative Menu") + SupervisorJob()
+
     var botOnline = false
     val bot: Bot by lazy { Bot.botInstances.first() }
 
@@ -118,6 +121,13 @@ object MiraiNative : KotlinPlugin() {
         return null
     }
 
+    private suspend fun CoroutineScope.processMessage() {
+        while (isActive) {
+            Bridge.processMessage()
+            delay(10)
+        }
+    }
+
     override fun onEnable() {
         Tray.create()
         FloatingWindow.create()
@@ -125,12 +135,8 @@ object MiraiNative : KotlinPlugin() {
         checkNativeLibs()
         PluginManager.loadPlugins()
 
-        nativeLaunch {
-            while (isActive) {
-                Bridge.processMessage()
-                delay(10)
-            }
-        }
+        nativeLaunch { processMessage() }
+        launch(menuDispatcher) { processMessage() }
 
         PluginManager.registerCommands()
         EventManager.registerEvents()

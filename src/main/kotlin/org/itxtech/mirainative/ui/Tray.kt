@@ -24,6 +24,7 @@
 
 package org.itxtech.mirainative.ui
 
+import kotlinx.coroutines.launch
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.manager.PluginManager
@@ -190,7 +191,7 @@ object Tray {
                                 plugin.pluginInfo!!.menu.forEach { m ->
                                     val item = MenuItem(m.name)
                                     item.addActionListener {
-                                        MiraiNative.nativeLaunch {
+                                        MiraiNative.launch(MiraiNative.menuDispatcher) {
                                             Bridge.callIntMethod(plugin.id, m.function.toNative())
                                         }
                                     }
