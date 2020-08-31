@@ -6,6 +6,7 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 与**大部分**`酷Q`插件兼容，**不支持**`CPK`和解包的`DLL`，需获取`DLL`和`JSON`原文件，`JSON`文件**不支持**注释。
 
+## `Mirai Native` 仅支持 `Windows 32位 JRE`
 ## [欢迎参与建设`Mirai Native`插件中心](https://github.com/iTXTech/mirai-native/issues/50)
 
 ## [Wiki - 开发者和用户必读](https://github.com/iTXTech/mirai-native/wiki)
