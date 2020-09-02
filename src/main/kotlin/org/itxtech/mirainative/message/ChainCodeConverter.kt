@@ -28,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
-import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.uploadImage
 import net.mamoe.mirai.utils.toExternalImage
@@ -77,17 +76,18 @@ object ChainCodeConverter {
                     if (args["qq"] == "all") {
                         return AtAll
                     } else {
-                        val group = MiraiNative.bot.getGroupOrNull(contact!!.id)
-                        if (group == null) {
-                            MiraiNative.logger.debug("无法找到群：${contact.id}")
-                            return MSG_EMPTY
+                        return if (contact !is Group) {
+                            MiraiNative.logger.debug("不能在私聊中发送 At。")
+                            MSG_EMPTY
+                        } else {
+                            val member = contact.getOrNull(args["qq"]!!.toLong())
+                            if (member == null) {
+                                MiraiNative.logger.debug("无法找到群员：${args["qq"]}")
+                                MSG_EMPTY
+                            } else {
+                                At(member)
+                            }
                         }
-                        val member = group.getOrNull(args["qq"]!!.toLong())
-                        if (member == null) {
-                            MiraiNative.logger.debug("无法找到群员：${args["qq"]}")
-                            return MSG_EMPTY
-                        }
-                        return At(member)
                     }
                 }
                 "face" -> {
