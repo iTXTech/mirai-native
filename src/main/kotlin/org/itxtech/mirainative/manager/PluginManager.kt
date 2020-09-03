@@ -145,6 +145,7 @@ object PluginManager {
             if (loaded) {
                 disablePlugin(this)
                 NativeBridge.exitPlugin(this)
+                NativeBridge.unloadPlugin(this)
                 loaded = false
                 enabled = false
                 started = false

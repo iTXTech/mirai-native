@@ -103,7 +103,13 @@ object MiraiNative : KotlinPlugin() {
         initDataDir()
     }
 
+    private fun libPath(d: String) = System.getProperty("java.library.path")
+        .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + d
+
     private fun initDataDir() {
+        if (!File(libPath("image")).mkdirs() || !File(libPath("record")).mkdirs()) {
+            logger.warning("图片或语音文件夹创建失败，可能没有使用管理员权限运行。本文件夹专门用以兼容易语言编写的插件。位置：${libPath("")}")
+        }
         File(imageDataPath, "MIRAI_NATIVE_IMAGE_DATA").createNewFile()
         File(recDataPath, "MIRAI_NATIVE_RECORD_DATA").createNewFile()
     }
@@ -111,6 +117,7 @@ object MiraiNative : KotlinPlugin() {
     fun getDataFile(type: String, name: String): File? {
         arrayOf(
             "data" + File.separatorChar + type + File.separatorChar,
+            libPath(type) + File.separatorChar,
             ""
         ).forEach {
             val f = File(it + name).absoluteFile
