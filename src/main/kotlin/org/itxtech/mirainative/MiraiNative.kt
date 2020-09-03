@@ -43,9 +43,10 @@ import java.util.jar.Manifest
 
 object MiraiNative : KotlinPlugin(
     SimpleJvmPluginDescription(
-        name = "Mirai Native",
+        name = "MiraiNative",
         version = "1.9.0",
-        author = "iTX Technologies"
+        author = "iTX Technologies",
+        info = "强大的 mirai 原生插件加载器。"
     )
 ) {
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
@@ -54,10 +55,14 @@ object MiraiNative : KotlinPlugin(
     val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    private val dispatcher = newSingleThreadContext("MiraiNative") + SupervisorJob()
+    private val dispatcher = newSingleThreadContext("MiraiNative Main") + SupervisorJob()
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    val menuDispatcher = newSingleThreadContext("MiraiNative Menu") + SupervisorJob()
+    val menuDispatcher = newSingleThreadContext("MiraiNative Menu")
+
+    @OptIn(ObsoleteCoroutinesApi::class)
+    val eventDispatcher =
+        newFixedThreadPoolContext(Runtime.getRuntime().availableProcessors() * 2, "MiraiNative Events")
 
     var botOnline = false
     val bot: Bot by lazy { Bot.botInstances.first() }
@@ -174,6 +179,8 @@ object MiraiNative : KotlinPlugin(
     }
 
     fun nativeLaunch(b: suspend CoroutineScope.() -> Unit) = launch(context = dispatcher, block = b)
+
+    fun launchEvent(b: suspend CoroutineScope.() -> Unit) = launch(context = eventDispatcher, block = b)
 
     fun getVersion(): String {
         var version = description.version.value

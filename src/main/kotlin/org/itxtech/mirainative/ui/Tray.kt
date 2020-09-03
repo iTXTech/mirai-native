@@ -54,6 +54,7 @@ object Tray {
                     popupMenu = PopupMenu()
                     SystemTray.getSystemTray().add(this)
                 }
+                update()
             }
         } catch (e: Throwable) {
             MiraiNative.logger.error(e)
