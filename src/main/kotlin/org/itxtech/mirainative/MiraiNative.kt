@@ -27,6 +27,7 @@ package org.itxtech.mirainative
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
+import net.mamoe.mirai.console.plugin.jvm.SimpleJvmPluginDescription
 import org.itxtech.mirainative.manager.CacheManager
 import org.itxtech.mirainative.manager.EventManager
 import org.itxtech.mirainative.manager.LibraryManager
@@ -40,7 +41,13 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.jar.Manifest
 
-object MiraiNative : KotlinPlugin() {
+object MiraiNative : KotlinPlugin(
+    SimpleJvmPluginDescription(
+        name = "Mirai Native",
+        version = "1.9.0",
+        author = "iTX Technologies"
+    )
+) {
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
