@@ -177,14 +177,15 @@ object ChainCodeConverter {
                         if (args["file"]!!.endsWith(".mnrec")) {
                             rec = CacheManager.getRecord(args["file"]!!)
                         } else {
-                            val file = MiraiNative.getDataFile("record", args["file"]!!)
-                            if (file != null) {
-                                rec = (contact!! as Group).uploadVoice(file.inputStream())
+                            MiraiNative.getDataFile("record", args["file"]!!)?.inputStream()?.use {
+                                rec = (contact!! as Group).uploadVoice(it)
                             }
                         }
                     } else if (args.containsKey("url")) {
-                        rec = withContext(Dispatchers.IO) {
-                            (contact!! as Group).uploadVoice(URL(args["url"]!!).openStream())
+                        withContext(Dispatchers.IO) {
+                            URL(args["url"]!!).openStream().use {
+                                rec = (contact!! as Group).uploadVoice(it)
+                            }
                         }
                     }
                     return rec ?: MSG_EMPTY
