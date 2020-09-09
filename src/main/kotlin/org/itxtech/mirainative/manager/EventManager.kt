@@ -64,7 +64,7 @@ object EventManager {
                         CacheManager.cacheMessage(message.source, chain = message),
                         group.id,
                         sender.id,
-                        if (sender.id == 80000000L) senderName else "",
+                        "",
                         ChainCodeConverter.chainToCode(message),
                         0
                     )
