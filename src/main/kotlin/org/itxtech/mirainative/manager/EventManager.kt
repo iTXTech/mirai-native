@@ -129,23 +129,27 @@ object EventManager {
                     )
                 }
             }
-            subscribeAlways<BotJoinGroupEvent.Invite> { ev ->
-                NativeBridge.eventGroupMemberJoin(
-                    Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
-                    getTimestamp(),
-                    group.id,
-                    ev.invitor.id,
-                    bot.id
-                )
+            subscribeAlways<BotJoinGroupEvent.Invite> {
+                launchEvent {
+                    NativeBridge.eventGroupMemberJoin(
+                        Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
+                        getTimestamp(),
+                        group.id,
+                        invitor.id,
+                        bot.id
+                    )
+                }
             }
             subscribeAlways<BotJoinGroupEvent.Active> {
-                NativeBridge.eventGroupMemberJoin(
-                    Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
-                    getTimestamp(),
-                    group.id,
-                    0,
-                    bot.id
-                )
+                launchEvent {
+                    NativeBridge.eventGroupMemberJoin(
+                        Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
+                        getTimestamp(),
+                        group.id,
+                        0,
+                        bot.id
+                    )
+                }
             }
 
             //加好友事件
@@ -191,11 +195,11 @@ object EventManager {
                     )
                 }
             }
-            subscribeAlways<BotLeaveEvent.Kick> { ev ->
+            subscribeAlways<BotLeaveEvent.Kick> {
                 launchEvent {
                     NativeBridge.eventGroupMemberLeave(
                         Bridge.MEMBER_LEAVE_KICK,
-                        getTimestamp(), group.id, ev.operator.id, bot.id
+                        getTimestamp(), group.id, operator.id, bot.id
                     )
                 }
             }
