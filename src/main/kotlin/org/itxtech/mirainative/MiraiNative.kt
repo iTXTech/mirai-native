@@ -44,7 +44,7 @@ import java.util.jar.Manifest
 object MiraiNative : KotlinPlugin(
     SimpleJvmPluginDescription(
         name = "MiraiNative",
-        version = "1.9.0",
+        version = "1.9.1",
         author = "iTX Technologies",
         info = "强大的 mirai 原生插件加载器。"
     )
