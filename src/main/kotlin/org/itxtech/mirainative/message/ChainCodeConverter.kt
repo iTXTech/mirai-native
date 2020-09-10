@@ -177,7 +177,7 @@ object ChainCodeConverter {
                         if (args["file"]!!.endsWith(".mnrec")) {
                             rec = CacheManager.getRecord(args["file"]!!)
                         } else {
-                            MiraiNative.getDataFile("record", args["file"]!!)?.inputStream()?.use {
+                            MiraiNative.getDataFile("record", args["file"]!!)?.use {
                                 rec = (contact!! as Group).uploadVoice(it)
                             }
                         }

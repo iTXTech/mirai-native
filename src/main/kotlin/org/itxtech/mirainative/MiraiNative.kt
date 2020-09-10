@@ -24,6 +24,7 @@
 
 package org.itxtech.mirainative
 
+import io.ktor.util.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -35,8 +36,10 @@ import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.ui.FloatingWindow
 import org.itxtech.mirainative.ui.Tray
 import org.itxtech.mirainative.util.ConfigMan
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.jar.Manifest
@@ -127,7 +130,11 @@ object MiraiNative : KotlinPlugin(
         File(recDataPath, "MIRAI_NATIVE_RECORD_DATA").createNewFile()
     }
 
-    fun getDataFile(type: String, name: String): File? {
+    @OptIn(InternalAPI::class)
+    fun getDataFile(type: String, name: String): InputStream? {
+        if (name.startsWith("base64://")) {
+            return ByteArrayInputStream(name.split("base64://", limit = 2)[1].decodeBase64Bytes())
+        }
         arrayOf(
             "data" + File.separatorChar + type + File.separatorChar,
             libPath(type) + File.separatorChar,
@@ -135,7 +142,7 @@ object MiraiNative : KotlinPlugin(
         ).forEach {
             val f = File(it + name).absoluteFile
             if (f.exists()) {
-                return f
+                return f.inputStream()
             }
         }
         return null
