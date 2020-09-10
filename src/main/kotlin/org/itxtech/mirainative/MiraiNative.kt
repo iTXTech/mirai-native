@@ -70,7 +70,7 @@ object MiraiNative : KotlinPlugin(
     private fun ByteArray.checksum() = BigInteger(1, MessageDigest.getInstance("MD5").digest(this))
 
     private fun checkNativeLibs() {
-        logger.info("正在加载 ${dll.absolutePath}")
+        logger.info("正在加载 Mirai Native Bridge ${dll.absolutePath}")
         LibraryManager.load(dll.absolutePath)
 
         lib.listFiles()?.forEach { file ->
@@ -86,9 +86,8 @@ object MiraiNative : KotlinPlugin(
             botOnline = true
             nativeLaunch {
                 ConfigMan.init()
-                MiraiNative.logger.info("Mirai Native 正启用所有插件。")
+                logger.info("Mirai Native 正启用所有插件。")
                 PluginManager.enablePlugins()
-                Tray.update()
             }
         }
     }
@@ -118,9 +117,11 @@ object MiraiNative : KotlinPlugin(
     private fun libPath(d: String) = System.getProperty("java.library.path")
         .substringBefore(";") + File.separatorChar + "data" + File.separatorChar + d
 
+    private fun File.mkdirsOrExists() = if (exists()) true else mkdirs()
+
     private fun initDataDir() {
-        if (!File(libPath("image")).mkdirs() || !File(libPath("record")).mkdirs()) {
-            logger.warning("图片或语音文件夹创建失败，可能没有使用管理员权限运行。本文件夹专门用以兼容易语言编写的插件。位置：${libPath("")}")
+        if (!File(libPath("image")).mkdirsOrExists() || !File(libPath("record")).mkdirsOrExists()) {
+            logger.warning("图片或语音文件夹创建失败，可能没有使用管理员权限运行。位置：${libPath("")}")
         }
         File(imageDataPath, "MIRAI_NATIVE_IMAGE_DATA").createNewFile()
         File(recDataPath, "MIRAI_NATIVE_RECORD_DATA").createNewFile()

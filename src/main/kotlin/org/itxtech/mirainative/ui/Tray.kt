@@ -46,7 +46,7 @@ object Tray {
                 icon = TrayIcon(ImageIO.read(MiraiNative.getResourceAsStream("icon.jpg")), "Mirai Native 插件菜单").apply {
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseClicked(e: MouseEvent?) {
-                            if (e?.button == 1 && !FloatingWindow.isVisible()) {
+                            if (e?.button == 1 && !FloatingWindow.visible) {
                                 FloatingWindow.toggle()
                             }
                         }
@@ -71,7 +71,7 @@ object Tray {
         if (icon != null) {
             icon!!.popupMenu = PopupMenu().apply {
                 add(MenuItem().apply {
-                    fun lbl() = if (FloatingWindow.isVisible()) "隐藏悬浮窗" else "显示悬浮窗"
+                    fun lbl() = if (FloatingWindow.visible) "隐藏悬浮窗" else "显示悬浮窗"
                     label = lbl()
                     addActionListener {
                         FloatingWindow.toggle()

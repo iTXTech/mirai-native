@@ -67,7 +67,7 @@ data class NativePlugin(val file: File, val id: Int) {
             entries.add(entry)
             MiraiNative.nativeLaunch {
                 while (isActive && loaded && entry.vaild) {
-                    if (enabled && entry.visible && FloatingWindow.isVisible()) {
+                    if (enabled && entry.visible && FloatingWindow.visible) {
                         MiraiBridge.updateFwe(id, entry)
                     }
                     delay(it.period.toLong())

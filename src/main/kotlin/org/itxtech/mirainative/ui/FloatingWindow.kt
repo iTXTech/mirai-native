@@ -40,6 +40,9 @@ object FloatingWindow {
     private var window: JFrame? = null
     private var text: JTextArea? = null
 
+    val visible: Boolean
+        get() = window?.isVisible ?: false
+
     fun create() {
         try {
             val panel = JPanel()
@@ -112,6 +115,4 @@ object FloatingWindow {
             window!!.isVisible = !window!!.isVisible
         }
     }
-
-    fun isVisible() = window?.isVisible ?: false
 }

@@ -47,7 +47,7 @@ object ConfigMan {
     }
 
     fun init() {
-        if (config.fwState && !FloatingWindow.isVisible()) {
+        if (config.fwState && !FloatingWindow.visible) {
             FloatingWindow.toggle()
         }
         config.plugins.forEach { e ->
@@ -66,7 +66,7 @@ object ConfigMan {
     }
 
     fun save() {
-        config.fwState = FloatingWindow.isVisible()
+        config.fwState = FloatingWindow.visible
         config.plugins = ArrayList()
         PluginManager.plugins.values.forEach { p ->
             val entry = PluginEntry()
