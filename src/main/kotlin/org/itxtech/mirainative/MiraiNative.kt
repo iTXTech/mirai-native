@@ -27,8 +27,9 @@ package org.itxtech.mirainative
 import io.ktor.util.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.extension.PluginComponentStorage
+import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
-import net.mamoe.mirai.console.plugin.jvm.SimpleJvmPluginDescription
 import org.itxtech.mirainative.manager.CacheManager
 import org.itxtech.mirainative.manager.EventManager
 import org.itxtech.mirainative.manager.LibraryManager
@@ -45,12 +46,10 @@ import java.security.MessageDigest
 import java.util.jar.Manifest
 
 object MiraiNative : KotlinPlugin(
-    SimpleJvmPluginDescription(
-        name = "MiraiNative",
-        version = "1.9.1",
-        author = "iTX Technologies",
-        info = "强大的 mirai 原生插件加载器。"
-    )
+    JvmPluginDescriptionBuilder("MiraiNative", "1.9.1")
+        .author("iTX Technologies")
+        .info("强大的 mirai 原生插件加载器。")
+        .build()
 ) {
     private val lib: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "libraries").also { it.mkdirs() } }
     private val dll: File by lazy { File(dataFolder.absolutePath + File.separatorChar + "CQP.dll") }
@@ -95,7 +94,7 @@ object MiraiNative : KotlinPlugin(
         }
     }
 
-    override fun onLoad() {
+    override fun PluginComponentStorage.onLoad() {
         //暂时只支持 x86 平台运行，不兼容 amd64
         val mode = System.getProperty("sun.arch.data.model")
         if (mode != "32") {
