@@ -129,24 +129,13 @@ object EventManager {
                     )
                 }
             }
-            subscribeAlways<BotJoinGroupEvent.Invite> {
+            subscribeAlways<BotJoinGroupEvent> {
                 launchEvent {
                     NativeBridge.eventGroupMemberJoin(
                         Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
                         getTimestamp(),
                         group.id,
-                        invitor.id,
-                        bot.id
-                    )
-                }
-            }
-            subscribeAlways<BotJoinGroupEvent.Active> {
-                launchEvent {
-                    NativeBridge.eventGroupMemberJoin(
-                        Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
-                        getTimestamp(),
-                        group.id,
-                        0,
+                        if (this@subscribeAlways is BotJoinGroupEvent.Invite) invitor.id else 0,
                         bot.id
                     )
                 }

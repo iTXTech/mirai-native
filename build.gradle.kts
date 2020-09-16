@@ -24,7 +24,7 @@ repositories {
 dependencies {
     api("org.jetbrains.kotlinx:atomicfu:0.14.4")
 
-    implementation("net.mamoe:mirai-core:1.2.3")
+    implementation("net.mamoe:mirai-core:1.3.0")
     implementation("net.mamoe:mirai-console:1.0-M4")
 }
 
