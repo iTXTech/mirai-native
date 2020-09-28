@@ -13,6 +13,12 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 ## [下载 `Mirai Native`](https://github.com/iTXTech/mirai-native/releases)
 
+## 使用 [Mirai Console Loader](https://github.com/iTXTech/mirai-console-loader) 安装`Mirai Native`
+
+* `MCL` 支持自动更新插件，支持设置插件更新频道等功能
+
+`.\mcl --update-package org.itxtech:mirai-native --set-channel stable --set-type plugins`
+
 ## `Mirai Native Tray`
 
 * 右键`流泪猫猫头`打开 `Mirai Native` 托盘菜单。
