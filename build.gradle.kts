@@ -20,7 +20,7 @@ kotlin {
 }
 
 repositories {
-    maven("https://mirrors.huaweicloud.com/repository/maven")
+    maven("https://maven.aliyun.com/repository/public")
     maven("https://dl.bintray.com/him188moe/mirai")
     maven("https://dl.bintray.com/kotlin/kotlin-eap")
 }
@@ -28,8 +28,8 @@ repositories {
 dependencies {
     api("org.jetbrains.kotlinx:atomicfu:0.14.4")
 
-    implementation("net.mamoe:mirai-core:1.3.0")
-    implementation("net.mamoe:mirai-console:1.0-M4")
+    implementation("net.mamoe:mirai-core:1.3.1")
+    implementation("net.mamoe:mirai-console:1.0-RC-dev-29")
 }
 
 tasks.named<Jar>("jar") {
@@ -45,8 +45,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 bintray {
-    user = property("buser") as String?
-    key = property("bkey") as String?
+    user = findProperty("buser") as String?
+    key = findProperty("bkey") as String?
     setPublications("mavenJava")
     setConfigurations("archives")
     pkg.apply {

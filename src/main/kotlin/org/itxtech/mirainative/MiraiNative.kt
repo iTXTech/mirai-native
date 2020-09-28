@@ -191,7 +191,7 @@ object MiraiNative : KotlinPlugin(
     fun launchEvent(b: suspend CoroutineScope.() -> Unit) = launch(context = eventDispatcher, block = b)
 
     fun getVersion(): String {
-        var version = description.version.value
+        var version = description.version.toString()
         val mf = javaClass.classLoader.getResources("META-INF/MANIFEST.MF")
         while (mf.hasMoreElements()) {
             val manifest = Manifest(mf.nextElement().openStream())
