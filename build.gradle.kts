@@ -20,16 +20,17 @@ kotlin {
 }
 
 repositories {
-    maven("https://maven.aliyun.com/repository/public")
     maven("https://dl.bintray.com/him188moe/mirai")
+    maven("https://dl.bintray.com/mamoe/kotlin-jvm-blocking-bridge")
+    maven("https://maven.aliyun.com/repository/public")
     maven("https://dl.bintray.com/kotlin/kotlin-eap")
 }
 
 dependencies {
     api("org.jetbrains.kotlinx:atomicfu:0.14.4")
 
-    implementation("net.mamoe:mirai-core:1.3.1")
-    implementation("net.mamoe:mirai-console:1.0-RC-dev-29")
+    implementation("net.mamoe:mirai-core:1.3.2")
+    implementation("net.mamoe:mirai-console:1.0-RC-dev-32")
 }
 
 tasks.named<Jar>("jar") {
