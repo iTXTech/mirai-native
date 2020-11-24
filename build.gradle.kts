@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "org.itxtech"
-version = "1.9.3"
+version = "1.9.4"
 description = "强大的 mirai 原生插件加载器。"
 val vcs = "https://github.com/iTXTech/mirai-native"
 
