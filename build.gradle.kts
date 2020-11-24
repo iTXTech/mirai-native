@@ -1,8 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.4.10"
-    kotlin("plugin.serialization") version "1.4.10"
+    kotlin("jvm") version "1.4.20"
+    kotlin("plugin.serialization") version "1.4.20"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
+
+    id("net.mamoe.mirai-console") version "1.0.0"
 }
 
 group = "org.itxtech"
@@ -27,10 +29,7 @@ repositories {
 }
 
 dependencies {
-    api("org.jetbrains.kotlinx:atomicfu:0.14.4")
-
-    implementation("net.mamoe:mirai-core:1.3.2")
-    implementation("net.mamoe:mirai-console:1.0-RC-dev-32")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 }
 
 tasks.named<Jar>("jar") {
