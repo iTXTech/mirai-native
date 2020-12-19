@@ -27,11 +27,8 @@ package org.itxtech.mirainative.manager
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.event.subscribeAlways
-import net.mamoe.mirai.message.FriendMessageEvent
-import net.mamoe.mirai.message.GroupMessageEvent
-import net.mamoe.mirai.message.TempMessageEvent
 import net.mamoe.mirai.message.data.source
-import net.mamoe.mirai.utils.currentTimeSeconds
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.bridge.NativeBridge
@@ -39,6 +36,7 @@ import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.message.ChainCodeConverter.escape
 
 object EventManager {
+    @OptIn(MiraiExperimentalApi::class)
     fun registerEvents() {
         with(MiraiNative) {
             subscribeAlways<BotOnlineEvent> {
@@ -257,5 +255,5 @@ object EventManager {
         }
     }
 
-    fun getTimestamp() = currentTimeSeconds.toInt()
+    fun getTimestamp() = System.currentTimeMillis().toInt()
 }

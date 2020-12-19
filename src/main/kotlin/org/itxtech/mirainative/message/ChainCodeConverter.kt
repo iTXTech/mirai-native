@@ -29,7 +29,8 @@ import kotlinx.coroutines.withContext
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.message.uploadImage
+import net.mamoe.mirai.message.data.PokeMessage.Key.ChuoYiChuo
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.toExternalImage
 import net.mamoe.mirai.utils.upload
 import org.itxtech.mirainative.MiraiNative
@@ -63,6 +64,7 @@ object ChainCodeConverter {
         }
     }
 
+    @OptIn(MiraiExperimentalApi::class)
     private suspend fun String.toMessageInternal(contact: Contact?): Message {
         if (startsWith("[CQ:") && endsWith("]")) {
             val parts = substring(4, length - 1).split(delimiters = arrayOf(","), limit = 2)
@@ -80,7 +82,7 @@ object ChainCodeConverter {
                             MiraiNative.logger.debug("不能在私聊中发送 At。")
                             MSG_EMPTY
                         } else {
-                            val member = contact.getOrNull(args["qq"]!!.toLong())
+                            val member = contact.get(args["qq"]!!.toLong())
                             if (member == null) {
                                 MiraiNative.logger.debug("无法找到群员：${args["qq"]}")
                                 MSG_EMPTY
@@ -104,7 +106,7 @@ object ChainCodeConverter {
                         } else {
                             val file = MiraiNative.getDataFile("image", args["file"]!!)
                             if (file != null) {
-                                image = contact!!.uploadImage(file)
+                                image = contact!!.uploadImage(file.toExternalImage())
                             }
                         }
                     } else if (args.containsKey("url")) {
@@ -149,27 +151,27 @@ object ChainCodeConverter {
                     }
                 }
                 "shake" -> {
-                    return PokeMessage.Poke
+                    return ChuoYiChuo
                 }
                 "poke" -> {
                     PokeMessage.values.forEach {
-                        if (it.type == args["type"]!!.toInt() && it.id == args["id"]!!.toInt()) {
+                        if (it.pokeType == args["type"]!!.toInt() && it.id == args["id"]!!.toInt()) {
                             return it
                         }
                     }
                     return MSG_EMPTY
                 }
                 "xml" -> {
-                    return XmlMessage(args["data"]!!)
+                    return xmlMessage(args["data"]!!)
                 }
                 "json" -> {
-                    return JsonMessage(args["data"]!!)
+                    return jsonMessage(args["data"]!!)
                 }
                 "app" -> {
                     return LightApp(args["data"]!!)
                 }
                 "rich" -> {
-                    return ServiceMessage(args["id"]!!.toInt(), args["data"]!!)
+                    return SimpleServiceMessage(args["id"]!!.toInt(), args["data"]!!)
                 }
                 "record" -> {
                     var rec: Voice? = null
@@ -221,7 +223,7 @@ object ChainCodeConverter {
                     }
                 }
                 is Voice -> "[CQ:record,file=${it.fileName}.mnrec]"
-                is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.type},name=${it.name}]"
+                is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.pokeType},name=${it.name}]"
                 is FlashImage -> "[CQ:image,file=${it.image.imageId}.mning,type=flash]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
             }

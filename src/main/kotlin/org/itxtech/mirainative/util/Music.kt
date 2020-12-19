@@ -30,7 +30,9 @@ import io.ktor.client.request.*
 import io.ktor.util.*
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.message.data.Message
-import org.itxtech.mirainative.message.XmlMessage
+import net.mamoe.mirai.message.data.SimpleServiceMessage
+import net.mamoe.mirai.utils.MiraiExperimentalApi
+import org.itxtech.mirainative.message.xmlMessage
 
 @OptIn(KtorExperimentalAPI::class)
 abstract class MusicProvider {
@@ -41,7 +43,7 @@ abstract class MusicProvider {
 
 object Music {
     fun custom(url: String, audio: String, title: String, content: String?, image: String?) =
-        XmlMessage(
+        xmlMessage(
             "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>" +
                     "<msg serviceID=\"2\" templateID=\"1\" action=\"web\" brief=\"[分享] $title\" sourceMsgId=\"0\" " +
                     "url=\"$url\" " +
@@ -85,7 +87,7 @@ object QQMusic : MusicProvider() {
     }
 
     fun toXmlMessage(song: String, singer: String, songId: String, albumId: String, playUrl: String) =
-        XmlMessage(
+        xmlMessage(
             "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>" +
                     "<msg serviceID=\"2\" templateID=\"1\" action=\"web\" brief=\"[分享] $song\" sourceMsgId=\"0\" " +
                     "url=\"https://i.y.qq.com/v8/playsong.html?_wv=1&amp;songid=$songId&amp;souce=qqshare&amp;source=qqshare&amp;ADTAG=qqshare\" " +
@@ -111,8 +113,9 @@ object QQMusic : MusicProvider() {
     }
 }
 
+@OptIn(MiraiExperimentalApi::class)
 object NeteaseMusic : MusicProvider() {
-    override suspend fun send(id: String): XmlMessage {
+    override suspend fun send(id: String): SimpleServiceMessage {
         TODO("Not yet implemented")
     }
 }

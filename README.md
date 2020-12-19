@@ -17,7 +17,7 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 * `MCL` 支持自动更新插件，支持设置插件更新频道等功能
 
-`.\mcl --update-package org.itxtech:mirai-native --set-channel stable --set-type plugins`
+`.\mcl --update-package org.itxtech:mirai-native --channel stable --type plugin`
 
 ## `Mirai Native Tray`
 

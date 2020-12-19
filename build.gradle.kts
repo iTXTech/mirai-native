@@ -4,7 +4,7 @@ plugins {
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
 
-    id("net.mamoe.mirai-console") version "1.0.0"
+    id("net.mamoe.mirai-console") version "2.0-M1"
 }
 
 group = "org.itxtech"

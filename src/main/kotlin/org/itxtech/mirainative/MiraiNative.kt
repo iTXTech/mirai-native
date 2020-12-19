@@ -68,7 +68,7 @@ object MiraiNative : KotlinPlugin(
         newFixedThreadPoolContext(Runtime.getRuntime().availableProcessors() * 2, "MiraiNative Events")
 
     var botOnline = false
-    val bot: Bot by lazy { Bot.botInstances.first() }
+    val bot: Bot by lazy { Bot.instances.first() }
 
     private fun ByteArray.checksum() = BigInteger(1, MessageDigest.getInstance("MD5").digest(this))
 
@@ -168,7 +168,7 @@ object MiraiNative : KotlinPlugin(
         PluginManager.registerCommands()
         EventManager.registerEvents()
 
-        if (Bot.botInstances.isNotEmpty() && Bot.botInstances.first().isOnline) {
+        if (Bot.instances.isNotEmpty() && Bot.instances.first().isOnline) {
             setBotOnline()
         }
     }

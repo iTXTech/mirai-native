@@ -47,7 +47,7 @@ object FloatingWindow {
         try {
             val panel = JPanel()
 
-            window = JFrame("悬浮窗").apply {
+            window = JFrame("Mirai Native 悬浮窗").apply {
                 setSize(250, 150)
                 isResizable = false
                 isAlwaysOnTop = true

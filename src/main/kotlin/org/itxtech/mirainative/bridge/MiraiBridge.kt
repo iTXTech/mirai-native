@@ -39,11 +39,10 @@ import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
-import net.mamoe.mirai.getGroupOrNull
 import net.mamoe.mirai.message.data.Image
-import net.mamoe.mirai.message.data.isAboutGroup
-import net.mamoe.mirai.message.data.queryUrl
-import net.mamoe.mirai.message.data.quote
+import net.mamoe.mirai.message.data.Image.Key.queryUrl
+import net.mamoe.mirai.message.data.MessageSource.Key.isAboutGroup
+import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.fromNative
@@ -116,7 +115,7 @@ object MiraiBridge {
                     if (src.fromId != MiraiNative.bot.id) {
                         val f = MiraiNative.bot.getFriend(src.fromId)
                         val chain = src.quote() + ChainCodeConverter.codeToChain(message, f)
-                        f.sendMessage(chain).apply {
+                        f?.sendMessage(chain)?.apply {
                             CacheManager.cacheMessage(source, internalId, chain)
                         }
                     }
@@ -124,7 +123,7 @@ object MiraiBridge {
                     val group = MiraiNative.bot.getGroup(src.targetId)
                     if (src.fromId != MiraiNative.bot.id) {
                         val chain = src.quote() + ChainCodeConverter.codeToChain(message, group)
-                        group.sendMessage(chain).apply {
+                        group?.sendMessage(chain)?.apply {
                             CacheManager.cacheMessage(source, internalId, chain)
                         }
                     }
@@ -152,7 +151,7 @@ object MiraiBridge {
         MiraiNative.launch {
             val contact = MiraiNative.bot.getGroup(id)
             val chain = ChainCodeConverter.codeToChain(message, contact)
-            contact.sendMessage(chain).apply {
+            contact?.sendMessage(chain)?.apply {
                 CacheManager.cacheMessage(source, internalId, chain)
             }
         }
@@ -162,9 +161,9 @@ object MiraiBridge {
     fun setGroupBan(pluginId: Int, groupId: Long, memberId: Long, duration: Int) = call("CQ_setGroupBan", pluginId, 0) {
         MiraiNative.launch {
             if (duration == 0) {
-                MiraiNative.bot.getGroup(groupId)[memberId].unmute()
+                MiraiNative.bot.getGroup(groupId)?.get(memberId)?.unmute()
             } else {
-                MiraiNative.bot.getGroup(groupId)[memberId].mute(duration)
+                MiraiNative.bot.getGroup(groupId)?.get(memberId)?.mute(duration)
             }
         }
         return 0
@@ -172,32 +171,32 @@ object MiraiBridge {
 
     fun setGroupCard(pluginId: Int, groupId: Long, memberId: Long, card: String) =
         call("CQ_setGroupCard", pluginId, 0) {
-            MiraiNative.bot.getGroup(groupId)[memberId].nameCard = card
+            MiraiNative.bot.getGroup(groupId)?.get(memberId)?.nameCard = card
             return 0
         }
 
     fun setGroupKick(pluginId: Int, groupId: Long, memberId: Long) = call("CQ_setGroupKick", pluginId, 0) {
         MiraiNative.launch {
-            MiraiNative.bot.getGroup(groupId)[memberId].kick()
+            MiraiNative.bot.getGroup(groupId)?.get(memberId)?.kick()
         }
         return 0
     }
 
     fun setGroupLeave(pluginId: Int, groupId: Long) = call("CQ_setGroupLeave", pluginId, 0) {
         MiraiNative.launch {
-            MiraiNative.bot.getGroup(groupId).quit()
+            MiraiNative.bot.getGroup(groupId)?.quit()
         }
         return 0
     }
 
     fun setGroupSpecialTitle(pluginId: Int, group: Long, member: Long, title: String, duration: Long) =
         call("CQ_setGroupSpecialTitle", pluginId, 0) {
-            MiraiNative.bot.getGroup(group)[member].specialTitle = title
+            MiraiNative.bot.getGroup(group)?.get(member)?.specialTitle = title
             return 0
         }
 
     fun setGroupWholeBan(pluginId: Int, group: Long, enable: Boolean) = call("CQ_setGroupWholeBan", pluginId, 0) {
-        MiraiNative.bot.getGroup(group).settings.isMuteAll = enable
+        MiraiNative.bot.getGroup(group)?.settings?.isMuteAll = enable
         return 0
     }
 
@@ -227,7 +226,7 @@ object MiraiBridge {
     }
 
     fun getGroupInfo(pluginId: Int, id: Long) = call("CQ_getGroupInfo", pluginId, "") {
-        val info = MiraiNative.bot.getGroupOrNull(id)
+        val info = MiraiNative.bot.getGroup(id)
         return if (info != null) {
             buildPacket {
                 writeLong(id)
@@ -254,14 +253,14 @@ object MiraiBridge {
 
     fun getGroupMemberInfo(pluginId: Int, groupId: Long, memberId: Long) =
         call("CQ_getGroupMemberInfoV2", pluginId, "") {
-            val member = MiraiNative.bot.getGroupOrNull(groupId)?.getOrNull(memberId) ?: return ""
+            val member = MiraiNative.bot.getGroup(groupId)?.get(memberId) ?: return ""
             return buildPacket {
                 writeMember(member)
             }.encodeBase64()
         }
 
     fun getGroupMemberList(pluginId: Int, groupId: Long) = call("CQ_getGroupMemberList", pluginId, "") {
-        val group = MiraiNative.bot.getGroupOrNull(groupId) ?: return ""
+        val group = MiraiNative.bot.getGroup(groupId) ?: return ""
         return buildPacket {
             writeInt(group.members.size)
             group.members.forEach {
@@ -383,7 +382,7 @@ object MiraiBridge {
             val contact = if (type == 0) MiraiNative.bot.getFriend(id) else MiraiNative.bot.getGroup(id)
             val internalId = CacheManager.nextId()
             MiraiNative.launch {
-                contact.sendMessage(ForwardMessageDecoder.decode(contact, strategy, msg))
+                contact?.sendMessage(ForwardMessageDecoder.decode(contact, strategy, msg))
             }
             return internalId
         }

@@ -29,9 +29,12 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.event.events.BotEvent
-import net.mamoe.mirai.getFriendOrNull
-import net.mamoe.mirai.message.TempMessageEvent
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.event.events.TempMessageEvent
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.MessageSource
+import net.mamoe.mirai.message.data.MessageSource.Key.recall
+import net.mamoe.mirai.message.data.Voice
+import net.mamoe.mirai.message.data.source
 import org.itxtech.mirainative.MiraiNative
 
 object CacheManager {
@@ -76,10 +79,10 @@ object CacheManager {
     fun getRecord(name: String) = records[name.replace(".mnrec", "")]
 
     fun findUser(id: Long): User? {
-        val member = MiraiNative.bot.getFriendOrNull(id) ?: senders[id]
+        val member = MiraiNative.bot.getFriend(id) ?: senders[id]
         if (member == null) {
             MiraiNative.bot.groups.forEach {
-                if (it.getOrNull(id) != null) {
+                if (it[id] != null) {
                     return it[id]
                 }
             }

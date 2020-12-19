@@ -30,15 +30,16 @@ import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.getFriendOrNull
 import net.mamoe.mirai.message.data.ForwardMessage
 import net.mamoe.mirai.message.data.ForwardMessageBuilder
+import net.mamoe.mirai.message.data.RawForwardMessage
 import net.mamoe.mirai.message.data.buildForwardMessage
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.bridge.MiraiBridge.readString
 import org.itxtech.mirainative.message.ChainCodeConverter
 
-@InternalAPI
+@OptIn(InternalAPI::class, MiraiExperimentalApi::class)
 object ForwardMessageDecoder {
     /**
      * 结构
@@ -75,23 +76,22 @@ object ForwardMessageDecoder {
         for (i in 1..pre) {
             seq.add(pk.readString())
         }
-        return ForwardMessage.DisplayStrategy(
-            generateTitle = {
-                if (title == "") ForwardMessage.DisplayStrategy.generateTitle(it) else title
-            },
-            generateBrief = {
-                if (brief == "") ForwardMessage.DisplayStrategy.generateBrief(it) else brief
-            },
-            generateSource = {
-                if (source == "") ForwardMessage.DisplayStrategy.generateSource(it) else source
-            },
-            generateSummary = {
-                if (summary == "") ForwardMessage.DisplayStrategy.generateSummary(it) else summary
-            },
-            generatePreview = {
-                if (pre == 0.toShort()) ForwardMessage.DisplayStrategy.generatePreview(it) else seq.asSequence()
-            }
-        )
+        return object : ForwardMessage.DisplayStrategy {
+            override fun generateTitle(forward: RawForwardMessage) =
+                if (title == "") super.generateTitle(forward) else title
+
+            override fun generateBrief(forward: RawForwardMessage) =
+                if (brief == "") super.generateBrief(forward) else brief
+
+            override fun generateSource(forward: RawForwardMessage) =
+                if (source == "") super.generateSource(forward) else source
+
+            override fun generateSummary(forward: RawForwardMessage) =
+                if (summary == "") super.generateSummary(forward) else summary
+
+            override fun generatePreview(forward: RawForwardMessage): List<String> =
+                if (pre == 0.toShort()) super.generatePreview(forward) else seq
+        }
     }
 }
 
@@ -117,12 +117,12 @@ data class MessageEntry(val sender: Long, val name: String, val time: Int, val m
             return name
         }
         if (contact is Group && contact.contains(sender)) {
-            return contact[sender].nameCardOrNick
+            return contact[sender]!!.nameCardOrNick
         }
         if (sender == MiraiNative.bot.id) {
             return MiraiNative.bot.nick
         }
-        val friend = MiraiNative.bot.getFriendOrNull(sender)
+        val friend = MiraiNative.bot.getFriend(sender)
         if (friend != null) {
             return friend.nameCardOrNick
         }
