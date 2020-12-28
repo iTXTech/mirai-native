@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.4.20"
-    kotlin("plugin.serialization") version "1.4.20"
+    kotlin("jvm") version "1.4.21"
+    kotlin("plugin.serialization") version "1.4.21"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
 
-    id("net.mamoe.mirai-console") version "2.0-M1"
+    id("net.mamoe.mirai-console") version "2.0-M2"
 }
 
 group = "org.itxtech"

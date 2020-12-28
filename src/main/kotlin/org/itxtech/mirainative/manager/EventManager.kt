@@ -26,11 +26,13 @@ package org.itxtech.mirainative.manager
 
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.*
-import net.mamoe.mirai.event.subscribeAlways
+import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.message.data.source
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.MiraiNative.launchEvent
+import org.itxtech.mirainative.MiraiNative.setBotOnline
 import org.itxtech.mirainative.bridge.NativeBridge
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.message.ChainCodeConverter.escape
@@ -38,7 +40,7 @@ import org.itxtech.mirainative.message.ChainCodeConverter.escape
 object EventManager {
     @OptIn(MiraiExperimentalApi::class)
     fun registerEvents() {
-        with(MiraiNative) {
+        with(MiraiNative.globalEventChannel()) {
             subscribeAlways<BotOnlineEvent> {
                 setBotOnline()
             }

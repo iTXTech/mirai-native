@@ -30,9 +30,9 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.PokeMessage.Key.ChuoYiChuo
+import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
-import net.mamoe.mirai.utils.toExternalImage
-import net.mamoe.mirai.utils.upload
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.manager.CacheManager
 import org.itxtech.mirainative.util.Music
@@ -106,12 +106,12 @@ object ChainCodeConverter {
                         } else {
                             val file = MiraiNative.getDataFile("image", args["file"]!!)
                             if (file != null) {
-                                image = contact!!.uploadImage(file.toExternalImage())
+                                image = contact!!.uploadImage(file.toExternalResource())
                             }
                         }
                     } else if (args.containsKey("url")) {
                         image = withContext(Dispatchers.IO) {
-                            URL(args["url"]!!).openStream().toExternalImage().upload(contact!!)
+                            URL(args["url"]!!).openStream().toExternalResource().uploadAsImage(contact!!)
                         }
                     }
                     if (image != null) {
@@ -180,13 +180,13 @@ object ChainCodeConverter {
                             rec = CacheManager.getRecord(args["file"]!!)
                         } else {
                             MiraiNative.getDataFile("record", args["file"]!!)?.use {
-                                rec = (contact!! as Group).uploadVoice(it)
+                                rec = (contact!! as Group).uploadVoice(it.toExternalResource())
                             }
                         }
                     } else if (args.containsKey("url")) {
                         withContext(Dispatchers.IO) {
                             URL(args["url"]!!).openStream().use {
-                                rec = (contact!! as Group).uploadVoice(it)
+                                rec = (contact!! as Group).uploadVoice(it.toExternalResource())
                             }
                         }
                     }

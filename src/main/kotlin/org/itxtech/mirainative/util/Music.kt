@@ -25,7 +25,7 @@
 package org.itxtech.mirainative.util
 
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+import io.ktor.client.engine.okhttp.*
 import io.ktor.client.request.*
 import io.ktor.util.*
 import kotlinx.serialization.json.*
@@ -36,7 +36,7 @@ import org.itxtech.mirainative.message.xmlMessage
 
 @OptIn(KtorExperimentalAPI::class)
 abstract class MusicProvider {
-    val http = HttpClient(CIO)
+    val http = HttpClient(OkHttp)
 
     abstract suspend fun send(id: String): Message
 }

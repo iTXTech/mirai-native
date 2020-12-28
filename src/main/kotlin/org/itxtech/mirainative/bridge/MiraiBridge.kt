@@ -177,7 +177,8 @@ object MiraiBridge {
 
     fun setGroupKick(pluginId: Int, groupId: Long, memberId: Long) = call("CQ_setGroupKick", pluginId, 0) {
         MiraiNative.launch {
-            MiraiNative.bot.getGroup(groupId)?.get(memberId)?.kick()
+            //TODO: kick message
+            MiraiNative.bot.getGroup(groupId)?.get(memberId)?.kick("")
         }
         return 0
     }
