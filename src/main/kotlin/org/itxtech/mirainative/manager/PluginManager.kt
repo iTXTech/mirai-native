@@ -64,8 +64,11 @@ object PluginManager {
     fun unloadPlugins(): Job {
         MiraiNative.logger.info("正停用所有插件并调用Exit事件。")
         return MiraiNative.nativeLaunch {
-            plugins.values.forEach {
-                unloadPlugin(it)
+            val it = plugins.values.iterator()
+            while (it.hasNext()) {
+                val p = it.next()
+                unloadPlugin(p, false)
+                it.remove()
             }
             plugins.clear()
         }
@@ -140,7 +143,7 @@ object PluginManager {
         }
     }
 
-    fun unloadPlugin(plugin: NativePlugin) {
+    fun unloadPlugin(plugin: NativePlugin, remove: Boolean = true) {
         with(plugin) {
             if (loaded) {
                 disablePlugin(this)
@@ -153,7 +156,7 @@ object PluginManager {
                 entries.clear()
                 events.clear()
                 tempFile?.delete()
-                plugins.remove(id)
+                if (remove) plugins.remove(id)
                 Tray.update()
             }
         }
