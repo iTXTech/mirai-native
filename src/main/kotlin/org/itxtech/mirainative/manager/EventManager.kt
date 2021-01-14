@@ -70,7 +70,7 @@ object EventManager {
                     )
                 }
             }
-            subscribeAlways<TempMessageEvent> { msg ->
+            subscribeAlways<GroupTempMessageEvent> { msg ->
                 launchEvent {
                     NativeBridge.eventPrivateMessage(
                         Bridge.PRI_MSG_SUBTYPE_GROUP,

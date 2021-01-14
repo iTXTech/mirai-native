@@ -29,14 +29,16 @@ import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.event.events.BotEvent
-import net.mamoe.mirai.event.events.TempMessageEvent
+import net.mamoe.mirai.event.events.GroupTempMessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.message.data.Voice
 import net.mamoe.mirai.message.data.source
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.MiraiNative
 
+@OptIn(MiraiExperimentalApi::class)
 object CacheManager {
     private val msgCache = hashMapOf<Int, MessageSource>()
     private val evCache = hashMapOf<Int, BotEvent>()
@@ -60,7 +62,7 @@ object CacheManager {
         return id
     }
 
-    fun cacheTempMessage(message: TempMessageEvent, id: Int = nextId()): Int {
+    fun cacheTempMessage(message: GroupTempMessageEvent, id: Int = nextId()): Int {
         senders[message.sender.id] = message.sender
         return cacheMessage(message.message.source, id, message.message)
     }

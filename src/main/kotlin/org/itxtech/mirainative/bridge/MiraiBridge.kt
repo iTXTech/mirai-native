@@ -41,8 +41,9 @@ import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
-import net.mamoe.mirai.message.data.MessageSource.Key.isAboutGroup
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
+import net.mamoe.mirai.message.data.MessageSourceKind
+import net.mamoe.mirai.message.data.kind
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.fromNative
@@ -111,7 +112,7 @@ object MiraiBridge {
         MiraiNative.launch {
             val src = CacheManager.getMessage(msgId)
             if (src != null) {
-                if (!src.isAboutGroup()) {
+                if (src.kind != MessageSourceKind.GROUP) {
                     if (src.fromId != MiraiNative.bot.id) {
                         val f = MiraiNative.bot.getFriend(src.fromId)
                         val chain = src.quote() + ChainCodeConverter.codeToChain(message, f)
