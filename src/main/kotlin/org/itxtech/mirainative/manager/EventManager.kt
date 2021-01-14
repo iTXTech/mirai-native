@@ -85,6 +85,17 @@ object EventManager {
                     )
                 }
             }
+            subscribeAlways<StrangerMessageEvent> {
+                launchEvent {
+                    NativeBridge.eventPrivateMessage(
+                        Bridge.PRI_MSG_SUBTYPE_ONLINE_STATE,
+                        CacheManager.cacheMessage(message.source, chain = message),
+                        sender.id,
+                        ChainCodeConverter.chainToCode(message),
+                        0
+                    )
+                }
+            }
 
             // 权限事件
             subscribeAlways<MemberPermissionChangeEvent> {

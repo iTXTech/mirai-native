@@ -92,7 +92,10 @@ object CacheManager {
     fun getRecord(name: String) = records[name.replace(".mnrec", "")]
 
     fun findUser(id: Long): User? {
-        val member = MiraiNative.bot.getFriend(id) ?: senders[id]
+        var member = MiraiNative.bot.getFriend(id) ?: senders[id]
+        if (member == null) {
+            member = MiraiNative.bot.strangers[id]
+        }
         if (member == null) {
             MiraiNative.bot.groups.forEach {
                 if (it[id] != null) {

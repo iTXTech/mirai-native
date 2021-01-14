@@ -221,8 +221,7 @@ object MiraiBridge {
                 writeShortLVPacket {
                     writeLong(qq.id)
                     writeString(qq.nick)
-                    //TODO: 备注
-                    writeString("")
+                    writeString(qq.remark)
                 }
             }
         }.encodeBase64()
