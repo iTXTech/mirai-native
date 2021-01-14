@@ -44,7 +44,7 @@ Mirai Native 插件管理器
 
 ## 开源许可证
 
-    Copyright (C) 2020 iTX Technologies
+    Copyright (C) 2020-2021 iTX Technologies
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as

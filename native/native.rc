@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ÖÐÎÄ(¼òÌå£¬ÖÐ¹ú) resources
+// ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½å£¬ï¿½Ð¹ï¿½) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "Mirai Native Bridge"
             VALUE "FileVersion", "1.9.0.17"
             VALUE "InternalName", "CQP.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2020 iTX Technologies"
+            VALUE "LegalCopyright", "Copyright (C) 2020-2021 iTX Technologies"
             VALUE "OriginalFilename", "CQP.dll"
             VALUE "ProductName", "Mirai Native Bridge"
             VALUE "ProductVersion", "1.9.0.17"
@@ -83,7 +83,7 @@ BEGIN
     END
 END
 
-#endif    // ÖÐÎÄ(¼òÌå£¬ÖÐ¹ú) resources
+#endif    // ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½å£¬ï¿½Ð¹ï¿½) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
