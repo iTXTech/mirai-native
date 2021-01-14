@@ -254,6 +254,10 @@ object Bridge {
     fun getRecord(pluginId: Int, file: ByteArray, format: ByteArray) =
         MiraiBridge.getRecord(pluginId, file.fromNative(), format.fromNative()).toNative()
 
+    @JvmStatic
+    fun setGroupAnonymousBan(pluginId: Int, group: Long, id: ByteArray, duration: Long) =
+        MiraiBridge.setGroupAnonymousBan(pluginId, group, id.fromNative(), duration)
+
     // Placeholder methods which mirai hasn't supported yet
 
     @JvmStatic
@@ -262,9 +266,6 @@ object Bridge {
     @JvmStatic
     fun setGroupAdmin(pluginId: Int, group: Long, account: Long, admin: Boolean) = 0
     //true => set, false => revoke
-
-    @JvmStatic
-    fun setGroupAnonymousBan(pluginId: Int, group: Long, id: ByteArray, duration: Long) = 0
 
     // Wont' Implement
 

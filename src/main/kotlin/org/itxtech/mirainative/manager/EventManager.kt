@@ -24,6 +24,7 @@
 
 package org.itxtech.mirainative.manager
 
+import net.mamoe.mirai.contact.AnonymousMember
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.event.globalEventChannel
@@ -58,13 +59,16 @@ object EventManager {
                 }
             }
             subscribeAlways<GroupMessageEvent> {
+                if (sender is AnonymousMember) {
+                    CacheManager.cacheAnonymousMember(this)
+                }
                 launchEvent {
                     NativeBridge.eventGroupMessage(
                         1,
                         CacheManager.cacheMessage(message.source, chain = message),
                         group.id,
                         sender.id,
-                        "",
+                        if (sender is AnonymousMember) (sender as AnonymousMember).anonymousId else "",//可能不兼容某些插件
                         ChainCodeConverter.chainToCode(message),
                         0
                     )
@@ -105,7 +109,7 @@ object EventManager {
                 launchEvent {
                     NativeBridge.eventGroupMemberJoin(
                         if (ev is MemberJoinEvent.Invite) Bridge.MEMBER_JOIN_PERMITTED else Bridge.MEMBER_JOIN_INVITED_BY_ADMIN,
-                        getTimestamp(), group.id, 0, member.id
+                        getTimestamp(), group.id, if (ev is MemberJoinEvent.Invite) ev.invitor.id else 0, member.id
                     )
                 }
             }

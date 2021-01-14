@@ -44,6 +44,7 @@ import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.MessageSourceKind
 import net.mamoe.mirai.message.data.kind
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.fromNative
@@ -62,7 +63,7 @@ import java.security.MessageDigest
 import kotlin.io.use
 import kotlin.text.toByteArray
 
-@OptIn(InternalAPI::class)
+@OptIn(InternalAPI::class, MiraiExperimentalApi::class)
 object MiraiBridge {
     private fun logError(id: Int, e: String, err: Exception? = null) {
         val plugin = PluginManager.plugins[id]
@@ -361,6 +362,14 @@ object MiraiBridge {
                 }
                 return@runBlocking ""
             }
+        }
+
+    fun setGroupAnonymousBan(pluginId: Int, group: Long, id: String, duration: Long) =
+        call("CQ_setGroupAnonymousBan", pluginId, 0) {
+            runBlocking {
+                CacheManager.findAnonymousMember(group, id)?.mute(duration.toInt())
+            }
+            return 0
         }
 
     fun addLog(pluginId: Int, priority: Int, type: String, content: String) {
