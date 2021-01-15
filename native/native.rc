@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½å£¬ï¿½Ð¹ï¿½) resources
+// ÖÐÎÄ(¼òÌå£¬ÖÐ¹ú) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,9,0,17
- PRODUCTVERSION 1,9,0,17
+ FILEVERSION 2,0,0,18
+ PRODUCTVERSION 2,0,0,18
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "iTX Technologies"
             VALUE "FileDescription", "Mirai Native Bridge"
-            VALUE "FileVersion", "1.9.0.17"
+            VALUE "FileVersion", "2.0.0.18"
             VALUE "InternalName", "CQP.dll"
             VALUE "LegalCopyright", "Copyright (C) 2020-2021 iTX Technologies"
             VALUE "OriginalFilename", "CQP.dll"
             VALUE "ProductName", "Mirai Native Bridge"
-            VALUE "ProductVersion", "1.9.0.17"
+            VALUE "ProductVersion", "2.0.0.18"
         END
     END
     BLOCK "VarFileInfo"
@@ -83,7 +83,7 @@ BEGIN
     END
 END
 
-#endif    // ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½å£¬ï¿½Ð¹ï¿½) resources
+#endif    // ÖÐÎÄ(¼òÌå£¬ÖÐ¹ú) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
