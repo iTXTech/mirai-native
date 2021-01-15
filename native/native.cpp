@@ -728,3 +728,8 @@ CQAPI(int32_t, CQ_setFunctionMark, 8)(int32_t plugin_id, const char* name)
 {
 	return 0;
 }
+
+CQAPI(const char*, CQ_getRecord, 12)(int32_t plugin_id, const char* file, const char* format)
+{
+	return CQ_getRecordV2(plugin_id, file, format);
+}
