@@ -32,6 +32,7 @@ import io.ktor.util.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.Member
@@ -58,6 +59,7 @@ import org.itxtech.mirainative.toNative
 import org.itxtech.mirainative.util.ConfigMan
 import java.io.File
 import java.math.BigInteger
+import java.net.URLConnection
 import java.nio.charset.Charset
 import java.security.MessageDigest
 import kotlin.io.use
@@ -322,16 +324,23 @@ object MiraiBridge {
             return runBlocking {
                 val img = image.replace(".mnimg", "")
                 val u = Image(img).queryUrl()
-                val md = MessageDigest.getInstance("MD5")
-                val file = File(
-                    MiraiNative.imageDataPath.absolutePath + File.separatorChar +
-                            BigInteger(1, md.digest(img.toByteArray())).toString(16)
-                                .padStart(32, '0') + ".jpg"
-                )
                 if (u != "") {
                     val client = HttpClient()
                     val response = client.get<HttpResponse>(u)
                     if (response.status.isSuccess()) {
+                        val md = MessageDigest.getInstance("MD5")
+                        val basename = MiraiNative.imageDataPath.absolutePath + File.separatorChar +
+                                BigInteger(1, md.digest(img.toByteArray()))
+                                    .toString(16).padStart(32, '0')
+                        val ext = when (URLConnection.guessContentTypeFromStream(response.content.toInputStream())) {
+                            "image/gif" -> "gif"
+                            "image/png" -> "png"
+                            "image/jpeg" -> "jpg"
+                            "image/x-bitmap" -> "bmp"
+                            "image/tiff" -> "tiff"
+                            else -> "jpg"
+                        }
+                        val file = File("$basename.$ext")
                         response.content.copyAndClose(file.writeChannel())
                         return@runBlocking file.absolutePath
                     }
