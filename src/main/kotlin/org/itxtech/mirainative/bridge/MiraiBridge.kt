@@ -36,8 +36,7 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Mirai
-import net.mamoe.mirai.contact.Member
-import net.mamoe.mirai.contact.MemberPermission
+import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
@@ -208,8 +207,7 @@ object MiraiBridge {
 
     fun getStrangerInfo(pluginId: Int, account: Long) = call("CQ_getStrangerInfo", pluginId, "") {
         return@call runBlocking {
-            val profile = CacheManager.findUser(account)?.queryProfile()
-                ?: Mirai.queryProfile(MiraiNative.bot, account)
+            val profile = Mirai.queryProfile(MiraiNative.bot, account)
             return@runBlocking buildPacket {
                 writeLong(account)
                 writeString(profile.nickname)
@@ -455,29 +453,23 @@ object MiraiBridge {
         writeInt(if (bool) 1 else 0)
     }
 
-    private suspend fun BytePacketBuilder.writeMember(member: Member) {
+    private suspend fun BytePacketBuilder.writeMember(member: NormalMember) {
         val profile = member.queryProfile()
         writeLong(member.group.id)
         writeLong(member.id)
         writeString(member.nick)
         writeString(member.nameCard)
-        writeInt(profile.sex.ordinal) // TODO: 性别
-        writeInt(profile.age) // TODO: 年龄
+        writeInt(profile.sex.ordinal)
+        writeInt(profile.age)
         writeString("未知") // TODO: 地区
-        writeInt(0) // TODO: 加群时间
-        writeInt(0) // TODO: 最后发言
+        writeInt(member.joinTimestamp)
+        writeInt(member.lastSpeakTimestamp)
         writeString("") // TODO: 等级名称
-        writeInt(
-            when (member.permission) {
-                MemberPermission.MEMBER -> 1
-                MemberPermission.ADMINISTRATOR -> 2
-                MemberPermission.OWNER -> 3
-            }
-        )
+        writeInt(member.permission.ordinal)
         writeBool(false) // TODO: 不良记录成员
         writeString(member.specialTitle)
         writeInt(-1) // TODO: 头衔过期时间
-        writeBool(true) // TODO: 允许修改名片
+        writeBool(false) // TODO: 允许修改名片
     }
 }
 
