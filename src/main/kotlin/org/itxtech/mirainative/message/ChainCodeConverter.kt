@@ -40,6 +40,7 @@ import org.itxtech.mirainative.util.NeteaseMusic
 import org.itxtech.mirainative.util.QQMusic
 import java.net.URL
 
+@OptIn(MiraiExperimentalApi::class)
 object ChainCodeConverter {
     private val MSG_EMPTY = PlainText("")
 
@@ -64,7 +65,6 @@ object ChainCodeConverter {
         }
     }
 
-    @OptIn(MiraiExperimentalApi::class)
     private suspend fun String.toMessageInternal(contact: Contact?): Message {
         if (startsWith("[CQ:") && endsWith("]")) {
             val parts = substring(4, length - 1).split(delimiters = arrayOf(","), limit = 2)

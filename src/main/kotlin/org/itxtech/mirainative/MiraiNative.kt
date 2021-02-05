@@ -57,10 +57,10 @@ object MiraiNative : KotlinPlugin(
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
     val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
-    @OptIn(ObsoleteCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = newSingleThreadContext("MiraiNative Main") + SupervisorJob()
 
-    @OptIn(ObsoleteCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     val menuDispatcher = newSingleThreadContext("MiraiNative Menu")
 
     @OptIn(ObsoleteCoroutinesApi::class)
