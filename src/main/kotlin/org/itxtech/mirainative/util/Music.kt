@@ -24,19 +24,18 @@
 
 package org.itxtech.mirainative.util
 
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
 import io.ktor.client.request.*
 import io.ktor.util.*
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.message.data.SimpleServiceMessage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
+import org.itxtech.mirainative.bridge.MiraiBridge
 import org.itxtech.mirainative.message.xmlMessage
 
 @OptIn(KtorExperimentalAPI::class)
 abstract class MusicProvider {
-    val http = HttpClient(OkHttp)
+    val http = MiraiBridge.client
 
     abstract suspend fun send(id: String): Message
 }

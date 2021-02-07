@@ -359,6 +359,17 @@ CQAPI(int32_t, mForwardMessage, 24)(int32_t plugin_id, int32_t type, int64_t id,
 	return result;
 }
 
+CQAPI(int32_t, mSetGroupKick, 28)(int32_t plugin_id, int64_t group, int64_t member, BOOL reject, const char* msg)
+{
+	auto env = attach_java();
+	auto m = CharsToByteArray(env, msg);
+	auto method = env->GetStaticMethodID(bclz, "setGroupKick", "(IJJZ[B)I");
+	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, member, reject != FALSE, msg);
+	detach_java();
+	env->DeleteLocalRef(m);
+	return result;
+}
+
 // CQ APIs
 
 CQAPI(int32_t, CQ_addLog, 16)(int32_t plugin_id, int32_t priority, const char* type, const char* content)
@@ -473,11 +484,7 @@ CQAPI(int32_t, CQ_setGroupCard, 24)(int32_t plugin_id, int64_t group, int64_t me
 
 CQAPI(int32_t, CQ_setGroupKick, 24)(int32_t plugin_id, int64_t group, int64_t member, BOOL reject)
 {
-	auto env = attach_java();
-	auto method = env->GetStaticMethodID(bclz, "setGroupKick", "(IJJZ)I");
-	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, member, reject != FALSE);
-	detach_java();
-	return result;
+	return mSetGroupKick(plugin_id, group, member, reject, nullptr);
 }
 
 CQAPI(int32_t, CQ_setGroupLeave, 16)(int32_t plugin_id, int64_t group, BOOL dismiss)

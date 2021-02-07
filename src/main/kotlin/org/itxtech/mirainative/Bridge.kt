@@ -27,6 +27,7 @@
 package org.itxtech.mirainative
 
 import org.itxtech.mirainative.bridge.MiraiBridge
+import org.itxtech.mirainative.bridge.MiraiImpl
 import java.nio.charset.Charset
 
 object Bridge {
@@ -194,10 +195,6 @@ object Bridge {
         MiraiBridge.setGroupCard(pluginId, group, member, card.fromNative())
 
     @JvmStatic
-    fun setGroupKick(pluginId: Int, group: Long, member: Long, reject: Boolean) =
-        MiraiBridge.setGroupKick(pluginId, group, member)
-
-    @JvmStatic
     fun setGroupLeave(pluginId: Int, group: Long, dismiss: Boolean) =
         MiraiBridge.setGroupLeave(pluginId, group)
 
@@ -288,11 +285,15 @@ object Bridge {
 
     @JvmStatic
     fun quoteMessage(pluginId: Int, msgId: Int, msg: ByteArray) =
-        MiraiBridge.quoteMessage(pluginId, msgId, msg.fromNative())
+        MiraiImpl.quoteMessage(pluginId, msgId, msg.fromNative())
 
     @JvmStatic
     fun forwardMessage(pluginId: Int, type: Int, id: Long, strategy: ByteArray, msg: ByteArray) =
-        MiraiBridge.forwardMessage(pluginId, type, id, strategy.fromNative(), msg.fromNative())
+        MiraiImpl.forwardMessage(pluginId, type, id, strategy.fromNative(), msg.fromNative())
+
+    @JvmStatic
+    fun setGroupKick(pluginId: Int, group: Long, member: Long, reject: Boolean, message: ByteArray) =
+        MiraiImpl.setGroupKick(pluginId, group, member, message.fromNative())
 
 }
 
