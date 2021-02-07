@@ -25,6 +25,8 @@
 package org.itxtech.mirainative.bridge
 
 import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -67,6 +69,25 @@ import kotlin.text.toByteArray
 
 @OptIn(InternalAPI::class, MiraiExperimentalApi::class)
 object MiraiBridge {
+    private val client = HttpClient(OkHttp) {
+        install(UserAgent) {
+            agent =
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.146 Safari/537.36"
+        }
+
+        install(HttpTimeout) {
+            connectTimeoutMillis = 10000
+            requestTimeoutMillis = 60000
+            socketTimeoutMillis = 60000
+        }
+
+        engine {
+            config {
+                retryOnConnectionFailure(true)
+            }
+        }
+    }
+
     private fun logError(id: Int, e: String, err: Exception? = null) {
         val plugin = PluginManager.plugins[id]
         val info = if (plugin == null) {
@@ -334,7 +355,6 @@ object MiraiBridge {
                 val img = image.replace(".mnimg", "")
                 val u = Image(img).queryUrl()
                 if (u != "") {
-                    val client = HttpClient()
                     val response = client.get<HttpResponse>(u)
                     if (response.status.isSuccess()) {
                         val md = MessageDigest.getInstance("MD5")
@@ -369,7 +389,6 @@ object MiraiBridge {
                                     .padStart(32, '0') + ".silk"
                     )
                     if (rec.url != null) {
-                        val client = HttpClient()
                         val response = client.get<HttpResponse>(rec.url!!)
                         if (response.status.isSuccess()) {
                             response.content.copyAndClose(file.writeChannel())
