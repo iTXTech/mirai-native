@@ -46,6 +46,10 @@ object EventManager {
                 setBotOnline()
             }
 
+            subscribeAlways<BotReloginEvent> {
+                setBotOnline()
+            }
+
             // 消息事件
             subscribeAlways<FriendMessageEvent> {
                 launchEvent {
