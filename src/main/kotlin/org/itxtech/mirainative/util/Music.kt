@@ -28,6 +28,8 @@ import io.ktor.client.request.*
 import io.ktor.util.*
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.message.data.Message
+import net.mamoe.mirai.message.data.MusicKind
+import net.mamoe.mirai.message.data.MusicShare
 import net.mamoe.mirai.message.data.SimpleServiceMessage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.bridge.MiraiBridge
@@ -85,7 +87,29 @@ object QQMusic : MusicProvider() {
         return Json.parseToJsonElement(result).jsonObject.getValue("songinfo").jsonObject.getValue("data").jsonObject
     }
 
-    fun toXmlMessage(song: String, singer: String, songId: String, albumId: String, playUrl: String) =
+    override suspend fun send(id: String): Message {
+        val info = getSongInfo(id)
+        val trackInfo = info.getValue("track_info").jsonObject
+        val url = getPlayUrl(trackInfo.getValue("file").jsonObject["media_mid"]!!.jsonPrimitive.content)
+        val albumId = trackInfo.getValue("album").jsonObject["id"]!!.jsonPrimitive.content
+        return MusicShare(
+            kind = MusicKind.QQMusic,
+            title = trackInfo["name"]!!.jsonPrimitive.content,
+            summary = trackInfo.getValue("singer").jsonArray[0].jsonObject["name"]!!.jsonPrimitive.content,
+            jumpUrl = "https://i.y.qq.com/v8/playsong.html?_wv=1&amp;songid=$id&amp;souce=qqshare&amp;source=qqshare&amp;ADTAG=qqshare",
+            pictureUrl = "http://imgcache.qq.com/music/photo/album_500/${albumId.substring(albumId.length - 2)}/500_albumpic_${albumId}_0.jpg",
+            musicUrl = url,
+        )
+        /*return toXmlMessage(
+            trackInfo["name"]!!.jsonPrimitive.content,
+            trackInfo.getValue("singer").jsonArray[0].jsonObject["name"]!!.jsonPrimitive.content,
+            id,
+            trackInfo.getValue("album").jsonObject["id"]!!.jsonPrimitive.content,
+            url
+        )*/
+    }
+
+    /*fun toXmlMessage(song: String, singer: String, songId: String, albumId: String, playUrl: String) =
         xmlMessage(
             "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>" +
                     "<msg serviceID=\"2\" templateID=\"1\" action=\"web\" brief=\"[分享] $song\" sourceMsgId=\"0\" " +
@@ -96,20 +120,7 @@ object QQMusic : MusicProvider() {
                     "icon=\"https://i.gtimg.cn/open/app_icon/01/07/98/56/1101079856_100_m.png\" " +
                     "url=\"http://web.p.qq.com/qqmpmobile/aio/app.html?id=1101079856\" action=\"app\" " +
                     "a_actionData=\"com.tencent.qqmusic\" i_actionData=\"tencent1101079856://\" appid=\"1101079856\" /></msg>"
-        )
-
-    override suspend fun send(id: String): Message {
-        val info = getSongInfo(id)
-        val trackInfo = info.getValue("track_info").jsonObject
-        val url = getPlayUrl(trackInfo.getValue("file").jsonObject["media_mid"]!!.jsonPrimitive.content)
-        return toXmlMessage(
-            trackInfo["name"]!!.jsonPrimitive.content,
-            trackInfo.getValue("singer").jsonArray[0].jsonObject["name"]!!.jsonPrimitive.content,
-            id,
-            trackInfo.getValue("album").jsonObject["id"]!!.jsonPrimitive.content,
-            url
-        )
-    }
+        )*/
 }
 
 @OptIn(MiraiExperimentalApi::class)
