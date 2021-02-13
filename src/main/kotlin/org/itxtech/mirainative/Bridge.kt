@@ -295,6 +295,14 @@ object Bridge {
     fun setGroupKick(pluginId: Int, group: Long, member: Long, reject: Boolean, message: ByteArray) =
         MiraiImpl.setGroupKick(pluginId, group, member, message.fromNative())
 
+    @JvmStatic
+    fun getGroupEntranceAnnouncement(pluginId: Int, group: Long) =
+        MiraiImpl.getGroupEntranceAnnouncement(pluginId, group).toNative()
+
+    @JvmStatic
+    fun setGroupEntranceAnnouncement(pluginId: Int, group: Long, a: ByteArray) =
+        MiraiImpl.setGroupEntranceAnnouncement(pluginId, group, a.fromNative())
+
 }
 
 fun String.toNative() = toByteArray(Charset.forName("GB18030"))

@@ -78,4 +78,15 @@ object MiraiImpl {
             }
             return 0
         }
+
+    fun getGroupEntranceAnnouncement(pluginId: Int, id: Long) =
+        call("mGetGroupEntranceAnnouncement", pluginId, "") {
+            return MiraiNative.bot.getGroup(id)?.settings?.entranceAnnouncement ?: ""
+        }
+
+    fun setGroupEntranceAnnouncement(pluginId: Int, id: Long, a: String) =
+        call("mSetGroupEntranceAnnouncement", pluginId, 0) {
+            MiraiNative.bot.getGroup(id)?.settings?.entranceAnnouncement = a
+            return 0
+        }
 }

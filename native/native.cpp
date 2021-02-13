@@ -370,6 +370,28 @@ CQAPI(int32_t, mSetGroupKick, 28)(int32_t plugin_id, int64_t group, int64_t memb
 	return result;
 }
 
+CQAPI(const char*, mGetGroupEntranceAnnouncement, 12)(int32_t plugin_id, int64_t group)
+{
+	auto env = attach_java();
+	auto method = env->GetStaticMethodID(bclz, "getGroupEntranceAnnouncement", "(IJ)[B");
+	auto result = jbyteArray(env->CallStaticObjectMethod(bclz, method, plugin_id, group));
+	auto r = ByteArrayToChars(env, result);
+	env->DeleteLocalRef(result);
+	detach_java();
+	return delay_mem_free(r);
+}
+
+CQAPI(int32_t, mSetGroupEntranceAnnouncement, 16)(int32_t plugin_id, int64_t group, const char* a)
+{
+	auto env = attach_java();
+	auto an = CharsToByteArray(env, a);
+	auto method = env->GetStaticMethodID(bclz, "setGroupEntranceAnnouncement", "(IJ[B)I");
+	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, an);
+	detach_java();
+	env->DeleteLocalRef(an);
+	return result;
+}
+
 // CQ APIs
 
 CQAPI(int32_t, CQ_addLog, 16)(int32_t plugin_id, int32_t priority, const char* type, const char* content)
