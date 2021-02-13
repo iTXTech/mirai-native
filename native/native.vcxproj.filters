@@ -24,6 +24,15 @@
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="mirai_apis.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cq_events.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cq_apis.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="native.cpp">

@@ -157,6 +157,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="cq_apis.h" />
+    <ClInclude Include="cq_events.h" />
+    <ClInclude Include="mirai_apis.h" />
     <ClInclude Include="native.h" />
     <ClInclude Include="org_itxtech_mirainative_Bridge.h" />
     <ClInclude Include="resource.h" />
