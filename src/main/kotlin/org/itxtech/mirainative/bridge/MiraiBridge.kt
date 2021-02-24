@@ -436,7 +436,7 @@ object MiraiBridge {
         writeInt(member.joinTimestamp)
         writeInt(member.lastSpeakTimestamp)
         writeString("") // TODO: 等级名称
-        writeInt(member.permission.ordinal)
+        writeInt(member.permission.ordinal + 1)
         writeBool(false) // TODO: 不良记录成员
         writeString(member.specialTitle)
         writeInt(-1) // TODO: 头衔过期时间
