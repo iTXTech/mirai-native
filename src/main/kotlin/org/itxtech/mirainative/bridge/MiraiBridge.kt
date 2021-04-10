@@ -273,15 +273,7 @@ object MiraiBridge {
                 if (reqType == Bridge.REQUEST_GROUP_APPLY) {
                     (CacheManager.getEvent(requestId) as? MemberJoinRequestEvent)?.apply {
                         when (type) {//1通过，2拒绝，3忽略
-                            1 -> {
-                                accept()
-                                MiraiNative.nativeLaunch {
-                                    NativeBridge.eventGroupMemberJoin(
-                                        Bridge.MEMBER_JOIN_PERMITTED,
-                                        EventManager.getTimestamp(), groupId, 0, fromId
-                                    )
-                                }
-                            }
+                            1 -> accept()
                             2 -> reject(message = reason)
                             3 -> ignore()
                         }
