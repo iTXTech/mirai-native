@@ -8,7 +8,7 @@ CQAPI(int32_t, CQ_addLog, 16)(int32_t plugin_id, int32_t priority, const char* t
 	auto t = CharsToByteArray(env, type);
 	auto c = CharsToByteArray(env, content);
 	auto method = env->GetStaticMethodID(bclz, "addLog", "(II[B[B)V");
-	env->CallStaticIntMethod(bclz, method, plugin_id, priority, t, c);
+	env->CallStaticVoidMethod(bclz, method, plugin_id, priority, t, c);
 	env->DeleteLocalRef(t);
 	env->DeleteLocalRef(c);
 	detach_java();
