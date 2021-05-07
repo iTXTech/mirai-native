@@ -44,7 +44,7 @@ CQAPI(int32_t, mSetGroupKick, 28)(int32_t plugin_id, int64_t group, int64_t memb
 
 CQAPI(int32_t, CQ_setGroupKick, 24)(int32_t plugin_id, int64_t group, int64_t member, BOOL reject)
 {
-	return mSetGroupKick(plugin_id, group, member, reject, nullptr);
+	return mSetGroupKick(plugin_id, group, member, reject, "\0");
 }
 
 CQAPI(const char*, mGetGroupEntranceAnnouncement, 12)(int32_t plugin_id, int64_t group)
