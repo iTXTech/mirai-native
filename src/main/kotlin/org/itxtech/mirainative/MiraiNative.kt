@@ -58,7 +58,7 @@ object MiraiNative : KotlinPlugin(
     val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val dispatcher = newSingleThreadContext("MiraiNative Main") + SupervisorJob()
+    private val dispatcher =   newSingleThreadContext("MiraiNative Main") + SupervisorJob()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val menuDispatcher = newSingleThreadContext("MiraiNative Menu")

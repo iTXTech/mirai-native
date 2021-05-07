@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.NormalMember
+import net.mamoe.mirai.contact.getMember
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
@@ -358,6 +359,14 @@ object MiraiBridge {
         call("CQ_setGroupAnonymousBan", pluginId, 0) {
             runBlocking {
                 CacheManager.findAnonymousMember(group, id)?.mute(duration.toInt())
+            }
+            return 0
+        }
+
+    fun setGroupAdmin(pluginId: Int, group: Long, account: Long, admin: Boolean) =
+        call("CQ_setGroupAdmin", pluginId, 0) {
+            runBlocking {
+                MiraiNative.bot.getGroup(group)?.getMember(account)?.modifyAdmin(admin)
             }
             return 0
         }
