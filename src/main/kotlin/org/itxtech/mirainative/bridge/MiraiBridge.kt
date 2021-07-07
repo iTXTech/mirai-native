@@ -316,13 +316,15 @@ object MiraiBridge {
                         val basename = MiraiNative.imageDataPath.absolutePath + File.separatorChar +
                                 BigInteger(1, md.digest(img.toByteArray()))
                                     .toString(16).padStart(32, '0')
-                        val ext = when (URLConnection.guessContentTypeFromStream(response.content.toInputStream())) {
-                            "image/gif" -> "gif"
-                            "image/png" -> "png"
-                            "image/jpeg" -> "jpg"
-                            "image/x-bitmap" -> "bmp"
-                            "image/tiff" -> "tiff"
-                            else -> "jpg"
+                        val ext = response.content.toInputStream().use {
+                            when (URLConnection.guessContentTypeFromStream(it)) {
+                                "image/gif" -> "gif"
+                                "image/png" -> "png"
+                                "image/jpeg" -> "jpg"
+                                "image/x-bitmap" -> "bmp"
+                                "image/tiff" -> "tiff"
+                                else -> "jpg"
+                            }
                         }
                         val file = File("$basename.$ext")
                         response.content.copyAndClose(file.writeChannel())
