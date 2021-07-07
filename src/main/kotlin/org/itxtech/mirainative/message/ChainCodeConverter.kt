@@ -195,6 +195,9 @@ object ChainCodeConverter {
                     }
                     return rec ?: MSG_EMPTY
                 }
+                "dice" -> {
+                    return Dice(args["type"]!!.toInt())
+                }
                 else -> {
                     MiraiNative.logger.debug("不支持的 CQ码：${parts[0]}")
                 }
@@ -229,6 +232,7 @@ object ChainCodeConverter {
                 is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.pokeType},name=${it.name}]"
                 is FlashImage -> "[CQ:image,file=${it.image.imageId}.mning,type=flash]"
                 is MarketFace -> "[CQ:bface,id=${it.id},name=${it.name}]"
+                is Dice -> "[CQ:dice,type=${it.value}]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
             }
         }
