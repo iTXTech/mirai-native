@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "1.4.30"
-    kotlin("plugin.serialization") version "1.4.30"
+    kotlin("jvm") version "1.5.20"
+    kotlin("plugin.serialization") version "1.5.20"
 
-    id("net.mamoe.mirai-console") version "2.7-M1-dev-1"
+    id("net.mamoe.mirai-console") version "2.7-M2"
 }
 
 group = "org.itxtech"
@@ -19,14 +19,13 @@ kotlin {
 }
 
 repositories {
-    maven("https://dl.bintray.com/him188moe/mirai")
-    maven("https://dl.bintray.com/mamoe/kotlin-jvm-blocking-bridge")
+    mavenCentral()
     maven("https://maven.aliyun.com/repository/public")
     maven("https://dl.bintray.com/kotlin/kotlin-eap")
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 }
 
 tasks.named<Jar>("jar") {
@@ -38,5 +37,5 @@ tasks.named<Jar>("jar") {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
