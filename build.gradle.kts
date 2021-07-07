@@ -1,4 +1,6 @@
 plugins {
+    id("net.mamoe.maven-central-publish") version "0.5.0"
+
     kotlin("jvm") version "1.5.20"
     kotlin("plugin.serialization") version "1.5.20"
 
@@ -26,6 +28,11 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+}
+
+mavenCentralPublish {
+    singleDevGithubProject("iTXTech", "mirai-native")
+    licenseAGplV3()
 }
 
 tasks.named<Jar>("jar") {

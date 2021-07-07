@@ -47,7 +47,7 @@ import java.security.MessageDigest
 import java.util.jar.Manifest
 
 object MiraiNative : KotlinPlugin(
-    JvmPluginDescriptionBuilder("MiraiNative", "2.0.0-beta.1")
+    JvmPluginDescriptionBuilder("MiraiNative", "2.0.0-beta.2")
         .id("org.itxtech.mirainative")
         .author("iTX Technologies")
         .info("强大的 mirai 原生插件加载器。")
@@ -58,10 +58,10 @@ object MiraiNative : KotlinPlugin(
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
     val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val dispatcher =   newSingleThreadContext("MiraiNative Main") + SupervisorJob()
+    @OptIn(ObsoleteCoroutinesApi::class)
+    private val dispatcher = newSingleThreadContext("MiraiNative Main") + SupervisorJob()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ObsoleteCoroutinesApi::class)
     val menuDispatcher = newSingleThreadContext("MiraiNative Menu")
 
     @OptIn(ObsoleteCoroutinesApi::class)
