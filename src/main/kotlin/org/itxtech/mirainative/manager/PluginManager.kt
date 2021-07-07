@@ -124,12 +124,7 @@ object PluginManager {
             val json = File(file.parent + File.separatorChar + file.name.replace(suffix, ".json"))
 
             try {
-                plugin.pluginInfo = Json {
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                    allowSpecialFloatingPointValues = true
-                    useArrayPolymorphism = true
-                }.decodeFromString(
+                plugin.pluginInfo = MiraiNative.json.decodeFromString(
                     PluginInfo.serializer(),
                     if (json.exists()) json.readText() else NativeBridge.getPluginInfo(plugin)
                 )

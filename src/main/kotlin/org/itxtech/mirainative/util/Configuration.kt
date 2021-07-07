@@ -35,12 +35,7 @@ object ConfigMan {
     private val file = File(MiraiNative.dataFolder.absolutePath + File.separatorChar + "config.json")
     val config: Configuration by lazy {
         if (file.exists()) {
-            Json {
-                isLenient = true
-                ignoreUnknownKeys = true
-                allowSpecialFloatingPointValues = true
-                useArrayPolymorphism = true
-            }.decodeFromString(Configuration.serializer(), file.readText())
+            MiraiNative.json.decodeFromString(Configuration.serializer(), file.readText())
         } else {
             Configuration()
         }

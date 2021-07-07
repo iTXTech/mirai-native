@@ -26,6 +26,7 @@ package org.itxtech.mirainative
 
 import io.ktor.util.*
 import kotlinx.coroutines.*
+import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.extension.PluginComponentStorage
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder
@@ -71,6 +72,13 @@ object MiraiNative : KotlinPlugin(
     val bot: Bot by lazy { Bot.instances.first() }
 
     private fun ByteArray.checksum() = BigInteger(1, MessageDigest.getInstance("MD5").digest(this))
+
+    val json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+    }
 
     private fun checkNativeLibs() {
         logger.info("正在加载 Mirai Native Bridge ${dll.absolutePath}")
