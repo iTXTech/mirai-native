@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
+import net.mamoe.mirai.contact.VoiceSupported
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.PokeMessage.Key.ChuoYiChuo
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
@@ -175,18 +176,20 @@ object ChainCodeConverter {
                 }
                 "record" -> {
                     var rec: Voice? = null
-                    if (args.containsKey("file")) {
-                        if (args["file"]!!.endsWith(".mnrec")) {
-                            rec = CacheManager.getRecord(args["file"]!!)
-                        } else {
-                            MiraiNative.getDataFile("record", args["file"]!!)?.use {
-                                rec = (contact!! as Group).uploadVoice(it.toExternalResource())
+                    if (contact is VoiceSupported) {
+                        if (args.containsKey("file")) {
+                            if (args["file"]!!.endsWith(".mnrec")) {
+                                rec = CacheManager.getRecord(args["file"]!!)
+                            } else {
+                                MiraiNative.getDataFile("record", args["file"]!!)?.use {
+                                    rec = contact.uploadVoice(it.toExternalResource())
+                                }
                             }
-                        }
-                    } else if (args.containsKey("url")) {
-                        withContext(Dispatchers.IO) {
-                            URL(args["url"]!!).openStream().use {
-                                rec = (contact!! as Group).uploadVoice(it.toExternalResource())
+                        } else if (args.containsKey("url")) {
+                            withContext(Dispatchers.IO) {
+                                URL(args["url"]!!).openStream().use {
+                                    rec = contact.uploadVoice(it.toExternalResource())
+                                }
                             }
                         }
                     }
