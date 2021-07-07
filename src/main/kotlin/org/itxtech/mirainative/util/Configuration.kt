@@ -84,6 +84,7 @@ object ConfigMan {
 data class Configuration(
     var verboseNativeApiLog: Boolean = false,
     var fwState: Boolean = false,
+    var cacheExpiration: Int = 60000,
     var plugins: ArrayList<PluginEntry> = ArrayList()
 )
 
