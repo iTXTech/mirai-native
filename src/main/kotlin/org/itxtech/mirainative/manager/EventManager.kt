@@ -179,35 +179,23 @@ object EventManager {
             }
 
             // 退群事件
-            subscribeAlways<MemberLeaveEvent.Kick> {
+            subscribeAlways<MemberLeaveEvent> {
+                CacheManager.cacheMember(member)
                 launchEvent {
                     NativeBridge.eventGroupMemberLeave(
-                        Bridge.MEMBER_LEAVE_KICK,
-                        getTimestamp(), group.id, operator?.id ?: bot.id, member.id
+                        if (it is MemberLeaveEvent.Kick) Bridge.MEMBER_LEAVE_KICK else Bridge.MEMBER_LEAVE_QUIT,
+                        getTimestamp(),
+                        group.id,
+                        if (it is MemberLeaveEvent.Kick) it.operator?.id ?: bot.id else 0,
+                        member.id
                     )
                 }
             }
-            subscribeAlways<MemberLeaveEvent.Quit> {
+            subscribeAlways<BotLeaveEvent> {
                 launchEvent {
                     NativeBridge.eventGroupMemberLeave(
-                        Bridge.MEMBER_LEAVE_QUIT,
-                        getTimestamp(), group.id, 0, member.id
-                    )
-                }
-            }
-            subscribeAlways<BotLeaveEvent.Active> {
-                launchEvent {
-                    NativeBridge.eventGroupMemberLeave(
-                        Bridge.MEMBER_LEAVE_QUIT,
-                        getTimestamp(), group.id, 0, bot.id
-                    )
-                }
-            }
-            subscribeAlways<BotLeaveEvent.Kick> {
-                launchEvent {
-                    NativeBridge.eventGroupMemberLeave(
-                        Bridge.MEMBER_LEAVE_KICK,
-                        getTimestamp(), group.id, operator.id, bot.id
+                        if (it is BotLeaveEvent.Kick) Bridge.MEMBER_LEAVE_KICK else Bridge.MEMBER_LEAVE_QUIT,
+                        getTimestamp(), group.id, if (it is BotLeaveEvent.Kick) it.operator.id else 0, bot.id
                     )
                 }
             }

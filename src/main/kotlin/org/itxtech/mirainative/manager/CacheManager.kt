@@ -44,7 +44,7 @@ import org.itxtech.mirainative.MiraiNative
 object CacheManager {
     private val msgCache = hashMapOf<Int, MessageSource>()
     private val evCache = hashMapOf<Int, BotEvent>()
-    private val senders = hashMapOf<Long, NormalMember>()
+    private val senders = hashMapOf<Long, User>()
     private val anonymousMembers = hashMapOf<Long, HashMap<String, AnonymousMember>>()
     private val records = hashMapOf<String, Voice>()
     private val internalId = atomic(0)
@@ -65,8 +65,12 @@ object CacheManager {
         return id
     }
 
+    fun cacheMember(member: User) {
+        senders[member.id] = member
+    }
+
     fun cacheTempMessage(message: GroupTempMessageEvent, id: Int = nextId()): Int {
-        senders[message.sender.id] = message.sender
+        cacheMember(message.sender)
         return cacheMessage(message.message.source, id, message.message)
     }
 
