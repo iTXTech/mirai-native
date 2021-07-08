@@ -1,5 +1,5 @@
 plugins {
-    id("net.mamoe.maven-central-publish") version "0.5.0"
+    id("net.mamoe.maven-central-publish") version "0.6.0-dev-2"
 
     kotlin("jvm") version "1.5.20"
     kotlin("plugin.serialization") version "1.5.20"
@@ -23,16 +23,16 @@ kotlin {
 repositories {
     mavenCentral()
     maven("https://maven.aliyun.com/repository/public")
-    maven("https://dl.bintray.com/kotlin/kotlin-eap")
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 }
 
 mavenCentralPublish {
     singleDevGithubProject("iTXTech", "mirai-native")
     licenseAGplV3()
+    useCentralS01()
 }
 
 tasks.named<Jar>("jar") {
