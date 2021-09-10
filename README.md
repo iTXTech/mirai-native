@@ -8,8 +8,6 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 ## `Mirai Native` 仅支持 `Windows 32位 JRE`
 
-## [欢迎参与建设`Mirai Native`插件中心](https://github.com/iTXTech/mirai-native/discussions/121)
-
 ## [Wiki - 开发者和用户必读](https://github.com/iTXTech/mirai-native/wiki)
 
 ## [下载 `Mirai Native`](https://github.com/iTXTech/mirai-native/releases)
@@ -18,7 +16,7 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 * `MCL` 支持自动更新插件，支持设置插件更新频道等功能
 
-`.\mcl --update-package org.itxtech:mirai-native --channel stable --type plugin`
+`.\mcl --update-package org.itxtech:mirai-native`
 
 ## `Mirai Native Tray`
 
