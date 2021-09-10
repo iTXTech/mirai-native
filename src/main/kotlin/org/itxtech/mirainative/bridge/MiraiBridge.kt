@@ -342,15 +342,13 @@ object MiraiBridge {
                 if (rec != null) {
                     val file = File(
                         MiraiNative.recDataPath.absolutePath + File.separatorChar +
-                                BigInteger(1, rec.md5).toString(16)
+                                BigInteger(1, rec.fileMd5).toString(16)
                                     .padStart(32, '0') + ".silk"
                     )
-                    if (rec.url != null) {
-                        val response = client.get<HttpResponse>(rec.url!!)
-                        if (response.status.isSuccess()) {
-                            response.content.copyAndClose(file.writeChannel())
-                            return@runBlocking file.absolutePath
-                        }
+                    val response = client.get<HttpResponse>(rec.urlForDownload)
+                    if (response.status.isSuccess()) {
+                        response.content.copyAndClose(file.writeChannel())
+                        return@runBlocking file.absolutePath
                     }
                 }
                 return@runBlocking ""

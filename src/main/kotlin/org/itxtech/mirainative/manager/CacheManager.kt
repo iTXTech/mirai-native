@@ -33,11 +33,8 @@ import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import net.mamoe.mirai.event.events.GroupTempMessageEvent
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.MessageSource
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
-import net.mamoe.mirai.message.data.Voice
-import net.mamoe.mirai.message.data.source
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.MiraiNative
 
@@ -64,7 +61,7 @@ object CacheManager {
     private val evCache = hashMapWrapperOf<Int, BotEvent>()
     private val senders = hashMapWrapperOf<Long, User>()
     private val anonymousMembers = hashMapOf<Long, HashMap<String, CacheWrapper<AnonymousMember>>>()
-    private val records = hashMapWrapperOf<String, Voice>()
+    private val records = hashMapWrapperOf<String, OnlineAudio>()
     private val internalId = atomic(0)
 
     fun checkCacheLimit(exp: Int) {
@@ -84,8 +81,8 @@ object CacheManager {
     fun cacheMessage(source: MessageSource, id: Int = nextId(), chain: MessageChain? = null): Int {
         msgCache[id] = source
         chain?.forEach {
-            if (it is Voice) {
-                records[it.fileName] = it
+            if (it is OnlineAudio) {
+                records[it.filename] = it
             }
         }
         return id
@@ -119,7 +116,7 @@ object CacheManager {
 
     fun getMessage(id: Int): MessageSource? = msgCache.getObj(id)
 
-    fun getRecord(name: String): Voice? = records.getObj(name.replace(".mnrec", ""))
+    fun getRecord(name: String): OnlineAudio? = records.getObj(name.replace(".mnrec", ""))
 
     fun findUser(id: Long): User? {
         var member = MiraiNative.bot.getFriend(id) ?: senders.getObj(id)

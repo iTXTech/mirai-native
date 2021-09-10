@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm") version "1.5.20"
     kotlin("plugin.serialization") version "1.5.20"
 
-    id("net.mamoe.mirai-console") version "2.7-M2"
+    id("net.mamoe.mirai-console") version "2.7.1-dev-1"
 }
 
 group = "org.itxtech"
@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
 }
 
 mavenCentralPublish {
