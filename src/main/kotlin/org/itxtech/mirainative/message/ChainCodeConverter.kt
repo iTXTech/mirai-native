@@ -24,22 +24,24 @@
 
 package org.itxtech.mirainative.message
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.util.*
 import net.mamoe.mirai.contact.AudioSupported
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.PokeMessage.Key.ChuoYiChuo
+import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.MiraiNative
+import org.itxtech.mirainative.bridge.MiraiBridge
 import org.itxtech.mirainative.manager.CacheManager
 import org.itxtech.mirainative.util.Music
 import org.itxtech.mirainative.util.NeteaseMusic
 import org.itxtech.mirainative.util.QQMusic
-import java.net.URL
 
 @OptIn(MiraiExperimentalApi::class)
 object ChainCodeConverter {
@@ -64,6 +66,10 @@ object ChainCodeConverter {
             val parts = it.split(delimiters = arrayOf("="), limit = 2)
             this[parts[0].trim()] = parts[1].unescape(true).trim()
         }
+    }
+
+    private suspend inline fun <T> String.useExternalResource(block: (ExternalResource) -> T): T {
+        return MiraiBridge.client.get<HttpResponse>(this).content.toByteArray().toExternalResource().use(block)
     }
 
     private suspend fun String.toMessageInternal(contact: Contact?): Message {
@@ -106,14 +112,12 @@ object ChainCodeConverter {
                             Image(args["file"]!!.replace(".mnimg", ""))
                         } else {
                             MiraiNative.getDataFile("image", args["file"]!!)?.use {
-                                contact!!.uploadImage(it.toExternalResource())
+                                contact!!.uploadImage(it)
                             }
                         }
                     } else if (args.containsKey("url")) {
-                        image = withContext(Dispatchers.IO) {
-                            URL(args["url"]!!).openStream().use {
-                                it.toExternalResource().uploadAsImage(contact!!)
-                            }
+                        image = args["url"]!!.useExternalResource {
+                            it.uploadAsImage(contact!!)
                         }
                     }
                     if (image != null) {
@@ -179,18 +183,16 @@ object ChainCodeConverter {
                     var rec: Audio? = null
                     if (contact is AudioSupported) {
                         if (args.containsKey("file")) {
-                            if (args["file"]!!.endsWith(".mnrec")) {
-                                rec = CacheManager.getRecord(args["file"]!!)
+                            rec = if (args["file"]!!.endsWith(".mnrec")) {
+                                CacheManager.getRecord(args["file"]!!)
                             } else {
                                 MiraiNative.getDataFile("record", args["file"]!!)?.use {
-                                    rec = contact.uploadAudio(it.toExternalResource())
+                                    contact.uploadAudio(it)
                                 }
                             }
                         } else if (args.containsKey("url")) {
-                            withContext(Dispatchers.IO) {
-                                URL(args["url"]!!).openStream().use {
-                                    rec = contact.uploadAudio(it.toExternalResource())
-                                }
+                            rec = args["url"]!!.useExternalResource {
+                                contact.uploadAudio(it)
                             }
                         }
                     }
