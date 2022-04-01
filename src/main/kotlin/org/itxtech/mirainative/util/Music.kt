@@ -25,7 +25,6 @@
 package org.itxtech.mirainative.util
 
 import io.ktor.client.request.*
-import io.ktor.util.*
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.message.data.MusicKind
@@ -35,7 +34,6 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.bridge.MiraiBridge
 import org.itxtech.mirainative.message.xmlMessage
 
-@OptIn(KtorExperimentalAPI::class)
 abstract class MusicProvider {
     val http = MiraiBridge.client
 
@@ -43,6 +41,7 @@ abstract class MusicProvider {
 }
 
 object Music {
+    @OptIn(MiraiExperimentalApi::class)
     fun custom(url: String, audio: String, title: String, content: String?, image: String?) =
         xmlMessage(
             "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>" +

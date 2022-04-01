@@ -1,10 +1,10 @@
 plugins {
-    id("net.mamoe.maven-central-publish") version "0.6.0-dev-2"
+    id("me.him188.maven-central-publish") version "1.0.0-dev-3"
 
-    kotlin("jvm") version "1.5.20"
-    kotlin("plugin.serialization") version "1.5.20"
+    kotlin("jvm") version "1.6.0"
+    kotlin("plugin.serialization") version "1.6.20-RC"
 
-    id("net.mamoe.mirai-console") version "2.7.1-dev-1"
+    id("net.mamoe.mirai-console") version "2.11.0-M1"
 }
 
 group = "org.itxtech"
@@ -15,7 +15,7 @@ kotlin {
     sourceSets {
         all {
             languageSettings.enableLanguageFeature("InlineClasses")
-            languageSettings.useExperimentalAnnotation("kotlin.Experimental")
+            languageSettings.optIn("kotlin.Experimental")
         }
     }
 }
@@ -27,6 +27,7 @@ repositories {
 
 dependencies {
     compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+    compileOnly("org.jetbrains.kotlinx:atomicfu:0.17.0")
 }
 
 mavenCentralPublish {

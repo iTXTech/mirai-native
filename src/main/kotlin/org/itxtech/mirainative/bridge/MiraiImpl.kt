@@ -24,7 +24,12 @@
 
 package org.itxtech.mirainative.bridge
 
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.announcement.Announcement.Companion.publishAnnouncement
+import net.mamoe.mirai.contact.announcement.AnnouncementParameters
 import net.mamoe.mirai.message.data.MessageSource.Key.quote
 import net.mamoe.mirai.message.data.MessageSourceKind
 import net.mamoe.mirai.message.data.kind
@@ -81,12 +86,20 @@ object MiraiImpl {
 
     fun getGroupEntranceAnnouncement(pluginId: Int, id: Long) =
         call("mGetGroupEntranceAnnouncement", pluginId, "") {
-            return MiraiNative.bot.getGroup(id)?.settings?.entranceAnnouncement ?: ""
+            return@call runBlocking {
+                MiraiNative.bot.getGroup(id)?.announcements?.asFlow()?.filter { it.parameters.sendToNewMember }
+                    ?.firstOrNull()?.content ?: ""
+            }
         }
 
     fun setGroupEntranceAnnouncement(pluginId: Int, id: Long, a: String) =
         call("mSetGroupEntranceAnnouncement", pluginId, 0) {
-            MiraiNative.bot.getGroup(id)?.settings?.entranceAnnouncement = a
+            MiraiNative.launch {
+                MiraiNative.bot.getGroup(id)?.publishAnnouncement(
+                    a,
+                    AnnouncementParameters.DEFAULT.builder().sendToNewMember(true).build()
+                )
+            }
             return 0
         }
 }

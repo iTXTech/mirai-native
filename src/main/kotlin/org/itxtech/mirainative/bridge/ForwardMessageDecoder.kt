@@ -100,6 +100,7 @@ object ForwardMessageDecoder {
  * 当time=0时为当前时间
  */
 data class MessageEntry(val sender: Long, val name: String, val time: Int, val msg: String) {
+    @OptIn(MiraiExperimentalApi::class)
     suspend fun append(builder: ForwardMessageBuilder, contact: Contact) {
         val s = if (sender == 0L) MiraiNative.bot.id else sender
         builder.add(
