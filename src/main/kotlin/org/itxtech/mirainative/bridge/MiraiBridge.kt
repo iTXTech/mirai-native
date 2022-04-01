@@ -2,7 +2,7 @@
  *
  * Mirai Native
  *
- * Copyright (C) 2020-2021 iTX Technologies
+ * Copyright (C) 2020-2022 iTX Technologies
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -50,7 +50,6 @@ import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.fromNative
 import org.itxtech.mirainative.manager.CacheManager
-import org.itxtech.mirainative.manager.EventManager
 import org.itxtech.mirainative.manager.PluginManager
 import org.itxtech.mirainative.message.ChainCodeConverter
 import org.itxtech.mirainative.plugin.FloatingWindowEntry
