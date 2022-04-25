@@ -425,13 +425,13 @@ object MiraiBridge {
     }
 
     private suspend fun BytePacketBuilder.writeMember(member: NormalMember) {
-        val profile = member.queryProfile()
+        // val profile = member.queryProfile()
         writeLong(member.group.id)
         writeLong(member.id)
         writeString(member.nick)
         writeString(member.nameCard)
-        writeInt(profile.sex.ordinal)
-        writeInt(profile.age)
+        writeInt(0) // TODO: 性别
+        writeInt(0) // TODO: 年龄
         writeString("未知") // TODO: 地区
         writeInt(member.joinTimestamp)
         writeInt(member.lastSpeakTimestamp)
