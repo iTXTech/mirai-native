@@ -233,7 +233,7 @@ object ChainCodeConverter {
                 }
                 is Audio -> "[CQ:record,file=${it.filename}.mnrec]"
                 is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.pokeType},name=${it.name}]"
-                is FlashImage -> "[CQ:image,file=${it.image.imageId}.mning,type=flash]"
+                is FlashImage -> "[CQ:image,file=${it.image.imageId}.mnimg,type=flash]"
                 is MarketFace -> "[CQ:bface,id=${it.id},name=${it.name}]"
                 is Dice -> "[CQ:dice,type=${it.value}]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
