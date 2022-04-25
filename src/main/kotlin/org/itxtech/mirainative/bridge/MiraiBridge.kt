@@ -306,7 +306,7 @@ object MiraiBridge {
     fun getImage(pluginId: Int, image: String): String =
         call("CQ_getImage", pluginId, "", "Error occurred when plugin %0 downloading image $image") {
             return@call runBlocking {
-                val img = image.replace(".mnimg", "")
+                val img = image.replace(".mnimg,type=flash","").replace(".mnimg", "") // fix when get flash image
                 val u = Image(img).queryUrl()
                 if (u != "") {
                     val response = client.get<HttpResponse>(u)
