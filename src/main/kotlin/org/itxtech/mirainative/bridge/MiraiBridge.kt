@@ -306,7 +306,7 @@ object MiraiBridge {
     fun getImage(pluginId: Int, image: String): String =
         call("CQ_getImage", pluginId, "", "Error occurred when plugin %0 downloading image $image") {
             return@call runBlocking {
-                val img = image.replace(".mnimg", "")
+                val img = image.replace(".mnimg,type=flash","").replace(".mnimg", "") // fix when get flash image
                 val u = Image(img).queryUrl()
                 if (u != "") {
                     val response = client.get<HttpResponse>(u)
@@ -425,13 +425,13 @@ object MiraiBridge {
     }
 
     private suspend fun BytePacketBuilder.writeMember(member: NormalMember) {
-        val profile = member.queryProfile()
+        // val profile = member.queryProfile()
         writeLong(member.group.id)
         writeLong(member.id)
         writeString(member.nick)
         writeString(member.nameCard)
-        writeInt(profile.sex.ordinal)
-        writeInt(profile.age)
+        writeInt(0) // TODO: 性别
+        writeInt(0) // TODO: 年龄
         writeString("未知") // TODO: 地区
         writeInt(member.joinTimestamp)
         writeInt(member.lastSpeakTimestamp)
