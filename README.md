@@ -8,6 +8,10 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 ## `Mirai Native` 仅支持 `Windows 32位 JRE`
 
+[点击此处下载：AdoptOpenJDK11](https://adoptopenjdk.net/releases.html?variant=openjdk11&jvmVariant=hotspot)
+
+需自行下滑页面寻找所需平台的x86包。
+
 ## [欢迎参与建设`Mirai Native`插件中心](https://github.com/iTXTech/mirai-native/discussions/121)
 
 ## [Wiki - 开发者和用户必读](https://github.com/iTXTech/mirai-native/wiki)
