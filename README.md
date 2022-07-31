@@ -6,11 +6,11 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 与**大部分**`酷Q`插件兼容，**不支持**`CPK`和解包的`DLL`，需获取`DLL`和`JSON`原文件，`JSON`文件**不支持**注释。
 
-## `Mirai Native` 仅支持 `Windows 32位 JRE`
+## `Mirai Native` 仅支持 `Windows 32位 Java`
 
-[点击此处下载：AdoptOpenJDK11](https://adoptopenjdk.net/releases.html?variant=openjdk11&jvmVariant=hotspot)
-
-需自行下滑页面寻找所需平台的x86包。
+1. 可前往 [Temurin](https://adoptium.net/temurin/releases/) 下载
+2. 选择 `Windows` -> `x86` 下载 `Windows 32位 Java`
+3. 支持 `Java 11` 之后的版本
 
 ## [欢迎参与建设`Mirai Native`插件中心](https://github.com/iTXTech/mirai-native/discussions/121)
 
@@ -28,7 +28,6 @@ Mirai Native 支持所有`stdcall`方式导出方法的`DLL`与 [mirai](https://
 
 * 右键`流泪猫猫头`打开 `Mirai Native` 托盘菜单。
 * 左键`流泪猫猫头`显示悬浮窗。
-* 插画由作者女朋友提供，**版权所有**。
 
 ## `mirai Native Plugin Manager`
 
