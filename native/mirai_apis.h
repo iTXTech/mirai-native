@@ -36,7 +36,7 @@ CQAPI(int32_t, mSetGroupKick, 28)(int32_t plugin_id, int64_t group, int64_t memb
 	auto env = attach_java();
 	auto m = CharsToByteArray(env, msg);
 	auto method = env->GetStaticMethodID(bclz, "setGroupKick", "(IJJZ[B)I");
-	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, member, reject != FALSE, msg);
+	auto result = env->CallStaticIntMethod(bclz, method, plugin_id, group, member, reject != FALSE, m);
 	detach_java();
 	env->DeleteLocalRef(m);
 	return result;
