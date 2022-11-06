@@ -44,10 +44,11 @@ import java.io.File
 import java.io.FileOutputStream
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.util.*
 import java.util.jar.Manifest
 
 object MiraiNative : KotlinPlugin(
-    JvmPluginDescriptionBuilder("MiraiNative", "2.0.0-beta.2")
+    JvmPluginDescriptionBuilder("MiraiNative", "2.0.0")
         .id("org.itxtech.mirainative")
         .author("iTX Technologies")
         .info("强大的 mirai 原生插件加载器。")
@@ -58,13 +59,13 @@ object MiraiNative : KotlinPlugin(
     val imageDataPath: File by lazy { File("data" + File.separatorChar + "image").also { it.mkdirs() } }
     val recDataPath: File by lazy { File("data" + File.separatorChar + "record").also { it.mkdirs() } }
 
-    @OptIn(ObsoleteCoroutinesApi::class)
+    @OptIn(DelicateCoroutinesApi::class)
     private val dispatcher = newSingleThreadContext("MiraiNative Main") + SupervisorJob()
 
-    @OptIn(ObsoleteCoroutinesApi::class)
+    @OptIn(DelicateCoroutinesApi::class)
     val menuDispatcher = newSingleThreadContext("MiraiNative Menu")
 
-    @OptIn(ObsoleteCoroutinesApi::class)
+    @OptIn(DelicateCoroutinesApi::class)
     val eventDispatcher =
         newFixedThreadPoolContext(Runtime.getRuntime().availableProcessors() * 2, "MiraiNative Events")
 
@@ -138,7 +139,6 @@ object MiraiNative : KotlinPlugin(
         File(recDataPath, "MIRAI_NATIVE_RECORD_DATA").createNewFile()
     }
 
-    @OptIn(InternalAPI::class)
     fun getDataFile(type: String, name: String): ExternalResource? {
         if (name.startsWith("base64://")) {
             return name.split("base64://", limit = 2)[1].decodeBase64Bytes().toExternalResource()

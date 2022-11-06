@@ -24,6 +24,7 @@
 
 package org.itxtech.mirainative.message
 
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.util.*
@@ -69,7 +70,7 @@ object ChainCodeConverter {
     }
 
     private suspend inline fun <T> String.useExternalResource(block: (ExternalResource) -> T): T {
-        return MiraiBridge.client.get<HttpResponse>(this).content.toByteArray().toExternalResource().use(block)
+        return MiraiBridge.client.get(this).body<ByteArray>().toExternalResource().use(block)
     }
 
     private suspend fun String.toMessageInternal(contact: Contact?): Message {
@@ -234,8 +235,8 @@ object ChainCodeConverter {
                 is Audio -> "[CQ:record,file=${it.filename}.mnrec]"
                 is PokeMessage -> "[CQ:poke,id=${it.id},type=${it.pokeType},name=${it.name}]"
                 is FlashImage -> "[CQ:image,file=${it.image.imageId}.mnimg,type=flash]"
-                is MarketFace -> "[CQ:bface,id=${it.id},name=${it.name}]"
                 is Dice -> "[CQ:dice,type=${it.value}]"
+                is MarketFace -> "[CQ:bface,id=${it.id},name=${it.name}]"
                 else -> ""//error("不支持的消息类型：${it::class.simpleName}")
             }
         }

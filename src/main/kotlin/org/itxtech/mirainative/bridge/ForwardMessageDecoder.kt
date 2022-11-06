@@ -39,7 +39,6 @@ import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.bridge.MiraiBridge.readString
 import org.itxtech.mirainative.message.ChainCodeConverter
 
-@OptIn(InternalAPI::class, MiraiExperimentalApi::class)
 object ForwardMessageDecoder {
     /**
      * 结构
