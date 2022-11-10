@@ -25,6 +25,7 @@
 package org.itxtech.mirainative.util
 
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.message.data.MusicKind
@@ -59,15 +60,15 @@ object Music {
 object QQMusic : MusicProvider() {
     suspend fun search(name: String, page: Int, cnt: Int): JsonElement {
         val result =
-            http.get<String>("https://c.y.qq.com/soso/fcgi-bin/client_search_cp?aggr=1&cr=1&flag_qc=0&p=$page&n=$cnt&w=$name")
+            http.get("https://c.y.qq.com/soso/fcgi-bin/client_search_cp?aggr=1&cr=1&flag_qc=0&p=$page&n=$cnt&w=$name").bodyAsText()
         return Json.parseToJsonElement(result.substring(8, result.length - 1))
     }
 
     suspend fun getPlayUrl(mid: String): String {
-        val result = http.get<String>(
+        val result = http.get(
             "https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?&jsonpCallback=MusicJsonCallback&cid=205361747&songmid=" +
                     mid + "&filename=C400" + mid + ".m4a&guid=7549058080"
-        )
+        ).bodyAsText()
         val json =
             Json.parseToJsonElement(result).jsonObject.getValue("data").jsonObject.getValue("items").jsonArray[0].jsonObject
         if (json["subcode"]?.jsonPrimitive?.int == 0) {
@@ -77,12 +78,12 @@ object QQMusic : MusicProvider() {
     }
 
     suspend fun getSongInfo(id: String = "", mid: String = ""): JsonObject {
-        val result = http.get<String>(
+        val result = http.get(
             "https://u.y.qq.com/cgi-bin/musicu.fcg?format=json&inCharset=utf8&outCharset=utf-8&notice=0&" +
                     "platform=yqq.json&needNewCode=0&data=" +
                     "{%22comm%22:{%22ct%22:24,%22cv%22:0},%22songinfo%22:{%22method%22:%22get_song_detail_yqq%22,%22param%22:" +
                     "{%22song_type%22:0,%22song_mid%22:%22$mid%22,%22song_id%22:$id},%22module%22:%22music.pf_song_detail_svr%22}}"
-        )
+        ).bodyAsText()
         return Json.parseToJsonElement(result).jsonObject.getValue("songinfo").jsonObject.getValue("data").jsonObject
     }
 

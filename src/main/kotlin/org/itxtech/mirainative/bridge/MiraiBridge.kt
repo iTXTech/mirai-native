@@ -26,7 +26,7 @@ package org.itxtech.mirainative.bridge
 
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -34,7 +34,6 @@ import io.ktor.util.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
-import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Mirai
@@ -45,7 +44,6 @@ import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.Bridge
 import org.itxtech.mirainative.MiraiNative
 import org.itxtech.mirainative.fromNative
@@ -58,13 +56,11 @@ import org.itxtech.mirainative.toNative
 import org.itxtech.mirainative.util.ConfigMan
 import java.io.File
 import java.math.BigInteger
-import java.net.URLConnection
 import java.nio.charset.Charset
 import java.security.MessageDigest
 import kotlin.io.use
 import kotlin.text.toByteArray
 
-@OptIn(InternalAPI::class, MiraiExperimentalApi::class)
 object MiraiBridge {
     val client = HttpClient(OkHttp) {
         install(UserAgent) {
@@ -309,14 +305,13 @@ object MiraiBridge {
                 val img = image.replace(".mnimg,type=flash","").replace(".mnimg", "") // fix when get flash image
                 val u = Image(img).queryUrl()
                 if (u != "") {
-                    val response = client.get<HttpResponse>(u)
-                    if (response.status.isSuccess()) {
-                        val md = MessageDigest.getInstance("MD5")
-                        val basename = MiraiNative.imageDataPath.absolutePath + File.separatorChar +
+                    client.prepareGet(u).execute { response ->
+                        if (response.status.isSuccess()) {
+                            val md = MessageDigest.getInstance("MD5")
+                            val basename = MiraiNative.imageDataPath.absolutePath + File.separatorChar +
                                 BigInteger(1, md.digest(img.toByteArray()))
                                     .toString(16).padStart(32, '0')
-                        val ext = response.content.toInputStream().use {
-                            when (URLConnection.guessContentTypeFromStream(it)) {
+                            val ext = when (response.headers[HttpHeaders.ContentType]) {
                                 "image/gif" -> "gif"
                                 "image/png" -> "png"
                                 "image/jpeg" -> "jpg"
@@ -324,13 +319,16 @@ object MiraiBridge {
                                 "image/tiff" -> "tiff"
                                 else -> "jpg"
                             }
+                            val file = File("$basename.$ext")
+                            response.bodyAsChannel().copyAndClose(file.writeChannel())
+                            file.absolutePath
+                        } else {
+                            ""
                         }
-                        val file = File("$basename.$ext")
-                        response.content.copyAndClose(file.writeChannel())
-                        return@runBlocking file.absolutePath
                     }
+                } else {
+                    ""
                 }
-                return@runBlocking ""
             }
         }
 
@@ -344,13 +342,17 @@ object MiraiBridge {
                                 BigInteger(1, rec.fileMd5).toString(16)
                                     .padStart(32, '0') + ".silk"
                     )
-                    val response = client.get<HttpResponse>(rec.urlForDownload)
-                    if (response.status.isSuccess()) {
-                        response.content.copyAndClose(file.writeChannel())
-                        return@runBlocking file.absolutePath
+                    client.prepareGet(rec.urlForDownload).execute { response ->
+                        if (response.status.isSuccess()) {
+                            response.bodyAsChannel().copyAndClose(file.writeChannel())
+                            file.absolutePath
+                        } else {
+                            ""
+                        }
                     }
+                } else {
+                    ""
                 }
-                return@runBlocking ""
             }
         }
 

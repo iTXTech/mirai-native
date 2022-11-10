@@ -1,33 +1,31 @@
 plugins {
+    kotlin("jvm") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
+
     id("me.him188.maven-central-publish") version "1.0.0-dev-3"
-
-    kotlin("jvm") version "1.6.0"
-    kotlin("plugin.serialization") version "1.6.20-RC"
-
-    id("net.mamoe.mirai-console") version "2.11.0-M1"
+    id("net.mamoe.mirai-console") version "2.13.0-RC2"
 }
 
 group = "org.itxtech"
 version = "2.0.0"
 description = "强大的 mirai 原生插件加载器。"
 
-kotlin {
-    sourceSets {
-        all {
-            languageSettings.enableLanguageFeature("InlineClasses")
-            languageSettings.optIn("kotlin.Experimental")
-        }
-    }
-}
-
 repositories {
     mavenCentral()
-    maven("https://maven.aliyun.com/repository/public")
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
-    compileOnly("org.jetbrains.kotlinx:atomicfu:0.17.0")
+    compileOnly("org.jetbrains.kotlinx:atomicfu:0.18.4")
+    implementation("io.ktor:ktor-client-okhttp:2.1.3") {
+        exclude(group = "org.jetbrains.kotlin")
+        exclude(group = "org.jetbrains.kotlinx")
+        exclude(group = "org.slf4j")
+    }
+    implementation("com.squareup.okhttp3:okhttp:4.10.0") {
+        exclude(group = "org.jetbrains.kotlin")
+        exclude(group = "org.jetbrains.kotlinx")
+        exclude(group = "org.slf4j")
+    }
 }
 
 mavenCentralPublish {
@@ -44,6 +42,6 @@ tasks.named<Jar>("jar") {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+mirai {
+    jvmTarget = JavaVersion.VERSION_11
 }

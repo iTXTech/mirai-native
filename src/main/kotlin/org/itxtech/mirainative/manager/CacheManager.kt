@@ -38,7 +38,6 @@ import net.mamoe.mirai.message.data.MessageSource
 import net.mamoe.mirai.message.data.MessageSource.Key.recall
 import net.mamoe.mirai.message.data.OnlineAudio
 import net.mamoe.mirai.message.data.source
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.itxtech.mirainative.MiraiNative
 
 class CacheWrapper<T>(
@@ -58,7 +57,6 @@ inline fun <K, V> MutableMap<K, CacheWrapper<V>>.checkExpiration(exp: Int) {
     values.removeIf { it.creationTime + exp >= System.currentTimeMillis() }
 }
 
-@OptIn(MiraiExperimentalApi::class)
 object CacheManager {
     private val msgCache = hashMapWrapperOf<Int, MessageSource>()
     private val evCache = hashMapWrapperOf<Int, BotEvent>()
