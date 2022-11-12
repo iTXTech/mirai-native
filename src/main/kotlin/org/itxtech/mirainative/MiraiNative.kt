@@ -44,11 +44,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.math.BigInteger
 import java.security.MessageDigest
-import java.util.*
 import java.util.jar.Manifest
 
 object MiraiNative : KotlinPlugin(
-    JvmPluginDescriptionBuilder("MiraiNative", "2.0.0")
+    JvmPluginDescriptionBuilder("MiraiNative", "2.0.1")
         .id("org.itxtech.mirainative")
         .author("iTX Technologies")
         .info("强大的 mirai 原生插件加载器。")
