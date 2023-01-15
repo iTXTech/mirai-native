@@ -18,14 +18,15 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
         with:
-          msbuild-architecture: x86
+          msbuild-architecture: x64
 
       - name: Native Build
         working-directory: native
         run: >
           msbuild native.sln
           -t:rebuild
-          -p:Configuration='Release|x86'
+          -p:Configuration=Release
+          -p:PlatformTarget=x86
           -p:OutDir='build\native'
         env:
-          ADDITIONAL_INCLUDE_PATH: '%JAVA_HOME%\include;%JAVA_HOME%\include\win32;'
+          ADDITIONAL_INCLUDE_PATHS: '%JAVA_HOME%\include;%JAVA_HOME%\include\win32;'
