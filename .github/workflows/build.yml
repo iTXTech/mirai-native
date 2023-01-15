@@ -28,10 +28,24 @@ jobs:
           -p:Configuration=Release
           -p:Platform=x86
           -p:AssemblyName=CQP
-          -p:BaseOutputPath='..\build\native\'
 
       - name: Native Upload
         uses: actions/upload-artifact@v3
         with:
           name: native-build
-          path: build/native
+          path: native/Release
+
+      - name: chmod -R 777 *
+        run: chmod -R 777 *
+
+      - name: Init gradle project
+        run: ./gradlew assemble --scan
+
+      - name: Mirai Plugin Build
+        run: ./gradlew mirai:buildPlugin --scan
+
+      - name: Mirai Plugin Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: mirai-plugin-build
+          path: build/mirai
