@@ -32,3 +32,4 @@ jobs:
           -p:AdditionalLibPaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
           -p:AdditionalIncludePaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
           -p:AdditionalLibraryDirectories='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
+          -p:AssemblySearchPaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
