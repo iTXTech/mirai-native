@@ -1,0 +1,25 @@
+name: Native Build
+on: [ push, pull_request ]
+
+jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
+
+      - name: MSBuild
+        working-directory: native
+        run: msbuild native.sln -t:rebuild -verbosity:diag -property:Configuration=Release
