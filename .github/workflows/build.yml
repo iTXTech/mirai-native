@@ -28,4 +28,4 @@ jobs:
           -p:Configuration=Release
           -p:Platform=x86
           -p:OutDir='build\native'
-          -p:AdditionalLibPaths='$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;'
+          -p:AdditionalLibPaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
