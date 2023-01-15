@@ -36,7 +36,7 @@ jobs:
           path: native/Release
 
       - name: CQP Move
-        run: copy /Y 'src/main/resources/CQP.dll' 'native/Release/CQP.dll'
+        run: copy /Y 'src\main\resources/CQP.dll' 'native\Release\CQP.dll'
 
       - name: chmod -R 777 *
         run: chmod -R 777 *
