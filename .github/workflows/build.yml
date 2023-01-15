@@ -30,6 +30,9 @@ jobs:
           -p:AssemblyName=CQP
           -p:OutPath='build\native\'
           -p:AdditionalLibPaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
+          -p:AdditionalLibPath='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
           -p:AdditionalIncludePaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
+          -p:AdditionalIncludePath='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
           -p:AdditionalLibraryDirectories='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
           -p:AdditionalReferencePaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
+          -p:AdditionalReferencePath='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
