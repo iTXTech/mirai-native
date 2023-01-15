@@ -25,8 +25,8 @@ jobs:
         run: >
           msbuild native.sln
           -t:rebuild
-          -v:diag
           -p:Configuration=Release
           -p:Platform=x86
-          -p:OutDir='build\native'
+          -p:AssemblyName=CQP
+          -p:OutPath='build\native\'
           -p:AdditionalLibPaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
