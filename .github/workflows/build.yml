@@ -27,4 +27,4 @@ jobs:
           -t:rebuild
           -p:Configuration=Release
           -p:OutDir=build\native
-          -p:AdditionalLibPaths="$env:JAVA_HOME\include;$env:JAVA_HOME\include\win32"
+          -p:AdditionalLibPaths="$env:JAVA_HOME\include;$env:JAVA_HOME\include\win32;"
