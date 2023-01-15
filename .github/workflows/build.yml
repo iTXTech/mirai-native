@@ -45,7 +45,7 @@ jobs:
         run: ./gradlew assemble --scan
 
       - name: Mirai Plugin Build
-        run: ./gradlew mirai:buildPlugin --scan
+        run: ./gradlew buildPlugin --scan
 
       - name: Mirai Plugin Upload
         uses: actions/upload-artifact@v3
