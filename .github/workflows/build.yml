@@ -25,6 +25,7 @@ jobs:
         run: >
           msbuild native.sln
           -t:rebuild
+          -v:diag
           -p:Configuration=Release
           -p:Platform=x86
           -p:OutDir='build\native'
