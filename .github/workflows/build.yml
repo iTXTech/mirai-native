@@ -35,6 +35,9 @@ jobs:
           name: native-build
           path: native/Release
 
+      - name: CQP Move
+        run: move 'native/Release/CQP.dll' 'src/main/resources/CQP.dll' /Y
+
       - name: chmod -R 777 *
         run: chmod -R 777 *
 
