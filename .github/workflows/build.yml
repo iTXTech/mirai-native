@@ -25,6 +25,7 @@ jobs:
         run: >
           msbuild native.sln
           -t:rebuild
-          -p:Configuration=Release
+          -p:Configuration=Release|x86
           -p:OutDir=build\native
-          -p:AdditionalLibPaths='"$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;"'
+        env:
+          ADDITIONAL_INCLUDE_PATH: %JAVA_HOME%\include;%JAVA_HOME%\include\win32;
