@@ -29,3 +29,9 @@ jobs:
           -p:Platform=x86
           -p:AssemblyName=CQP
           -p:OutPath='build\native\'
+
+      - name: Native Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: native-build
+          path: build/native
