@@ -71,23 +71,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Java\jdk-11.0.7\include\win32;C:\Program Files (x86)\Java\jdk-11.0.7\include;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Program Files (x86)\Java\jdk-11.0.7\include\win32;C:\Program Files (x86)\Java\jdk-11.0.7\include;$(ReferencePath)</ReferencePath>
+    <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath)</IncludePath>
+    <ReferencePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\Java\jdk1.8.0_241\include;C:\Program Files\Java\jdk1.8.0_241\include\win32;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Program Files\Java\jdk1.8.0_241\include\win32;C:\Program Files\Java\jdk1.8.0_241\include;$(ReferencePath)</ReferencePath>
+    <IncludePath>$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;$(IncludePath)</IncludePath>
+    <ReferencePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Java\jdk-11.0.7\include\win32;C:\Program Files (x86)\Java\jdk-11.0.7\include;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Program Files (x86)\Java\jdk-11.0.7\include\win32;C:\Program Files (x86)\Java\jdk-11.0.7\include;$(ReferencePath)</ReferencePath>
+    <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath)</IncludePath>
+    <ReferencePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files\Java\jdk1.8.0_241\include;C:\Program Files\Java\jdk1.8.0_241\include\win32;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Program Files\Java\jdk1.8.0_241\include\win32;C:\Program Files\Java\jdk1.8.0_241\include;$(ReferencePath)</ReferencePath>
+    <IncludePath>$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;$(IncludePath)</IncludePath>
+    <ReferencePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
