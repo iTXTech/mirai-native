@@ -22,4 +22,4 @@ jobs:
 
       - name: MSBuild
         working-directory: native
-        run: msbuild native.sln -t:rebuild -p:Configuration=Release,OutDir=build\Native,AdditionalLibPaths=$(JAVA_HOME)/include;$(JAVA_HOME)/include/win32;
+        run: msbuild native.sln -t:rebuild -p:Configuration=Release,OutDir=build\Native,AdditionalLibPaths=$(JAVA_HOME)\include;$(JAVA_HOME)\include/win32;
