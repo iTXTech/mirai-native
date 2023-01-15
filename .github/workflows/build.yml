@@ -47,6 +47,11 @@ jobs:
       - name: Mirai Plugin Build
         run: ./gradlew buildPlugin --scan
 
+      - name: Mirai Plugin SHA1SUM
+        shell: bash
+        working-directory: build/mirai
+        run: find . -name "*.jar" -type f -exec sh -c "sha1sum {} | cut -b-40 > {}.sha1" \;
+
       - name: Mirai Plugin Upload
         uses: actions/upload-artifact@v3
         with:
