@@ -22,9 +22,9 @@ jobs:
 
       - name: Native Build
         working-directory: native
-        run: |
-          msbuild native.sln \
-            -t:rebuild \
-            -p:Configuration=Release \
-            -p:OutDir=build\native \
+        run: >
+          msbuild native.sln 
+            -t:rebuild 
+            -p:Configuration=Release 
+            -p:OutDir=build\native 
             -p:AdditionalLibPaths="$env:JAVA_HOME\include;$env:JAVA_HOME\include\win32;"
